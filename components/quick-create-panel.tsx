@@ -136,41 +136,43 @@ export default function QuickCreatePanel({
       </ScrollArea>
 
       {/* Composer */}
-      <div className="shrink-0 border-t px-4 py-4">
-        {/* Dismissible gray banner */}
-        {showQuotaBanner && (
-          <div className="mb-3 flex items-center gap-3 rounded-none border bg-muted/20 px-3 py-2 text-xs text-muted-foreground">
-            <div className="min-w-0 truncate">
-              You have 3 Free Pro messages left.
-            </div>
-
-            <Button variant="ghost" size="sm" className="ml-auto h-7 px-2">
-              Upgrade
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              onClick={() => setShowQuotaBanner(false)}
-              aria-label="Close banner"
-            >
-              ✕
-            </Button>
-          </div>
-        )}
-
+      <div className="shrink-0 border-t">
         {/* input surface (drop target) */}
         <div
           className={cn(
-            "rounded-none border bg-background/60 p-4 transition-[padding]",
-            isDraggingFiles && "p-5"
+            "rounded-none border-0 border-b bg-background transition-[padding]",
+            isDraggingFiles && "p-3",
+            !isDraggingFiles && "p-0"
           )}
           onDragEnter={onDragEnter}
           onDragOver={onDragOver}
           onDragLeave={onDragLeave}
           onDrop={onDrop}
         >
+          {/* Dismissible gray banner - now inside the input surface */}
+          {showQuotaBanner && (
+            <div className="mb-0 flex items-center gap-3 rounded-none border-0 bg-muted px-3 py-2 text-xs text-muted-foreground">
+              <div className="min-w-0 truncate">
+                You have 3 Free Pro messages left.
+              </div>
+
+              <Button variant="ghost" size="sm" className="ml-auto h-6 px-2 text-xs">
+                Upgrade
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
+                onClick={() => setShowQuotaBanner(false)}
+                aria-label="Close banner"
+              >
+                ✕
+              </Button>
+            </div>
+          )}
+
+          <div className="px-3 py-2">
           {/* dashed drop area: only show when user is dragging files */}
           {isDraggingFiles && (
             <div className="mb-3 flex items-center justify-center gap-2 rounded-none border-[4px] border-dashed bg-muted/10 px-5 py-7 text-sm text-muted-foreground">
@@ -202,26 +204,27 @@ export default function QuickCreatePanel({
           <Textarea
             placeholder="Describe your theme..."
             className={cn(
-              "min-h-[64px] resize-none border-0 bg-transparent p-0",
-              "text-base outline-none",
+              "min-h-[48px] resize-none border-0 bg-transparent p-0",
+              "text-sm outline-none",
               "focus-visible:ring-0 focus-visible:ring-offset-0",
               "placeholder:text-muted-foreground"
             )}
           />
 
-          <div className="mt-4 flex items-center justify-between">
-            <Button variant="outline" className="rounded-none">
+          <div className="mt-2 flex items-center justify-between">
+            <Button variant="outline" className="rounded-none h-8">
               ＋
             </Button>
 
             <div className="flex items-center gap-2">
-              <Button variant="outline" className="rounded-none">
+              <Button variant="outline" className="rounded-none h-8 text-xs">
                 ⊞ Image
               </Button>
-              <Button className="rounded-none w-10" aria-label="Send">
+              <Button className="rounded-none w-8 h-8" aria-label="Send">
                 ↑
               </Button>
             </div>
+          </div>
           </div>
         </div>
       </div>
