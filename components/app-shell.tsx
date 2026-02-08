@@ -10,7 +10,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import Sidebar, { type NavKey } from "@/components/sidebar"
@@ -20,22 +19,22 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
 import SystemBanner from "@/components/ui/system-banner"
 import {
-  ArrowCircleUp,
-  MagnifyingGlass,
-  Globe,
-  Bell,
-  CaretDown,
-  User,
-  Gear,
-  Question,
-  BookmarkSimple,
-  Rocket,
-  SignOut,
+  ArrowCircleUpIcon,
+  MagnifyingGlassIcon,
+  GlobeIcon,
+  BellIcon,
+  CaretDownIcon,
+  UserIcon,
+  GearIcon,
+  QuestionIcon,
+  BookmarkSimpleIcon,
+  RocketIcon,
+  SignOutIcon,
   NoteBlankIcon,
-  DownloadSimple,
-  PushPin,
-  X,
-  CaretUp,
+  DownloadSimpleIcon,
+  PushPinIcon,
+  XIcon,
+  CaretUpIcon,
 } from "@phosphor-icons/react"
 
 function TopBar({ onOpenNotes }: { onOpenNotes?: () => void }) {
@@ -63,7 +62,7 @@ function TopBar({ onOpenNotes }: { onOpenNotes?: () => void }) {
       <div className="flex h-16 items-center gap-4 px-6">
         {/* LEFT: brand */}
         <div className="flex items-center gap-2">
-          <ArrowCircleUp size={28} weight="bold" className="text-primary" />
+          <ArrowCircleUpIcon size={28} weight="bold" className="text-primary" />
           <div className="font-mono text-lg font-semibold tracking-tight text-primary">
             Acme Inc.
           </div>
@@ -76,7 +75,7 @@ function TopBar({ onOpenNotes }: { onOpenNotes?: () => void }) {
         <div className="flex items-center gap-3">
           {/* search */}
           <div className="relative w-[520px] max-w-[40vw]">
-            <MagnifyingGlass
+            <MagnifyingGlassIcon
               size={22}
               weight="bold"
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
@@ -97,7 +96,7 @@ function TopBar({ onOpenNotes }: { onOpenNotes?: () => void }) {
                 aria-label="Language"
                 onClick={handleLocaleChange}
               >
-                <Globe size={28} weight="bold" />
+                <GlobeIcon size={28} weight="bold" />
               </Button>
               <div className="text-sm font-semibold cursor-pointer hover:opacity-80 transition-opacity" onClick={handleLocaleChange}>
                 {locale}
@@ -114,7 +113,7 @@ function TopBar({ onOpenNotes }: { onOpenNotes?: () => void }) {
                     className="h-10 w-10 rounded-none"
                     aria-label="Notifications"
                   >
-                    <Bell size={28} weight="bold" />
+                    <BellIcon size={28} weight="bold" />
                   </Button>
                   {unreadCount > 0 && (
                     <span className="absolute top-1 right-1.5 h-2 w-2 rounded-full bg-red-500"></span>
@@ -181,7 +180,7 @@ function TopBar({ onOpenNotes }: { onOpenNotes?: () => void }) {
                     <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=128&h=128&fit=crop" alt="Profile" />
                     <AvatarFallback>EG</AvatarFallback>
                   </Avatar>
-                  <CaretDown
+                  <CaretDownIcon
                     size={22}
                     weight="bold"
                     className={`opacity-80 transition-transform duration-200 ${
@@ -192,19 +191,19 @@ function TopBar({ onOpenNotes }: { onOpenNotes?: () => void }) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem>
-                  <User size={18} weight="bold" />
+                  <UserIcon size={18} weight="bold" />
                   <span>My Portfolio</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Gear size={18} weight="bold" />
+                  <GearIcon size={18} weight="bold" />
                   <span>Account Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Question size={18} weight="bold" />
+                  <QuestionIcon size={18} weight="bold" />
                   <span>Support</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <BookmarkSimple size={18} weight="bold" />
+                  <BookmarkSimpleIcon size={18} weight="bold" />
                   <span>My Library</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => onOpenNotes?.()}>
@@ -212,11 +211,11 @@ function TopBar({ onOpenNotes }: { onOpenNotes?: () => void }) {
                   <span>Notes</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="text-primary">
-                  <Rocket size={18} weight="bold" />
+                  <RocketIcon size={18} weight="bold" />
                   <span>Upgrade</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem variant="destructive">
-                  <SignOut size={18} weight="bold" />
+                  <SignOutIcon size={18} weight="bold" />
                   <span>Log Out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -346,7 +345,7 @@ function NotesPanel({
         <span className="text-sm font-semibold">Notes</span>
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Download">
-            <DownloadSimple size={18} />
+            <DownloadSimpleIcon size={18} />
           </Button>
           <Button
             variant="ghost"
@@ -355,10 +354,10 @@ function NotesPanel({
             aria-label={isPinned ? "Unpin" : "Pin"}
             onClick={onTogglePin}
           >
-            <PushPin size={18} weight={isPinned ? "fill" : "regular"} />
+            <PushPinIcon size={18} weight={isPinned ? "fill" : "regular"} />
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Close" onClick={onClose}>
-            <X size={18} />
+            <XIcon size={18} />
           </Button>
         </div>
       </div>
@@ -376,7 +375,7 @@ function NotesPanel({
       {/* Search */}
       <div className="px-4 pt-3 shrink-0" ref={searchRef}>
         <div className="relative">
-          <MagnifyingGlass
+          <MagnifyingGlassIcon
             size={16}
             className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
           />
@@ -435,7 +434,7 @@ function NotesPanel({
                     className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-muted/50 transition-colors"
                   >
                     <span className="text-sm font-bold">{note.title}</span>
-                    <CaretUp
+                    <CaretUpIcon
                       size={16}
                       className={cn(
                         "shrink-0 text-muted-foreground transition-transform",
