@@ -17,43 +17,43 @@ import {
   SquaresFour,
   ListBullets,
   ChartBar,
-  return (
-    <Button
-      type="button"
-      onClick={onClick}
-      variant="ghost"
-      className={cn(
-        "h-10 w-full justify-start gap-3 text-base font-medium",
-        "bg-transparent hover:bg-muted/20",
-        // Active style: primary background with white text and no gaps
-        active ? "bg-primary text-white hover:bg-primary/95 rounded-none" : "",
-        // Non-active accent/muted coloring
-        !active && item.accent && "text-primary hover:text-primary",
-        !active && item.muted && "text-muted-foreground hover:text-foreground",
-        // padding inside button to give left/right spacing when not collapsed
-        collapsed ? "justify-center px-0" : "px-4"
-      )}
-    >
-      <span
-        className={cn(
-          "shrink-0 text-xl",
-          // icon inherits white when active, otherwise keep accent/muted/default
-          active
-            ? "text-white"
-            : item.accent
-            ? "text-primary"
-            : item.muted
-            ? "text-muted-foreground"
-            : "text-foreground"
-        )}
-      >
-        {item.icon}
-      </span>
-      {!collapsed && (
-        <span className={cn("truncate", active && "text-white")}>{item.label}</span>
-      )}
-    </Button>
-  )
+  FolderSimple,
+  UsersThree,
+  Database,
+  ClipboardText,
+  FileText,
+  DotsThree,
+  Gear,
+  Question,
+} from "@phosphor-icons/react"
+
+type NavKey =
+  | "quickCreate"
+  | "dashboard"
+  | "lifecycle"
+  | "analytics"
+  | "projects"
+  | "team"
+  | "dataLibrary"
+  | "reports"
+  | "wordAssistant"
+  | "more"
+  | "settings"
+  | "help"
+
+type NavItem = {
+  key: NavKey
+  label: string
+  icon: React.ReactNode
+  accent?: boolean
+  muted?: boolean
+}
+
+function NavRow({
+  item,
+  collapsed = false,
+  active = false,
+  onClick,
 }: {
   item: NavItem
   collapsed?: boolean
@@ -98,6 +98,7 @@ import {
     </Button>
   )
 }
+ 
 
 export default function Sidebar({
   collapsed = false,
