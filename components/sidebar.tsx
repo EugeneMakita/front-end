@@ -25,11 +25,6 @@ import {
   DotsThree,
   Gear,
   Question,
-  DotsThreeVertical,
-  UserCircle,
-  CreditCard,
-  Bell,
-  SignOut,
 } from "@phosphor-icons/react"
 
 type NavKey =
@@ -69,21 +64,44 @@ function NavRow({
     <Button
       type="button"
       onClick={onClick}
-      variant={active ? "secondary" : "ghost"}
+      variant="ghost"
       className={cn(
-        "h-10 w-full justify-start gap-3 px-3 text-base font-medium",
+        "h-10 w-full text-base font-medium",
         "bg-transparent hover:bg-muted/20",
-        active && "bg-muted/50 hover:bg-muted/50",
-        item.accent && "text-primary hover:text-primary",
-        item.muted && "text-muted-foreground hover:text-foreground",
-        collapsed && "justify-center px-0"
+        // Active style: primary background with white text
+        active ? "bg-primary text-white hover:bg-primary/95" : "",
+        // Non-active accent/muted coloring
+        !active && item.accent && "text-primary hover:text-primary",
+        !active && item.muted && "text-muted-foreground hover:text-foreground",
+        // collapsed uses centered layout
+        collapsed && "justify-center px-0",
+        !collapsed && "justify-start"
       )}
     >
-      <span className="shrink-0 text-xl">{item.icon}</span>
-      {!collapsed && <span className="truncate">{item.label}</span>}
+      <div className={cn("flex items-center gap-3 w-full", collapsed ? "px-0" : "px-4")}> 
+        <span
+          className={cn(
+            "shrink-0 text-xl",
+            // icon inherits white when active, otherwise keep accent/muted/default
+            active
+              ? "text-white"
+              : item.accent
+              ? "text-primary"
+              : item.muted
+              ? "text-muted-foreground"
+              : "text-foreground"
+          )}
+        >
+          {item.icon}
+        </span>
+        {!collapsed && (
+          <span className={cn("truncate", active && "text-white")}>{item.label}</span>
+        )}
+      </div>
     </Button>
   )
 }
+ 
 
 export default function Sidebar({
   collapsed = false,
@@ -124,131 +142,69 @@ export default function Sidebar({
         collapsed && "w-[64px]"
       )}
     >
-      <ScrollArea className="h-[calc(100vh-64px-76px)]">
-        <div className={cn("px-2 py-4", collapsed && "px-2")}>
-          <div className="space-y-1">
-            {top.map((item) => (
-              <NavRow
-                key={item.key}
-                item={item}
-                collapsed={collapsed}
-                active={activeKey === item.key}
-                onClick={() => onSelect?.(item.key)}
-              />
-            ))}
-          </div>
-
-          {!collapsed && (
-            <div className="mt-10 px-3 text-sm font-semibold text-muted-foreground">
-              Documents
+      <div className="flex flex-col h-full">
+        <ScrollArea className="flex-1">
+          <div className={cn("px-0 py-4", collapsed && "px-0")}>
+            <div className="space-y-1">
+              {top.map((item) => (
+                <NavRow
+                  key={item.key}
+                  item={item}
+                  collapsed={collapsed}
+                  active={activeKey === item.key}
+                  onClick={() => onSelect?.(item.key)}
+                />
+              ))}
             </div>
-          )}
 
-          <div className={cn("mt-4 space-y-1", collapsed && "mt-6")}>
-            {documents.map((item) => (
-              <NavRow
-                key={item.key}
-                item={item}
-                collapsed={collapsed}
-                active={activeKey === item.key}
-                onClick={() => onSelect?.(item.key)}
-              />
-            ))}
-          </div>
-
-          <div className="mt-6 space-y-1">
-            {bottom.map((item) => (
-              <NavRow
-                key={item.key}
-                item={item}
-                collapsed={collapsed}
-                active={activeKey === item.key}
-                onClick={() => onSelect?.(item.key)}
-              />
-            ))}
-          </div>
-        </div>
-      </ScrollArea>
-
-      {/* Profile footer */}
-      <div
-        className={cn(
-          "flex items-center gap-3 px-4 py-4",
-          collapsed && "justify-center px-0"
-        )}
-      >
-        <div className="flex h-10 w-10 items-center justify-center bg-muted/30 font-mono text-sm">
-          CN
-        </div>
-
-        {!collapsed && (
-          <>
-            <div className="min-w-0">
-              <div className="truncate text-base font-semibold">shadcn</div>
-              <div className="truncate text-sm text-muted-foreground">
-                m@example.com
+            {!collapsed && (
+              <div className="mt-10 px-3 text-sm font-semibold text-muted-foreground">
+                Documents
               </div>
+            )}
+
+            <div className={cn("mt-4 space-y-1", collapsed && "mt-6")}>
+              {documents.map((item) => (
+                <NavRow
+                  key={item.key}
+                  item={item}
+                  collapsed={collapsed}
+                  active={activeKey === item.key}
+                  onClick={() => onSelect?.(item.key)}
+                />
+              ))}
             </div>
 
-            {/* 3-dots menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="ml-auto h-9 w-9"
-                  aria-label="Open user menu"
-                >
-                  <DotsThreeVertical size={18} />
-                </Button>
-              </DropdownMenuTrigger>
+            <div className="mt-6 space-y-1">
+              {bottom.map((item) => (
+                <NavRow
+                  key={item.key}
+                  item={item}
+                  collapsed={collapsed}
+                  active={activeKey === item.key}
+                  onClick={() => onSelect?.(item.key)}
+                />
+              ))}
+            </div>
+          </div>
+        </ScrollArea>
 
-              <DropdownMenuContent
-                align="end"
-                side="top"
-                sideOffset={10}
-                className="w-64 rounded-none"
-              >
-                {/* header */}
-                <div className="flex items-center gap-3 px-3 py-2">
-                  <div className="flex h-9 w-9 items-center justify-center bg-muted/30 font-mono text-sm">
-                    CN
-                  </div>
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-semibold">shadcn</div>
-                    <div className="truncate text-xs text-muted-foreground">
-                      m@example.com
-                    </div>
-                  </div>
-                </div>
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem className="gap-2">
-                  <UserCircle size={18} />
-                  Account
-                </DropdownMenuItem>
-
-                <DropdownMenuItem className="gap-2">
-                  <CreditCard size={18} />
-                  Billing
-                </DropdownMenuItem>
-
-                <DropdownMenuItem className="gap-2">
-                  <Bell size={18} />
-                  Notifications
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem className="gap-2 text-destructive focus:text-destructive">
-                  <SignOut size={18} />
-                  Log out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-        )}
+        {/* Bottom-left footer: Terms & Privacy */}
+        <div className="px-4 py-3">
+          {!collapsed ? (
+            <a
+              href="/terms"
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Terms & Privacy
+            </a>
+          ) : (
+            <a href="/terms" className="block w-full text-center text-primary" aria-label="Terms and Privacy">
+              {/* show small dot when collapsed to indicate presence */}
+              <span className="inline-block h-2 w-2 rounded-full bg-primary" />
+            </a>
+          )}
+        </div>
       </div>
     </aside>
   )
