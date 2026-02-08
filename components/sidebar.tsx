@@ -66,14 +66,15 @@ function NavRow({
       onClick={onClick}
       variant="ghost"
       className={cn(
-        "h-10 w-full justify-start gap-3 px-3 text-base font-medium",
+        "h-10 w-full justify-start gap-3 text-base font-medium",
         "bg-transparent hover:bg-muted/20",
         // Active style: primary background with white text
         active ? "bg-primary text-white hover:bg-primary/95" : "",
         // Non-active accent/muted coloring
         !active && item.accent && "text-primary hover:text-primary",
         !active && item.muted && "text-muted-foreground hover:text-foreground",
-        collapsed && "justify-center px-0"
+        // When not collapsed, extend button to cancel parent's padding so background fills edge-to-edge
+        collapsed ? "justify-center px-0" : "-mx-2 px-4"
       )}
     >
       <span
