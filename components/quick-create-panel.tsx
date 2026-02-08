@@ -6,6 +6,45 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Textarea } from "@/components/ui/textarea"
+import { X } from "@phosphor-icons/react"
+
+function ImagePreview({
+  file,
+  onRemove,
+}: {
+  file: File
+  onRemove: () => void
+}) {
+  const [preview, setPreview] = React.useState<string | null>(null)
+
+  React.useEffect(() => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      setPreview(e.target?.result as string)
+    }
+    reader.readAsDataURL(file)
+  }, [file])
+
+  return (
+    <div className="relative rounded-none border bg-muted/10 w-20 h-20 overflow-hidden">
+      {preview ? (
+        <img src={preview} alt={file.name} className="w-full h-full object-cover" />
+      ) : (
+        <div className="w-full h-full flex items-center justify-center bg-muted/20">
+          <span className="text-xs text-muted-foreground">Loading...</span>
+        </div>
+      )}
+      <Button
+        variant="ghost"
+        className="absolute top-1 right-1 h-7 w-7 rounded-none bg-red-500 hover:bg-red-600 text-white hover:text-white p-0 flex items-center justify-center"
+        onClick={onRemove}
+        aria-label="Remove image"
+      >
+        <X size={16} weight="bold" />
+      </Button>
+    </div>
+  )
+}
 
 export default function QuickCreatePanel({
   onClose,
@@ -74,6 +113,10 @@ export default function QuickCreatePanel({
     if (files.length > 0) {
       setDroppedFiles((prev) => [...prev, ...files])
     }
+  }
+
+  function removeFile(index: number) {
+    setDroppedFiles((prev) => prev.filter((_, i) => i !== index))
   }
 
   return (
@@ -181,21 +224,19 @@ export default function QuickCreatePanel({
             </div>
           )}
 
-          {/* optional: show file names after drop (remove later if you want) */}
+          {/* optional: show image previews after drop */}
           {droppedFiles.length > 0 && (
             <div className="mb-3 flex flex-wrap gap-2">
-              {droppedFiles.slice(0, 6).map((f) => (
-                <div
-                  key={`${f.name}-${f.size}-${f.lastModified}`}
-                  className="max-w-[220px] truncate rounded-none border bg-muted/10 px-2 py-1 text-xs text-muted-foreground"
-                  title={f.name}
-                >
-                  {f.name}
-                </div>
+              {droppedFiles.slice(0, 6).map((f, idx) => (
+                <ImagePreview
+                  key={`${f.name}-${f.size}-${f.lastModified}-${idx}`}
+                  file={f}
+                  onRemove={() => removeFile(idx)}
+                />
               ))}
               {droppedFiles.length > 6 && (
-                <div className="rounded-none border bg-muted/10 px-2 py-1 text-xs text-muted-foreground">
-                  +{droppedFiles.length - 6} more
+                <div className="flex items-center justify-center rounded-none border border-dashed bg-muted/10 w-20 h-20 text-xs font-medium text-muted-foreground">
+                  +{droppedFiles.length - 6}
                 </div>
               )}
             </div>
