@@ -25,11 +25,6 @@ import {
   DotsThree,
   Gear,
   Question,
-  DotsThreeVertical,
-  UserCircle,
-  CreditCard,
-  Bell,
-  SignOut,
 } from "@phosphor-icons/react"
 
 type NavKey =
@@ -124,7 +119,7 @@ export default function Sidebar({
         collapsed && "w-[64px]"
       )}
     >
-      <ScrollArea className="h-[calc(100vh-64px-76px)]">
+      <ScrollArea className="h-[calc(100vh-64px)]">
         <div className={cn("px-2 py-4", collapsed && "px-2")}>
           <div className="space-y-1">
             {top.map((item) => (
@@ -170,86 +165,8 @@ export default function Sidebar({
         </div>
       </ScrollArea>
 
-      {/* Profile footer */}
-      <div
-        className={cn(
-          "flex items-center gap-3 px-4 py-4",
-          collapsed && "justify-center px-0"
-        )}
-      >
-        <div className="flex h-10 w-10 items-center justify-center bg-muted/30 font-mono text-sm">
-          CN
-        </div>
-
-        {!collapsed && (
-          <>
-            <div className="min-w-0">
-              <div className="truncate text-base font-semibold">shadcn</div>
-              <div className="truncate text-sm text-muted-foreground">
-                m@example.com
-              </div>
-            </div>
-
-            {/* 3-dots menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="ml-auto h-9 w-9"
-                  aria-label="Open user menu"
-                >
-                  <DotsThreeVertical size={18} />
-                </Button>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent
-                align="end"
-                side="top"
-                sideOffset={10}
-                className="w-64 rounded-none"
-              >
-                {/* header */}
-                <div className="flex items-center gap-3 px-3 py-2">
-                  <div className="flex h-9 w-9 items-center justify-center bg-muted/30 font-mono text-sm">
-                    CN
-                  </div>
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-semibold">shadcn</div>
-                    <div className="truncate text-xs text-muted-foreground">
-                      m@example.com
-                    </div>
-                  </div>
-                </div>
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem className="gap-2">
-                  <UserCircle size={18} />
-                  Account
-                </DropdownMenuItem>
-
-                <DropdownMenuItem className="gap-2">
-                  <CreditCard size={18} />
-                  Billing
-                </DropdownMenuItem>
-
-                <DropdownMenuItem className="gap-2">
-                  <Bell size={18} />
-                  Notifications
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem className="gap-2 text-destructive focus:text-destructive">
-                  <SignOut size={18} />
-                  Log out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </>
-        )}
-      </div>
+      {/* Spacer to preserve layout height previously used by profile footer */}
+      <div className="h-16" />
     </aside>
   )
 }
