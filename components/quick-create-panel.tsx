@@ -6,9 +6,16 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Textarea } from "@/components/ui/textarea"
-import { X } from "@phosphor-icons/react"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { X, FileText, FilePdf, FileDoc, File } from "@phosphor-icons/react"
 
-function ImagePreview({
+function FilePreview({
   file,
   onRemove,
 }: {
@@ -16,29 +23,92 @@ function ImagePreview({
   onRemove: () => void
 }) {
   const [preview, setPreview] = React.useState<string | null>(null)
+  const [isImage, setIsImage] = React.useState(false)
 
   React.useEffect(() => {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      setPreview(e.target?.result as string)
+    if (file.type.startsWith("image/")) {
+      setIsImage(true)
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setPreview(e.target?.result as string)
+      }
+      reader.readAsDataURL(file)
+    } else {
+      setIsImage(false)
     }
-    reader.readAsDataURL(file)
   }, [file])
 
+  function getFileTypeIcon() {
+    const name = file.name.toLowerCase()
+    const type = file.type
+
+    if (type.startsWith("image/")) return null
+
+    if (type === "application/pdf" || name.endsWith(".pdf")) {
+      return { icon: <FilePdf size={24} weight="bold" />, color: "text-red-500" }
+    }
+    if (
+      type === "application/msword" ||
+      type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+      name.endsWith(".doc") ||
+      name.endsWith(".docx")
+    ) {
+      return { icon: <FileDoc size={24} weight="bold" />, color: "text-blue-500" }
+    }
+    if (
+      type.includes("sheet") ||
+      type.includes("excel") ||
+      name.endsWith(".xls") ||
+      name.endsWith(".xlsx")
+    ) {
+      return { icon: <File size={24} weight="bold" />, color: "text-green-500" }
+    }
+    if (
+      type.includes("presentation") ||
+      type.includes("powerpoint") ||
+      name.endsWith(".ppt") ||
+      name.endsWith(".pptx")
+    ) {
+      return { icon: <File size={24} weight="bold" />, color: "text-orange-500" }
+    }
+    return { icon: <FileText size={24} weight="bold" />, color: "text-gray-500" }
+  }
+
+  function getShortFileName() {
+    // Remove extension
+    const dotIndex = file.name.lastIndexOf(".")
+    const nameWithoutExt = dotIndex > 0 ? file.name.substring(0, dotIndex) : file.name
+    
+    const maxChars = 14
+    if (nameWithoutExt.length > maxChars) {
+      return nameWithoutExt.substring(0, maxChars) + "..."
+    }
+    return nameWithoutExt
+  }
+
+  const fileTypeInfo = getFileTypeIcon()
+
   return (
-    <div className="relative rounded-none border bg-muted/10 w-20 h-20 overflow-hidden">
-      {preview ? (
+    <div className="relative rounded-none border bg-muted/10 w-20 h-20 overflow-hidden flex flex-col items-center justify-center p-0">
+      {isImage && preview ? (
         <img src={preview} alt={file.name} className="w-full h-full object-cover" />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-muted/20">
-          <span className="text-xs text-muted-foreground">Loading...</span>
+        <div className="w-full h-full flex flex-col items-center justify-between p-1">
+          <div className="flex-1 flex items-center justify-center">
+            <div className={fileTypeInfo?.color || "text-gray-500"}>
+              {fileTypeInfo?.icon}
+            </div>
+          </div>
+          <span className="text-[9px] leading-tight text-center text-muted-foreground w-full px-1 break-words">
+            {getShortFileName()}
+          </span>
         </div>
       )}
       <Button
         variant="ghost"
         className="absolute top-1 right-1 h-7 w-7 rounded-none bg-red-500 hover:bg-red-600 text-white hover:text-white p-0 flex items-center justify-center"
         onClick={onRemove}
-        aria-label="Remove image"
+        aria-label="Remove file"
       >
         <X size={16} weight="bold" />
       </Button>
@@ -62,6 +132,9 @@ export default function QuickCreatePanel({
 
   // optional: store dropped files (for now just to prove it works)
   const [droppedFiles, setDroppedFiles] = React.useState<File[]>([])
+
+  // duplicate file modal state
+  const [showDuplicateModal, setShowDuplicateModal] = React.useState(false)
 
   function hasFiles(e: React.DragEvent) {
     // Best-effort detection across browsers
@@ -114,7 +187,7 @@ export default function QuickCreatePanel({
 
     const files = Array.from(e.dataTransfer.files ?? [])
     if (files.length > 0) {
-      setDroppedFiles((prev) => [...prev, ...files])
+      addFiles(files)
     }
   }
 
@@ -122,10 +195,38 @@ export default function QuickCreatePanel({
     setDroppedFiles((prev) => prev.filter((_, i) => i !== index))
   }
 
+  function isDuplicateFile(newFile: File): boolean {
+    return droppedFiles.some(
+      (existingFile) =>
+        existingFile.name === newFile.name && existingFile.size === newFile.size
+    )
+  }
+
+  function addFiles(filesToAdd: File[]) {
+    let hasDuplicate = false
+    const filesToAddFiltered: File[] = []
+
+    for (const file of filesToAdd) {
+      if (isDuplicateFile(file)) {
+        hasDuplicate = true
+      } else {
+        filesToAddFiltered.push(file)
+      }
+    }
+
+    if (hasDuplicate) {
+      setShowDuplicateModal(true)
+    }
+
+    if (filesToAddFiltered.length > 0) {
+      setDroppedFiles((prev) => [...prev, ...filesToAddFiltered])
+    }
+  }
+
   function handleFileInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? [])
     if (files.length > 0) {
-      setDroppedFiles((prev) => [...prev, ...files])
+      addFiles(files)
     }
     // Reset input so same file can be selected again
     if (fileInputRef.current) {
@@ -242,11 +343,11 @@ export default function QuickCreatePanel({
             </div>
           )}
 
-          {/* optional: show image previews after drop */}
+          {/* optional: show file previews after drop */}
           {droppedFiles.length > 0 && (
             <div className="mb-3 flex flex-wrap gap-2">
               {droppedFiles.slice(0, 6).map((f, idx) => (
-                <ImagePreview
+                <FilePreview
                   key={`${f.name}-${f.size}-${f.lastModified}-${idx}`}
                   file={f}
                   onRemove={() => removeFile(idx)}
@@ -301,6 +402,19 @@ export default function QuickCreatePanel({
           className="hidden"
         />
       </div>
+
+      {/* Duplicate file modal */}
+      <AlertDialog open={showDuplicateModal} onOpenChange={setShowDuplicateModal}>
+        <AlertDialogContent>
+          <AlertDialogTitle>You've already uploaded this file.</AlertDialogTitle>
+          <AlertDialogDescription>
+            Try uploading something new.
+          </AlertDialogDescription>
+          <AlertDialogAction onClick={() => setShowDuplicateModal(false)}>
+            OK
+          </AlertDialogAction>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
