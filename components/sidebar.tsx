@@ -64,18 +64,36 @@ function NavRow({
     <Button
       type="button"
       onClick={onClick}
-      variant={active ? "secondary" : "ghost"}
+      variant="ghost"
       className={cn(
         "h-10 w-full justify-start gap-3 px-3 text-base font-medium",
         "bg-transparent hover:bg-muted/20",
-        active && "bg-muted/50 hover:bg-muted/50",
-        item.accent && "text-primary hover:text-primary",
-        item.muted && "text-muted-foreground hover:text-foreground",
+        // Active style: primary background with white text
+        active ? "bg-primary text-white hover:bg-primary/95" : "",
+        // Non-active accent/muted coloring
+        !active && item.accent && "text-primary hover:text-primary",
+        !active && item.muted && "text-muted-foreground hover:text-foreground",
         collapsed && "justify-center px-0"
       )}
     >
-      <span className="shrink-0 text-xl">{item.icon}</span>
-      {!collapsed && <span className="truncate">{item.label}</span>}
+      <span
+        className={cn(
+          "shrink-0 text-xl",
+          // icon inherits white when active, otherwise keep accent/muted/default
+          active
+            ? "text-white"
+            : item.accent
+            ? "text-primary"
+            : item.muted
+            ? "text-muted-foreground"
+            : "text-foreground"
+        )}
+      >
+        {item.icon}
+      </span>
+      {!collapsed && (
+        <span className={cn("truncate", active && "text-white")}>{item.label}</span>
+      )}
     </Button>
   )
 }
