@@ -57,6 +57,9 @@ export default function QuickCreatePanel({
   const [isDraggingFiles, setIsDraggingFiles] = React.useState(false)
   const dragDepthRef = React.useRef(0)
 
+  // file input ref
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
+
   // optional: store dropped files (for now just to prove it works)
   const [droppedFiles, setDroppedFiles] = React.useState<File[]>([])
 
@@ -117,6 +120,21 @@ export default function QuickCreatePanel({
 
   function removeFile(index: number) {
     setDroppedFiles((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  function handleFileInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? [])
+    if (files.length > 0) {
+      setDroppedFiles((prev) => [...prev, ...files])
+    }
+    // Reset input so same file can be selected again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
+  }
+
+  function openFileDialog() {
+    fileInputRef.current?.click()
   }
 
   return (
@@ -253,7 +271,11 @@ export default function QuickCreatePanel({
           />
 
           <div className="mt-2 flex items-center justify-between">
-            <Button variant="outline" className="rounded-none h-8">
+            <Button 
+              variant="outline" 
+              className="rounded-none h-8"
+              onClick={openFileDialog}
+            >
               ＋
             </Button>
 
@@ -268,6 +290,16 @@ export default function QuickCreatePanel({
           </div>
           </div>
         </div>
+
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+          onChange={handleFileInputChange}
+          className="hidden"
+        />
       </div>
     </div>
   )
