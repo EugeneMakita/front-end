@@ -172,7 +172,7 @@ export default function QuickCreatePanel({
             </div>
           )}
 
-          <div className="px-3 py-2">
+          <div className="px-4 py-5">
           {/* dashed drop area: only show when user is dragging files */}
           {isDraggingFiles && (
             <div className="mb-3 flex items-center justify-center gap-2 rounded-none border-[4px] border-dashed bg-muted/10 px-5 py-7 text-sm text-muted-foreground">
