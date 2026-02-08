@@ -136,7 +136,7 @@ export default function QuickCreatePanel({
       </ScrollArea>
 
       {/* Composer */}
-      <div className="shrink-0 border-t">
+      <div className="shrink-0 border-t-2">
         {/* input surface (drop target) */}
         <div
           className={cn(
