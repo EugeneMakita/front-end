@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import {
@@ -146,13 +147,14 @@ function TopBar() {
 
                 {/* View All Button */}
                 <div className="border-t p-3">
-                  <Button
-                    variant="outline"
-                    className="w-full rounded-none font-semibold"
-                    onClick={() => setIsNotificationsOpen(false)}
-                  >
-                    View All Notifications
-                  </Button>
+                  <Link href="/notifications">
+                    <Button
+                      variant="outline"
+                      className="w-full rounded-none font-semibold"
+                    >
+                      View All Notifications
+                    </Button>
+                  </Link>
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -195,12 +197,10 @@ function TopBar() {
                   <BookmarkSimple size={18} weight="bold" />
                   <span>My Library</span>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-primary">
                   <Rocket size={18} weight="bold" />
                   <span>Upgrade</span>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
                 <DropdownMenuItem variant="destructive">
                   <SignOut size={18} weight="bold" />
                   <span>Log Out</span>
