@@ -142,54 +142,70 @@ export default function Sidebar({
         collapsed && "w-[64px]"
       )}
     >
-      <ScrollArea className="h-[calc(100vh-64px)]">
-        <div className={cn("px-0 py-4", collapsed && "px-0")}>
-          <div className="space-y-1">
-            {top.map((item) => (
-              <NavRow
-                key={item.key}
-                item={item}
-                collapsed={collapsed}
-                active={activeKey === item.key}
-                onClick={() => onSelect?.(item.key)}
-              />
-            ))}
-          </div>
-
-          {!collapsed && (
-            <div className="mt-10 px-3 text-sm font-semibold text-muted-foreground">
-              Documents
+      <div className="flex flex-col h-full">
+        <ScrollArea className="flex-1">
+          <div className={cn("px-0 py-4", collapsed && "px-0")}>
+            <div className="space-y-1">
+              {top.map((item) => (
+                <NavRow
+                  key={item.key}
+                  item={item}
+                  collapsed={collapsed}
+                  active={activeKey === item.key}
+                  onClick={() => onSelect?.(item.key)}
+                />
+              ))}
             </div>
+
+            {!collapsed && (
+              <div className="mt-10 px-3 text-sm font-semibold text-muted-foreground">
+                Documents
+              </div>
+            )}
+
+            <div className={cn("mt-4 space-y-1", collapsed && "mt-6")}>
+              {documents.map((item) => (
+                <NavRow
+                  key={item.key}
+                  item={item}
+                  collapsed={collapsed}
+                  active={activeKey === item.key}
+                  onClick={() => onSelect?.(item.key)}
+                />
+              ))}
+            </div>
+
+            <div className="mt-6 space-y-1">
+              {bottom.map((item) => (
+                <NavRow
+                  key={item.key}
+                  item={item}
+                  collapsed={collapsed}
+                  active={activeKey === item.key}
+                  onClick={() => onSelect?.(item.key)}
+                />
+              ))}
+            </div>
+          </div>
+        </ScrollArea>
+
+        {/* Bottom-left footer: Terms & Privacy */}
+        <div className="px-4 py-3">
+          {!collapsed ? (
+            <a
+              href="/terms"
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Terms & Privacy
+            </a>
+          ) : (
+            <a href="/terms" className="block w-full text-center text-primary" aria-label="Terms and Privacy">
+              {/* show small dot when collapsed to indicate presence */}
+              <span className="inline-block h-2 w-2 rounded-full bg-primary" />
+            </a>
           )}
-
-          <div className={cn("mt-4 space-y-1", collapsed && "mt-6")}>
-            {documents.map((item) => (
-              <NavRow
-                key={item.key}
-                item={item}
-                collapsed={collapsed}
-                active={activeKey === item.key}
-                onClick={() => onSelect?.(item.key)}
-              />
-            ))}
-          </div>
-
-          <div className="mt-6 space-y-1">
-            {bottom.map((item) => (
-              <NavRow
-                key={item.key}
-                item={item}
-                collapsed={collapsed}
-                active={activeKey === item.key}
-                onClick={() => onSelect?.(item.key)}
-              />
-            ))}
-          </div>
         </div>
-      </ScrollArea>
-
-      {/* Spacer to preserve layout height previously used by profile footer */}
-      <div className="h-16" />
+      </div>
     </aside>
   )
 }
