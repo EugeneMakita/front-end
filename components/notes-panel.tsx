@@ -283,12 +283,6 @@ export default function NotesPanel({
         )}
       </ScrollArea>
 
-      {/* Page counter badge */}
-      <div className="absolute bottom-4 right-4">
-        <div className="h-7 w-7 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center shadow-md">
-          3
-        </div>
-      </div>
     </div>
   )
 }
