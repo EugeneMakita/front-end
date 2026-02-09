@@ -245,7 +245,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
         {showRightPanel && (
           <aside className="h-full w-[420px] overflow-hidden border-r bg-background">
-            <QuickCreatePanel onClose={() => setActiveKey("dashboard")} />
+            <QuickCreatePanel onClose={() => setActiveKey("library")} />
           </aside>
         )}
 

@@ -7,7 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 
 import {
   PlusCircleIcon,
-  SquaresFourIcon,
+  BookOpenIcon,
   ListBulletsIcon,
   ChartBarIcon,
   FolderSimpleIcon,
@@ -22,7 +22,7 @@ import {
 
 type NavKey =
   | "quickCreate"
-  | "dashboard"
+  | "library"
   | "lifecycle"
   | "analytics"
   | "projects"
@@ -107,7 +107,7 @@ export default function Sidebar({
 }) {
   const top: NavItem[] = [
     { key: "quickCreate", label: "Quick Create", icon: <PlusCircleIcon size={22} /> },
-    { key: "dashboard", label: "Dashboard", icon: <SquaresFourIcon size={22} /> },
+    { key: "library", label: "Library", icon: <BookOpenIcon size={22} /> },
     { key: "lifecycle", label: "Lifecycle", icon: <ListBulletsIcon size={22} /> },
     { key: "analytics", label: "Analytics", icon: <ChartBarIcon size={22} /> },
     { key: "projects", label: "Projects", icon: <FolderSimpleIcon size={22} /> },
