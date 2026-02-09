@@ -232,6 +232,7 @@ function TopBar({ onOpenNotes }: { onOpenNotes?: () => void }) {
 
 const navRoutes: Partial<Record<NavKey, string>> = {
   library: "/library",
+  courses: "/courses",
   quickCreate: "/",
 }
 

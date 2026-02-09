@@ -8,7 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   PlusCircleIcon,
   BookOpenIcon,
-  ListBulletsIcon,
+  GraduationCapIcon,
   ChartBarIcon,
   FolderSimpleIcon,
   UsersThreeIcon,
@@ -23,7 +23,7 @@ import {
 type NavKey =
   | "quickCreate"
   | "library"
-  | "lifecycle"
+  | "courses"
   | "analytics"
   | "projects"
   | "team"
@@ -108,7 +108,7 @@ export default function Sidebar({
   const top: NavItem[] = [
     { key: "quickCreate", label: "Quick Create", icon: <PlusCircleIcon size={22} /> },
     { key: "library", label: "Library", icon: <BookOpenIcon size={22} /> },
-    { key: "lifecycle", label: "Lifecycle", icon: <ListBulletsIcon size={22} /> },
+    { key: "courses", label: "Courses", icon: <GraduationCapIcon size={22} /> },
     { key: "analytics", label: "Analytics", icon: <ChartBarIcon size={22} /> },
     { key: "projects", label: "Projects", icon: <FolderSimpleIcon size={22} /> },
     { key: "team", label: "Team", icon: <UsersThreeIcon size={22} /> },
