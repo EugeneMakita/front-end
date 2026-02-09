@@ -29,7 +29,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
-import { X, FileText, FilePdf, FileDoc, File, Stop, Lightning, ArrowDownIcon, ArrowRightIcon, CaretUpIcon, CaretDownIcon, CaretRightIcon, ThumbsUpIcon, ThumbsDownIcon, CopySimpleIcon, DotsThreeIcon, ClockIcon, PulseIcon, ArrowCounterClockwiseIcon, PlusCircleIcon, AtomIcon, CheckIcon } from "@phosphor-icons/react"
+import { XIcon, FileTextIcon, FilePdfIcon, FileDocIcon, FileIcon, StopIcon, LightningIcon, ArrowDownIcon, ArrowRightIcon, CaretUpIcon, CaretDownIcon, CaretRightIcon, ThumbsUpIcon, ThumbsDownIcon, CopySimpleIcon, DotsThreeIcon, ClockIcon, PulseIcon, ArrowCounterClockwiseIcon, PlusCircleIcon, AtomIcon, CheckIcon } from "@phosphor-icons/react"
 
 type FileAttachment = {
   name: string
@@ -98,7 +98,7 @@ function FilePreview({
     if (type.startsWith("image/")) return null
 
     if (type === "application/pdf" || name.endsWith(".pdf")) {
-      return { icon: <FilePdf size={24} weight="bold" />, color: "text-red-500" }
+      return { icon: <FilePdfIcon size={24} weight="bold" />, color: "text-red-500" }
     }
     if (
       type === "application/msword" ||
@@ -106,7 +106,7 @@ function FilePreview({
       name.endsWith(".doc") ||
       name.endsWith(".docx")
     ) {
-      return { icon: <FileDoc size={24} weight="bold" />, color: "text-blue-500" }
+      return { icon: <FileDocIcon size={24} weight="bold" />, color: "text-blue-500" }
     }
     if (
       type.includes("sheet") ||
@@ -114,7 +114,7 @@ function FilePreview({
       name.endsWith(".xls") ||
       name.endsWith(".xlsx")
     ) {
-      return { icon: <File size={24} weight="bold" />, color: "text-green-500" }
+      return { icon: <FileIcon size={24} weight="bold" />, color: "text-green-500" }
     }
     if (
       type.includes("presentation") ||
@@ -122,9 +122,9 @@ function FilePreview({
       name.endsWith(".ppt") ||
       name.endsWith(".pptx")
     ) {
-      return { icon: <File size={24} weight="bold" />, color: "text-orange-500" }
+      return { icon: <FileIcon size={24} weight="bold" />, color: "text-orange-500" }
     }
-    return { icon: <FileText size={24} weight="bold" />, color: "text-gray-500" }
+    return { icon: <FileTextIcon size={24} weight="bold" />, color: "text-gray-500" }
   }
 
   function getShortFileName() {
@@ -163,7 +163,7 @@ function FilePreview({
         onClick={onRemove}
         aria-label="Remove file"
       >
-        <X size={16} weight="bold" />
+        <XIcon size={16} weight="bold" />
       </Button>
     </div>
   )
@@ -374,7 +374,7 @@ function ResponseListCard({
             className="text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Dismiss"
           >
-            <X size={16} />
+            <XIcon size={16} />
           </button>
         </div>
       </div>
@@ -804,7 +804,7 @@ export default function QuickCreatePanel({
               onClick={onClose}
               aria-label="Close"
             >
-              <X size={20} weight="bold" />
+              <XIcon size={20} weight="bold" />
             </Button>
           )}
         </div>
@@ -851,7 +851,7 @@ export default function QuickCreatePanel({
                               key={i}
                               className="w-16 h-16 rounded border bg-muted/20 flex items-center justify-center"
                             >
-                              <FileText size={20} className="text-muted-foreground" />
+                              <FileTextIcon size={20} className="text-muted-foreground" />
                             </div>
                           )
                         )}
@@ -866,7 +866,7 @@ export default function QuickCreatePanel({
               ) : (
                 <div key={msg.id} className="flex justify-start gap-2 items-start">
                   <div className="shrink-0 mt-0.5 h-6 w-6 rounded-full bg-muted flex items-center justify-center">
-                    <Lightning size={14} weight="fill" />
+                    <LightningIcon size={14} weight="fill" />
                   </div>
                   <div className="min-w-0 flex-1">
                     {msg.thinkingSteps && msg.thinkingLabel && (
@@ -1126,7 +1126,7 @@ export default function QuickCreatePanel({
                 >
                   {isRecording ? (
                     <>
-                      <Stop size={16} weight="bold" />
+                      <StopIcon size={16} weight="bold" />
                       <span className="text-xs font-medium">Stop</span>
                     </>
                   ) : (

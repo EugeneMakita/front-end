@@ -4,27 +4,20 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 
 import {
-  PlusCircle,
-  SquaresFour,
-  ListBullets,
-  ChartBar,
-  FolderSimple,
-  UsersThree,
-  Database,
-  ClipboardText,
-  FileText,
-  DotsThree,
-  Gear,
-  Question,
+  PlusCircleIcon,
+  SquaresFourIcon,
+  ListBulletsIcon,
+  ChartBarIcon,
+  FolderSimpleIcon,
+  UsersThreeIcon,
+  DatabaseIcon,
+  ClipboardTextIcon,
+  FileTextIcon,
+  DotsThreeIcon,
+  GearIcon,
+  QuestionIcon,
 } from "@phosphor-icons/react"
 
 type NavKey =
@@ -113,24 +106,24 @@ export default function Sidebar({
   onSelect?: (key: NavKey) => void
 }) {
   const top: NavItem[] = [
-    { key: "quickCreate", label: "Quick Create", icon: <PlusCircle size={22} /> },
-    { key: "dashboard", label: "Dashboard", icon: <SquaresFour size={22} /> },
-    { key: "lifecycle", label: "Lifecycle", icon: <ListBullets size={22} /> },
-    { key: "analytics", label: "Analytics", icon: <ChartBar size={22} /> },
-    { key: "projects", label: "Projects", icon: <FolderSimple size={22} /> },
-    { key: "team", label: "Team", icon: <UsersThree size={22} /> },
+    { key: "quickCreate", label: "Quick Create", icon: <PlusCircleIcon size={22} /> },
+    { key: "dashboard", label: "Dashboard", icon: <SquaresFourIcon size={22} /> },
+    { key: "lifecycle", label: "Lifecycle", icon: <ListBulletsIcon size={22} /> },
+    { key: "analytics", label: "Analytics", icon: <ChartBarIcon size={22} /> },
+    { key: "projects", label: "Projects", icon: <FolderSimpleIcon size={22} /> },
+    { key: "team", label: "Team", icon: <UsersThreeIcon size={22} /> },
   ]
 
   const documents: NavItem[] = [
-    { key: "dataLibrary", label: "Data Library", icon: <Database size={22} />, accent: true },
-    { key: "reports", label: "Reports", icon: <ClipboardText size={22} />, accent: true },
-    { key: "wordAssistant", label: "Word Assistant", icon: <FileText size={22} />, accent: true },
-    { key: "more", label: "More", icon: <DotsThree size={22} />, muted: true },
+    { key: "dataLibrary", label: "Data Library", icon: <DatabaseIcon size={22} />, accent: true },
+    { key: "reports", label: "Reports", icon: <ClipboardTextIcon size={22} />, accent: true },
+    { key: "wordAssistant", label: "Word Assistant", icon: <FileTextIcon size={22} />, accent: true },
+    { key: "more", label: "More", icon: <DotsThreeIcon size={22} />, muted: true },
   ]
 
   const bottom: NavItem[] = [
-    { key: "settings", label: "Settings", icon: <Gear size={22} />, accent: true },
-    { key: "help", label: "Get Help", icon: <Question size={22} />, accent: true },
+    { key: "settings", label: "Settings", icon: <GearIcon size={22} />, accent: true },
+    { key: "help", label: "Get Help", icon: <QuestionIcon size={22} />, accent: true },
   ]
 
   return (
