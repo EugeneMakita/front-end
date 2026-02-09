@@ -137,7 +137,7 @@ export default function Sidebar({
     <aside
       className={cn(
         "border-r bg-background",
-        "h-[calc(100vh-64px)]",
+        "h-full",
         "w-[260px]",
         collapsed && "w-[64px]"
       )}
