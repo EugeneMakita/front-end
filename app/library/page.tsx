@@ -5,6 +5,13 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog"
+import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
@@ -105,6 +112,10 @@ export default function LibraryPage() {
   const [items, setItems] = React.useState(initialItems)
   const [selectedItems, setSelectedItems] = React.useState<Set<string>>(new Set())
   const [activeFolderId, setActiveFolderId] = React.useState<string | null>(null)
+  const [moveDialogOpen, setMoveDialogOpen] = React.useState(false)
+  const [moveItemId, setMoveItemId] = React.useState<string | null>(null)
+  const [moveTargetFolderId, setMoveTargetFolderId] = React.useState<string | null>(null)
+  const [folderSearch, setFolderSearch] = React.useState("")
 
   const filtered = items
     .filter((item) => {
@@ -344,16 +355,17 @@ export default function LibraryPage() {
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
-                        {/* Move to folder submenu (simplified) */}
-                        {folders.map((f) => (
-                          <DropdownMenuItem
-                            key={f.id}
-                            onSelect={() => handleMoveToFolder(item.id, f.id)}
-                          >
-                            <ArrowRightIcon size={16} />
-                            <span>Move to {f.name}</span>
-                          </DropdownMenuItem>
-                        ))}
+                        <DropdownMenuItem
+                          onSelect={() => {
+                            setMoveItemId(item.id)
+                            setMoveTargetFolderId(null)
+                            setFolderSearch("")
+                            setMoveDialogOpen(true)
+                          }}
+                        >
+                          <ArrowRightIcon size={16} />
+                          <span>Move to folder</span>
+                        </DropdownMenuItem>
                         <DropdownMenuItem onSelect={() => handleDuplicate(item.id)}>
                           <CopyIcon size={16} />
                           <span>Duplicate</span>
@@ -380,6 +392,87 @@ export default function LibraryPage() {
           })}
         </div>
       )}
+
+      {/* Move to folder dialog */}
+      <Dialog open={moveDialogOpen} onOpenChange={setMoveDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">Select the folder</DialogTitle>
+            <DialogDescription>
+              Select the folder to move your lesson or create a new folder for it
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 pt-2">
+            {/* Search */}
+            <div className="relative">
+              <MagnifyingGlassIcon
+                size={16}
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+              />
+              <Input
+                className="h-10 pl-9"
+                placeholder="Search..."
+                value={folderSearch}
+                onChange={(e) => setFolderSearch(e.target.value)}
+              />
+            </div>
+
+            {/* Folder list */}
+            <div className="space-y-1">
+              {folders
+                .filter((f) =>
+                  f.name.toLowerCase().includes(folderSearch.toLowerCase())
+                )
+                .map((folder) => (
+                  <button
+                    key={folder.id}
+                    onClick={() => setMoveTargetFolderId(folder.id)}
+                    className={`flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-accent ${
+                      moveTargetFolderId === folder.id
+                        ? "bg-accent"
+                        : ""
+                    }`}
+                  >
+                    <FolderSimpleIcon size={20} className="text-muted-foreground shrink-0" />
+                    <span className="text-sm font-medium flex-1">{folder.name}</span>
+                    <span className="text-sm text-muted-foreground">{folder.count}</span>
+                  </button>
+                ))}
+            </div>
+
+            {/* Add folder */}
+            <button
+              className="flex w-full items-center justify-center gap-2 py-2 text-sm font-medium text-primary hover:opacity-80 transition-opacity"
+              onClick={() => {
+                const id = crypto.randomUUID()
+                const newFolder: Folder = { id, name: "New Folder", count: 0, icon: "folder" }
+                setFolders((prev) => [...prev, newFolder])
+                setMoveTargetFolderId(id)
+              }}
+            >
+              <PlusIcon size={16} />
+              <span>Add Folder</span>
+            </button>
+
+            {/* Move button */}
+            <Button
+              className="w-full"
+              disabled={!moveTargetFolderId}
+              onClick={() => {
+                if (moveItemId && moveTargetFolderId) {
+                  handleMoveToFolder(moveItemId, moveTargetFolderId)
+                  setMoveDialogOpen(false)
+                  setMoveItemId(null)
+                  setMoveTargetFolderId(null)
+                }
+              }}
+            >
+              Move
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
