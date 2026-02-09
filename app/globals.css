@@ -124,3 +124,60 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* TipTap editor styles */
+.tiptap-editor .tiptap {
+  outline: none;
+}
+.tiptap-editor .tiptap p {
+  @apply text-sm text-muted-foreground;
+}
+.tiptap-editor .tiptap h1 {
+  @apply text-lg font-bold text-foreground mb-2 mt-4 first:mt-0;
+}
+.tiptap-editor .tiptap h2 {
+  @apply text-base font-bold text-foreground mb-2 mt-3 first:mt-0;
+}
+.tiptap-editor .tiptap h3 {
+  @apply text-sm font-bold text-foreground mb-1.5 mt-2.5 first:mt-0;
+}
+.tiptap-editor .tiptap ul {
+  @apply ml-4 list-disc;
+}
+.tiptap-editor .tiptap ol {
+  @apply ml-4 list-decimal;
+}
+.tiptap-editor .tiptap li {
+  @apply text-sm text-muted-foreground;
+}
+.tiptap-editor .tiptap li p {
+  @apply inline;
+}
+.tiptap-editor .tiptap pre {
+  @apply bg-muted p-3 text-sm font-mono my-2;
+}
+.tiptap-editor .tiptap code {
+  @apply bg-muted px-1 py-0.5 text-sm font-mono;
+}
+.tiptap-editor .tiptap a {
+  @apply text-primary underline;
+}
+.tiptap-editor .tiptap s {
+  @apply line-through;
+}
+.tiptap-editor .tiptap ul[data-type="taskList"] {
+  @apply list-none ml-0;
+}
+.tiptap-editor .tiptap ul[data-type="taskList"] li {
+  @apply flex items-start gap-2;
+}
+.tiptap-editor .tiptap ul[data-type="taskList"] li label {
+  @apply mt-0.5;
+}
+.tiptap-editor .tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--muted-foreground);
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
