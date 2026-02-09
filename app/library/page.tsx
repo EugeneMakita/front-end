@@ -116,6 +116,9 @@ export default function LibraryPage() {
   const [moveItemId, setMoveItemId] = React.useState<string | null>(null)
   const [moveTargetFolderId, setMoveTargetFolderId] = React.useState<string | null>(null)
   const [folderSearch, setFolderSearch] = React.useState("")
+  const [renameDialogOpen, setRenameDialogOpen] = React.useState(false)
+  const [renameFolderId, setRenameFolderId] = React.useState<string | null>(null)
+  const [renameValue, setRenameValue] = React.useState("")
 
   const filtered = items
     .filter((item) => {
@@ -198,15 +201,23 @@ export default function LibraryPage() {
     if (activeFolderId === folderId) setActiveFolderId(null)
   }
 
-  function handleRenameFolder(folderId: string) {
+  function openRenameDialog(folderId: string) {
     const folder = folders.find((f) => f.id === folderId)
     if (!folder) return
-    const newName = prompt("Rename folder", folder.name)
-    if (newName && newName.trim()) {
+    setRenameFolderId(folderId)
+    setRenameValue(folder.name)
+    setRenameDialogOpen(true)
+  }
+
+  function confirmRename() {
+    if (renameFolderId && renameValue.trim()) {
       setFolders((prev) =>
-        prev.map((f) => (f.id === folderId ? { ...f, name: newName.trim() } : f))
+        prev.map((f) => (f.id === renameFolderId ? { ...f, name: renameValue.trim() } : f))
       )
     }
+    setRenameDialogOpen(false)
+    setRenameFolderId(null)
+    setRenameValue("")
   }
 
   return (
@@ -246,7 +257,7 @@ export default function LibraryPage() {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onSelect={() => handleRenameFolder(folder.id)}>
+                <DropdownMenuItem onSelect={() => openRenameDialog(folder.id)}>
                   <PencilSimpleIcon size={16} />
                   <span>Rename</span>
                 </DropdownMenuItem>
@@ -469,6 +480,41 @@ export default function LibraryPage() {
               }}
             >
               Move
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Rename folder dialog */}
+      <Dialog open={renameDialogOpen} onOpenChange={setRenameDialogOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">Rename folder</DialogTitle>
+            <DialogDescription>
+              Enter a new name for this folder
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 pt-2">
+            <Input
+              className="h-10"
+              placeholder="Folder name"
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  confirmRename()
+                }
+              }}
+              autoFocus
+            />
+            <Button
+              className="w-full"
+              disabled={!renameValue.trim()}
+              onClick={confirmRename}
+            >
+              Rename
             </Button>
           </div>
         </DialogContent>
