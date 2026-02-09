@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { useRouter, usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -229,11 +230,28 @@ function TopBar({ onOpenNotes }: { onOpenNotes?: () => void }) {
   )
 }
 
+const navRoutes: Partial<Record<NavKey, string>> = {
+  library: "/library",
+  quickCreate: "/",
+}
+
 export default function AppShell({ children }: { children: React.ReactNode }) {
-  const [activeKey, setActiveKey] = React.useState<NavKey>("quickCreate")
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const pathToKey = Object.entries(navRoutes).find(([, path]) => path === pathname)?.[0] as NavKey | undefined
+  const [activeKey, setActiveKey] = React.useState<NavKey>(pathToKey ?? "quickCreate")
   const showRightPanel = activeKey === "quickCreate"
   const [showNotes, setShowNotes] = React.useState(false)
   const [notesPinned, setNotesPinned] = React.useState(false)
+
+  function handleNavSelect(key: NavKey) {
+    setActiveKey(key)
+    const route = navRoutes[key]
+    if (route) {
+      router.push(route)
+    }
+  }
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-background">
@@ -241,11 +259,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Row under the topbar */}
       <div className="flex min-h-0 flex-1 overflow-hidden">
-        <Sidebar activeKey={activeKey} onSelect={(key) => setActiveKey(key)} />
+        <Sidebar activeKey={activeKey} onSelect={handleNavSelect} />
 
         {showRightPanel && (
           <aside className="h-full w-[420px] overflow-hidden border-r bg-background">
-            <QuickCreatePanel onClose={() => setActiveKey("library")} />
+            <QuickCreatePanel onClose={() => handleNavSelect("library")} />
           </aside>
         )}
 
