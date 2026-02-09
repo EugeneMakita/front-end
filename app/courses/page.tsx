@@ -9,7 +9,6 @@ import {
   FunnelIcon,
   SquaresFourIcon,
   ListBulletsIcon,
-  GraduationCapIcon,
   ClockIcon,
   StarIcon,
 } from "@phosphor-icons/react"
@@ -110,10 +109,7 @@ export default function CoursesPage() {
     <div className="max-w-6xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <GraduationCapIcon size={32} weight="bold" className="text-primary" />
-          <h1 className="text-3xl font-bold">Courses</h1>
-        </div>
+        <h1 className="text-3xl font-bold mb-2">Courses</h1>
         <p className="text-muted-foreground">
           Browse and manage your courses, projects, and resources.
         </p>
