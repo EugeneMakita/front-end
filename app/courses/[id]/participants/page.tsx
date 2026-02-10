@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -245,9 +246,12 @@ export default function ParticipantsPage() {
                       weight="thin"
                       className="text-muted-foreground shrink-0"
                     />
-                    <span className="font-medium text-primary">
+                    <Link
+                      href={`/courses/${courseId}/participants/${participant.id}`}
+                      className="font-medium text-primary hover:underline"
+                    >
                       {participant.firstName} {participant.lastName}
-                    </span>
+                    </Link>
                   </div>
                 </TableCell>
                 <TableCell className="text-gray-600 dark:text-gray-400">{participant.role}</TableCell>

@@ -7,6 +7,11 @@ import { cn } from "@/lib/utils"
 import { mockCourses } from "@/lib/mock-courses"
 import { mockThreads } from "@/lib/mock-forum"
 import { mockWikiPages } from "@/lib/mock-wiki"
+import { mockParticipants } from "@/lib/mock-participants"
+
+function truncateLabel(label: string, max = 25) {
+  return label.length > max ? label.slice(0, max) + "\u2026" : label
+}
 
 const tabs = [
   { label: "Course", href: "" },
@@ -99,8 +104,40 @@ export default function CourseLayout({
           }
         }
       }
+
+      if (activeTab.label === "Participants") {
+        const participant = mockParticipants.find((p) => p.id === subId)
+        if (participant) {
+          const participantPath = `${tabPath}/${subId}`
+          breadcrumbSegments.push({
+            label: `${participant.firstName} ${participant.lastName}`,
+            href: participantPath,
+          })
+
+          const participantSubTab = segments[1]
+          if (participantSubTab) {
+            const tabLabels: Record<string, string> = {
+              grades: "Grades",
+              permissions: "Permissions",
+              settings: "Settings",
+            }
+            const tabLabel = tabLabels[participantSubTab]
+            if (tabLabel) {
+              breadcrumbSegments.push({
+                label: tabLabel,
+                href: pathname,
+              })
+            }
+          }
+        }
+      }
     }
   }
+
+  // Hide course-level tabs on participant detail page (it has its own tabs)
+  const isParticipantDetail =
+    activeTab?.label === "Participants" &&
+    pathname !== `${basePath}/participants`
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -112,15 +149,16 @@ export default function CourseLayout({
             <React.Fragment key={segment.href}>
               {i > 0 && <span>/</span>}
               {isLast ? (
-                <span className="text-foreground font-medium">
-                  {segment.label}
+                <span className="text-foreground font-medium" title={segment.label}>
+                  {truncateLabel(segment.label)}
                 </span>
               ) : (
                 <Link
                   href={segment.href}
                   className="hover:text-foreground transition-colors"
+                  title={segment.label}
                 >
-                  {segment.label}
+                  {truncateLabel(segment.label)}
                 </Link>
               )}
             </React.Fragment>
@@ -129,31 +167,35 @@ export default function CourseLayout({
       </nav>
 
       {/* Title */}
-      <h1 className="text-2xl font-bold mb-6">{course.title}</h1>
+      {!isParticipantDetail && (
+        <h1 className="text-2xl font-bold mb-6">{course.title}</h1>
+      )}
 
       {/* Tabs */}
-      <div className="border-b mb-8">
-        <div className="flex items-center gap-6">
-          {tabs.map((tab) => {
-            const tabPath = tab.href === "" ? basePath : `${basePath}${tab.href}`
-            const isActive = activeTab?.label === tab.label
-            return (
-              <Link
-                key={tab.label}
-                href={tabPath}
-                className={cn(
-                  "pb-3 text-sm font-medium transition-colors border-b-2 -mb-px",
-                  isActive
-                    ? "border-primary text-foreground"
-                    : "border-transparent text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {tab.label}
-              </Link>
-            )
-          })}
+      {!isParticipantDetail && (
+        <div className="border-b mb-8">
+          <div className="flex items-center gap-6">
+            {tabs.map((tab) => {
+              const tabPath = tab.href === "" ? basePath : `${basePath}${tab.href}`
+              const isActive = activeTab?.label === tab.label
+              return (
+                <Link
+                  key={tab.label}
+                  href={tabPath}
+                  className={cn(
+                    "pb-3 text-sm font-medium transition-colors border-b-2 -mb-px",
+                    isActive
+                      ? "border-primary text-foreground"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {tab.label}
+                </Link>
+              )
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Tab content */}
       {children}
