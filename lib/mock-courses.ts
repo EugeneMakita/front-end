@@ -13,6 +13,8 @@ export type CourseItem = {
   progress: number
   updatedAt: string
   starred: boolean
+  startDate: string
+  endDate: string
   sections: CourseSection[]
 }
 
@@ -26,6 +28,8 @@ export const mockCourses: CourseItem[] = [
     progress: 75,
     updatedAt: "2 days ago",
     starred: true,
+    startDate: "2026-01-13",
+    endDate: "2026-05-15",
     sections: [
       {
         id: "1-1",
@@ -69,6 +73,8 @@ export const mockCourses: CourseItem[] = [
     progress: 40,
     updatedAt: "1 week ago",
     starred: false,
+    startDate: "2026-02-03",
+    endDate: "2026-06-20",
     sections: [
       {
         id: "2-1",
@@ -106,6 +112,8 @@ export const mockCourses: CourseItem[] = [
     progress: 90,
     updatedAt: "3 days ago",
     starred: true,
+    startDate: "2025-11-01",
+    endDate: "2026-03-01",
     sections: [
       {
         id: "3-1",
@@ -142,6 +150,8 @@ export const mockCourses: CourseItem[] = [
     progress: 20,
     updatedAt: "2 weeks ago",
     starred: false,
+    startDate: "2026-01-20",
+    endDate: "2026-07-31",
     sections: [
       {
         id: "4-1",
@@ -179,6 +189,8 @@ export const mockCourses: CourseItem[] = [
     progress: 60,
     updatedAt: "5 days ago",
     starred: false,
+    startDate: "2025-12-01",
+    endDate: "2026-04-30",
     sections: [
       {
         id: "5-1",
@@ -222,6 +234,8 @@ export const mockCourses: CourseItem[] = [
     progress: 100,
     updatedAt: "1 month ago",
     starred: true,
+    startDate: "2025-09-01",
+    endDate: "2026-01-15",
     sections: [
       {
         id: "6-1",

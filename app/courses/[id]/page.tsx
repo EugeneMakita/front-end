@@ -1,9 +1,7 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
 import { useParams } from "next/navigation"
-import { cn } from "@/lib/utils"
 import {
   CaretDownIcon,
   CaretRightIcon,
@@ -11,25 +9,16 @@ import {
 } from "@phosphor-icons/react"
 import { mockCourses } from "@/lib/mock-courses"
 
-const tabs = ["Course", "Information", "Participants", "Grades", "Badges", "More"]
-
-export default function CourseDetailPage() {
+export default function CourseTabPage() {
   const params = useParams()
   const courseId = params.id as string
   const course = mockCourses.find((c) => c.id === courseId)
 
-  const [activeTab, setActiveTab] = React.useState("Course")
   const [expandedSections, setExpandedSections] = React.useState<Set<string>>(
     () => new Set(course?.sections.map((s) => s.id) ?? [])
   )
 
-  if (!course) {
-    return (
-      <div className="max-w-4xl mx-auto text-center py-16">
-        <p className="text-muted-foreground">Course not found</p>
-      </div>
-    )
-  }
+  if (!course) return null
 
   const allExpanded = course.sections.every((s) => expandedSections.has(s.id))
 
@@ -51,39 +40,7 @@ export default function CourseDetailPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-2">
-        <Link
-          href="/courses"
-          className="hover:text-foreground transition-colors"
-        >
-          Courses
-        </Link>
-        <span>/</span>
-        <span className="text-foreground font-medium">{course.title}</span>
-      </nav>
-
-      {/* Tabs */}
-      <div className="border-b mb-8">
-        <div className="flex items-center gap-6">
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={cn(
-                "pb-3 text-sm font-medium transition-colors border-b-2 -mb-px",
-                activeTab === tab
-                  ? "border-primary text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              )}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-      </div>
-
+    <>
       {/* Collapse all button */}
       <div className="flex justify-end mb-4">
         <button
@@ -141,6 +98,6 @@ export default function CourseDetailPage() {
           )
         })}
       </div>
-    </div>
+    </>
   )
 }
