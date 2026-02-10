@@ -6,11 +6,24 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import ForumReplyEditor from "@/components/forum-reply-editor"
 import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
+import {
   CaretDownIcon,
   CaretRightIcon,
   ArrowBendUpLeftIcon,
   FlagIcon,
   UserCircleIcon,
+  DotsThreeIcon,
+  TrashIcon,
+  UserMinusIcon,
+  WarningCircleIcon,
+  PencilSimpleIcon,
+  EyeSlashIcon,
 } from "@phosphor-icons/react"
 import { mockThreads, type ForumReply } from "@/lib/mock-forum"
 
@@ -58,6 +71,37 @@ function ReplyCard({
               <ArrowBendUpLeftIcon size={12} />
               Reply
             </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                  <DotsThreeIcon size={16} weight="bold" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-44">
+                <DropdownMenuItem>
+                  <PencilSimpleIcon size={14} />
+                  Edit post
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <EyeSlashIcon size={14} />
+                  Hide post
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <WarningCircleIcon size={14} />
+                  Report user
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <UserMinusIcon size={14} />
+                  Suspend user
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem variant="destructive">
+                  <TrashIcon size={14} />
+                  Delete post
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
 
@@ -147,15 +191,48 @@ export default function ThreadDetailPage() {
               <span className="text-muted-foreground">{thread.lastPost}</span>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="h-7 text-xs gap-1"
-            onClick={() => setShowReplyBox(!showReplyBox)}
-          >
-            <ArrowBendUpLeftIcon size={12} />
-            Reply
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 text-xs gap-1"
+              onClick={() => setShowReplyBox(!showReplyBox)}
+            >
+              <ArrowBendUpLeftIcon size={12} />
+              Reply
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                  <DotsThreeIcon size={16} weight="bold" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-44">
+                <DropdownMenuItem>
+                  <PencilSimpleIcon size={14} />
+                  Edit post
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <EyeSlashIcon size={14} />
+                  Hide post
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <WarningCircleIcon size={14} />
+                  Report user
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <UserMinusIcon size={14} />
+                  Suspend user
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem variant="destructive">
+                  <TrashIcon size={14} />
+                  Delete post
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
         <div className="px-4 py-3">
           <p className="text-sm leading-relaxed text-gray-900 dark:text-gray-100">{thread.content}</p>
