@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { useRouter, useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -28,7 +29,6 @@ import {
   SelectItem,
 } from "@/components/ui/select"
 import {
-  ArrowLeftIcon,
   CaretDownIcon,
   CaretRightIcon,
   MagnifyingGlassIcon,
@@ -39,9 +39,13 @@ import {
   FolderSimpleIcon,
 } from "@phosphor-icons/react"
 import { mockQuestions, questionTypes, type Question } from "@/lib/mock-questions"
+import { initialItems } from "@/lib/mock-library"
 
 export default function QuestionsPage() {
   const router = useRouter()
+  const params = useParams()
+  const itemId = params.id as string
+  const item = initialItems.find((i) => i.id === itemId)
   const [search, setSearch] = React.useState("")
   const [selectedItems, setSelectedItems] = React.useState<Set<number>>(new Set())
   const [expanded, setExpanded] = React.useState(true)
@@ -82,15 +86,25 @@ export default function QuestionsPage() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      {/* Header */}
+      {/* Breadcrumb + Header */}
       <div className="mb-6">
-        <button
-          onClick={() => router.push("/library")}
-          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
-        >
-          <ArrowLeftIcon size={16} />
-          <span>Back to Library</span>
-        </button>
+        <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-2">
+          <Link
+            href="/library"
+            className="hover:text-foreground transition-colors"
+          >
+            Library
+          </Link>
+          <span>/</span>
+          <Link
+            href={`/library/${itemId}/questions`}
+            className="hover:text-foreground transition-colors"
+          >
+            {item?.title ?? `Item ${itemId}`}
+          </Link>
+          <span>/</span>
+          <span className="text-foreground font-medium">Questions</span>
+        </nav>
         <h1 className="text-2xl font-bold">Questions</h1>
         <p className="text-sm text-muted-foreground mt-1">
           {filtered.length} question{filtered.length !== 1 ? "s" : ""} total
