@@ -240,7 +240,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
 
-  const pathToKey = Object.entries(navRoutes).find(([, path]) => path === pathname)?.[0] as NavKey | undefined
+  const pathToKey = Object.entries(navRoutes).find(([, path]) => pathname === path || pathname.startsWith(path + "/"))?.[0] as NavKey | undefined
   const [activeKey, setActiveKey] = React.useState<NavKey>(pathToKey ?? "quickCreate")
   const showRightPanel = activeKey === "quickCreate"
   const [showNotes, setShowNotes] = React.useState(false)

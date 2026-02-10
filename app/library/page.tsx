@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -106,6 +107,7 @@ const initialItems: LibraryItem[] = [
 ]
 
 export default function LibraryPage() {
+  const router = useRouter()
   const [search, setSearch] = React.useState("")
   const [sortBy, setSortBy] = React.useState("recent")
   const [folders, setFolders] = React.useState(initialFolders)
@@ -173,6 +175,18 @@ export default function LibraryPage() {
     })
   }
 
+  function handleBulkDelete() {
+    setItems((prev) => prev.filter((i) => !selectedItems.has(i.id)))
+    setSelectedItems(new Set())
+  }
+
+  function handleBulkMoveOpen() {
+    setMoveItemId(null)
+    setMoveTargetFolderId(null)
+    setFolderSearch("")
+    setMoveDialogOpen(true)
+  }
+
   function handleMoveToFolder(itemId: string, folderId: string) {
     setItems((prev) =>
       prev.map((i) => (i.id === itemId ? { ...i, folderId } : i))
@@ -228,7 +242,7 @@ export default function LibraryPage() {
       </div>
 
       {/* Folders row */}
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex flex-wrap items-center gap-3 mb-6">
         {folders.map((folder) => (
           <div
             key={folder.id}
@@ -292,12 +306,46 @@ export default function LibraryPage() {
             onCheckedChange={toggleSelectAll}
             aria-label="Select all"
           />
-          <span className="text-sm text-muted-foreground">Select all</span>
+          {selectedItems.size > 0 ? (
+            <span className="text-sm text-muted-foreground">
+              With <span className="font-semibold text-foreground">{selectedItems.size}</span> selected:
+            </span>
+          ) : (
+            <span className="text-sm text-muted-foreground">Select all</span>
+          )}
         </div>
+
+        {selectedItems.size > 0 && (
+          <Select
+            value=""
+            onValueChange={(value) => {
+              if (value === "move") handleBulkMoveOpen()
+              if (value === "delete") handleBulkDelete()
+            }}
+          >
+            <SelectTrigger className="w-[200px] h-10">
+              <SelectValue placeholder="Select the action..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="move">
+                <div className="flex items-center gap-2">
+                  <FolderSimpleIcon size={16} />
+                  <span>Move</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="delete">
+                <div className="flex items-center gap-2 text-destructive">
+                  <TrashIcon size={16} />
+                  <span>Delete</span>
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        )}
 
         <div className="ml-auto flex items-center gap-3">
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-[160px] h-9">
+            <SelectTrigger className="w-[160px] h-10">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -313,7 +361,7 @@ export default function LibraryPage() {
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
             />
             <Input
-              className="h-9 pl-9"
+              className="h-10 pl-9"
               placeholder="Search for lessons..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -337,6 +385,7 @@ export default function LibraryPage() {
                 className={`group border bg-card overflow-hidden transition-shadow hover:shadow-md cursor-pointer ${
                   isSelected ? "ring-2 ring-primary" : ""
                 }`}
+                onClick={() => router.push(`/library/${item.id}/questions`)}
               >
                 {/* Image */}
                 <div className="relative aspect-[5/3] overflow-hidden bg-muted">
@@ -346,7 +395,7 @@ export default function LibraryPage() {
                     className="h-full w-full object-cover"
                   />
                   {/* Top-left checkbox */}
-                  <div className="absolute top-2 left-2">
+                  <div className="absolute top-2 left-2" onClick={(e) => e.stopPropagation()}>
                     <Checkbox
                       checked={isSelected}
                       onCheckedChange={() => toggleSelect(item.id)}
@@ -355,7 +404,7 @@ export default function LibraryPage() {
                     />
                   </div>
                   {/* Top-right 3-dot menu */}
-                  <div className="absolute top-2 right-2">
+                  <div className="absolute top-2 right-2" onClick={(e) => e.stopPropagation()}>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button
@@ -471,8 +520,13 @@ export default function LibraryPage() {
               className="w-full"
               disabled={!moveTargetFolderId}
               onClick={() => {
-                if (moveItemId && moveTargetFolderId) {
-                  handleMoveToFolder(moveItemId, moveTargetFolderId)
+                if (moveTargetFolderId) {
+                  if (moveItemId) {
+                    handleMoveToFolder(moveItemId, moveTargetFolderId)
+                  } else {
+                    selectedItems.forEach((id) => handleMoveToFolder(id, moveTargetFolderId))
+                    setSelectedItems(new Set())
+                  }
                   setMoveDialogOpen(false)
                   setMoveItemId(null)
                   setMoveTargetFolderId(null)
