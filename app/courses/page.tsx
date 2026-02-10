@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -12,79 +13,7 @@ import {
   ClockIcon,
   StarIcon,
 } from "@phosphor-icons/react"
-
-type CourseItem = {
-  id: string
-  title: string
-  description: string
-  category: "course" | "project" | "resource"
-  progress: number
-  updatedAt: string
-  starred: boolean
-}
-
-const items: CourseItem[] = [
-  {
-    id: "1",
-    title: "Introduction to Machine Learning",
-    description:
-      "Learn the fundamentals of machine learning, including supervised and unsupervised learning techniques.",
-    category: "course",
-    progress: 75,
-    updatedAt: "2 days ago",
-    starred: true,
-  },
-  {
-    id: "2",
-    title: "Advanced TypeScript Patterns",
-    description:
-      "Deep dive into advanced type system features, generics, and design patterns in TypeScript.",
-    category: "course",
-    progress: 40,
-    updatedAt: "1 week ago",
-    starred: false,
-  },
-  {
-    id: "3",
-    title: "Portfolio Website Redesign",
-    description:
-      "A complete redesign of the personal portfolio using Next.js and Tailwind CSS.",
-    category: "project",
-    progress: 90,
-    updatedAt: "3 days ago",
-    starred: true,
-  },
-  {
-    id: "4",
-    title: "Data Visualization Handbook",
-    description:
-      "Comprehensive guide to creating effective data visualizations with D3.js and modern charting libraries.",
-    category: "resource",
-    progress: 20,
-    updatedAt: "2 weeks ago",
-    starred: false,
-  },
-  {
-    id: "5",
-    title: "Neural Networks from Scratch",
-    description:
-      "Build neural networks step by step to understand backpropagation, gradient descent, and activation functions.",
-    category: "course",
-    progress: 60,
-    updatedAt: "5 days ago",
-    starred: false,
-  },
-  {
-    id: "6",
-    title: "API Design Best Practices",
-    description:
-      "Learn RESTful API design principles, versioning strategies, and authentication patterns.",
-    category: "resource",
-    progress: 100,
-    updatedAt: "1 month ago",
-    starred: true,
-  },
-]
+import { mockCourses } from "@/lib/mock-courses"
 
 const categoryColors: Record<string, string> = {
   course: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
@@ -93,11 +22,12 @@ const categoryColors: Record<string, string> = {
 }
 
 export default function CoursesPage() {
+  const router = useRouter()
   const [search, setSearch] = React.useState("")
   const [filter, setFilter] = React.useState<"all" | "course" | "project" | "resource">("all")
   const [view, setView] = React.useState<"grid" | "list">("grid")
 
-  const filtered = items.filter((item) => {
+  const filtered = mockCourses.filter((item) => {
     const matchesSearch =
       item.title.toLowerCase().includes(search.toLowerCase()) ||
       item.description.toLowerCase().includes(search.toLowerCase())
@@ -178,6 +108,7 @@ export default function CoursesPage() {
             <div
               key={item.id}
               className="border bg-card p-5 hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => router.push(`/courses/${item.id}`)}
             >
               <div className="flex items-start justify-between mb-3">
                 <Badge className={`rounded-none text-xs ${categoryColors[item.category]}`}>
@@ -217,6 +148,7 @@ export default function CoursesPage() {
             <div
               key={item.id}
               className="flex items-center gap-4 border bg-card p-4 hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => router.push(`/courses/${item.id}`)}
             >
               <StarIcon
                 size={18}
