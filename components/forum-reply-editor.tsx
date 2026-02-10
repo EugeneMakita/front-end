@@ -9,6 +9,7 @@ import { Table } from "@tiptap/extension-table"
 import { TableRow } from "@tiptap/extension-table-row"
 import { TableHeader } from "@tiptap/extension-table-header"
 import { TableCell } from "@tiptap/extension-table-cell"
+import { Mark, mergeAttributes } from "@tiptap/core"
 import { cn } from "@/lib/utils"
 import { mockParticipants } from "@/lib/mock-participants"
 import {
@@ -25,6 +26,16 @@ import {
   InfoIcon,
   CaretDownIcon,
 } from "@phosphor-icons/react"
+
+const MentionMark = Mark.create({
+  name: "mentionHighlight",
+  parseHTML() {
+    return [{ tag: "span[data-mention]" }]
+  },
+  renderHTML({ HTMLAttributes }) {
+    return ["span", mergeAttributes(HTMLAttributes, { "data-mention": "", class: "mention-highlight" }), 0]
+  },
+})
 
 function ToolbarButton({
   active,
@@ -88,6 +99,7 @@ export default function ForumReplyEditor({
       TableRow,
       TableHeader,
       TableCell,
+      MentionMark,
     ],
     content: "",
     immediatelyRender: false,
@@ -142,7 +154,18 @@ export default function ForumReplyEditor({
 
   function handleMentionSelect(name: string) {
     if (!editor) return
-    editor.chain().focus().insertContent(`@${name} `).run()
+    editor
+      .chain()
+      .focus()
+      .insertContent([
+        {
+          type: "text",
+          text: `@${name}`,
+          marks: [{ type: "mentionHighlight" }],
+        },
+        { type: "text", text: " " },
+      ])
+      .run()
     setShowMentionMenu(false)
     setMentionSearch("")
   }
@@ -189,7 +212,7 @@ export default function ForumReplyEditor({
   })
 
   return (
-    <div className="forum-reply-editor border rounded-lg overflow-hidden bg-background text-gray-900 dark:text-gray-100">
+    <div className="forum-reply-editor border rounded-lg overflow-hidden bg-background text-gray-900 dark:text-gray-100 transition-[border-color,box-shadow] focus-within:border-primary focus-within:ring-[3px] focus-within:ring-primary/30">
       {/* Hidden file input for images */}
       <input
         ref={fileInputRef}

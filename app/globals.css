@@ -251,3 +251,6 @@
 .forum-reply-editor .tiptap img {
   @apply max-w-full h-auto my-2 rounded;
 }
+.forum-reply-editor .tiptap .mention-highlight {
+  @apply bg-primary/15 text-primary font-medium px-1 py-0.5 rounded-sm;
+}

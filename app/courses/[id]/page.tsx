@@ -35,7 +35,7 @@ export default function CourseTabPage() {
     if (allExpanded) {
       setExpandedSections(new Set())
     } else {
-      setExpandedSections(new Set(course.sections.map((s) => s.id)))
+      setExpandedSections(new Set(course!.sections.map((s) => s.id)))
     }
   }
 
