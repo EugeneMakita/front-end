@@ -229,7 +229,7 @@ export default function QuestionsPage() {
                 <TableRow
                   key={question.id}
                   data-state={isSelected ? "selected" : undefined}
-                  className={index % 2 === 0 ? "bg-gray-50 dark:bg-gray-900/30 hover:bg-gray-100 dark:hover:bg-gray-800/50" : "hover:bg-gray-50 dark:hover:bg-gray-900/20"}
+                  className={index % 2 === 0 ? "bg-gray-50 dark:bg-gray-900/30 hover:bg-primary/5" : "hover:bg-primary/5"}
                 >
                   <TableCell>
                     <Checkbox
