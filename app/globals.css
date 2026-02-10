@@ -188,6 +188,8 @@
   min-height: 120px;
   padding: 0.75rem 1rem;
   cursor: text;
+  resize: vertical;
+  overflow: auto;
   @apply text-gray-900 dark:text-gray-100;
 }
 .forum-reply-editor .tiptap p {

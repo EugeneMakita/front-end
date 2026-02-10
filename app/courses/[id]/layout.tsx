@@ -61,25 +61,42 @@ export default function CourseLayout({
 
     // Handle nested sub-pages
     if (isNestedRoute) {
-      const subId = pathname.split("/").pop()
+      // Extract the sub-path segment after the tab path
+      const subPath = pathname.slice(tabPath.length)
+      const segments = subPath.split("/").filter(Boolean)
+      const subId = segments[0]
 
       if (activeTab.label === "Forum") {
-        const thread = mockThreads.find((t) => t.id === subId)
-        if (thread) {
+        if (subId === "new") {
           breadcrumbSegments.push({
-            label: thread.topic,
+            label: "New Thread",
             href: pathname,
           })
+        } else {
+          const thread = mockThreads.find((t) => t.id === subId)
+          if (thread) {
+            breadcrumbSegments.push({
+              label: thread.topic,
+              href: pathname,
+            })
+          }
         }
       }
 
       if (activeTab.label === "Wiki") {
-        const wikiPage = mockWikiPages.find((p) => p.id === subId)
-        if (wikiPage) {
+        if (subId === "new") {
           breadcrumbSegments.push({
-            label: wikiPage.title,
+            label: "New Page",
             href: pathname,
           })
+        } else {
+          const wikiPage = mockWikiPages.find((p) => p.id === subId)
+          if (wikiPage) {
+            breadcrumbSegments.push({
+              label: wikiPage.title,
+              href: pathname,
+            })
+          }
         }
       }
     }

@@ -4,14 +4,6 @@ import * as React from "react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog"
 import {
   PencilSimpleIcon,
   PlusIcon,
@@ -26,9 +18,6 @@ export default function WikiPageDetail() {
   const pageId = params.pageId as string
 
   const [editing, setEditing] = React.useState(false)
-  const [showNewPage, setShowNewPage] = React.useState(false)
-  const [newPageTitle, setNewPageTitle] = React.useState("")
-  const [newPageEmpty, setNewPageEmpty] = React.useState(true)
 
   const selectedPage = mockWikiPages.find((p) => p.id === pageId)
 
@@ -129,65 +118,17 @@ export default function WikiPageDetail() {
         <div className="border-t my-3" />
 
         {/* New page button */}
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full gap-1 text-xs"
-          onClick={() => setShowNewPage(true)}
-        >
-          <PlusIcon size={14} />
-          New Page
-        </Button>
+        <Link href={`/courses/${courseId}/wiki/new`}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full gap-1 text-xs"
+          >
+            <PlusIcon size={14} />
+            New Page
+          </Button>
+        </Link>
       </div>
-
-      {/* New page modal */}
-      <Dialog open={showNewPage} onOpenChange={setShowNewPage}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>New Wiki Page</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                Title
-              </label>
-              <Input
-                className="text-gray-900 dark:text-gray-100"
-                placeholder="Page title..."
-                value={newPageTitle}
-                onChange={(e) => setNewPageTitle(e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                Content
-              </label>
-              <ForumReplyEditor
-                placeholder="Write page content..."
-                onContentChange={(isEmpty) => setNewPageEmpty(isEmpty)}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setShowNewPage(false)
-                setNewPageTitle("")
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              size="sm"
-              disabled={!newPageTitle.trim() || newPageEmpty}
-            >
-              Create Page
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

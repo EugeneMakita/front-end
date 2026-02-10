@@ -22,13 +22,6 @@ import {
   SelectItem,
 } from "@/components/ui/select"
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog"
-import {
   MagnifyingGlassIcon,
   PlusIcon,
   FlagIcon,
@@ -38,7 +31,6 @@ import {
   ChatCircleDotsIcon,
 } from "@phosphor-icons/react"
 import { mockThreads } from "@/lib/mock-forum"
-import ForumReplyEditor from "@/components/forum-reply-editor"
 
 export default function ForumPage() {
   const params = useParams()
@@ -46,10 +38,6 @@ export default function ForumPage() {
   const [search, setSearch] = React.useState("")
   const [filter, setFilter] = React.useState("recent")
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(new Set())
-  const [showNewThread, setShowNewThread] = React.useState(false)
-  const [newThreadTitle, setNewThreadTitle] = React.useState("")
-  const [newThreadEmpty, setNewThreadEmpty] = React.useState(true)
-
   const filtered = mockThreads
     .filter((t) => {
       const matchesSearch =
@@ -147,10 +135,12 @@ export default function ForumPage() {
         )}
 
         <div className="ml-auto flex items-center gap-3">
-          <Button size="sm" className="gap-2" onClick={() => setShowNewThread(true)}>
-            <PlusIcon size={16} />
-            Add New Thread
-          </Button>
+          <Link href={`/courses/${courseId}/forum/new`}>
+            <Button size="sm" className="gap-2">
+              <PlusIcon size={16} />
+              Add New Thread
+            </Button>
+          </Link>
 
           <Select value={filter} onValueChange={setFilter}>
             <SelectTrigger className="w-[170px] h-10">
@@ -245,54 +235,6 @@ export default function ForumPage() {
         </div>
       )}
 
-      {/* New thread modal */}
-      <Dialog open={showNewThread} onOpenChange={setShowNewThread}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>New Thread</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                Title
-              </label>
-              <Input
-                className="text-gray-900 dark:text-gray-100"
-                placeholder="Thread title..."
-                value={newThreadTitle}
-                onChange={(e) => setNewThreadTitle(e.target.value)}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                Content
-              </label>
-              <ForumReplyEditor
-                placeholder="Write your thread content..."
-                onContentChange={(isEmpty) => setNewThreadEmpty(isEmpty)}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setShowNewThread(false)
-                setNewThreadTitle("")
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              size="sm"
-              disabled={!newThreadTitle.trim() || newThreadEmpty}
-            >
-              Create Thread
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

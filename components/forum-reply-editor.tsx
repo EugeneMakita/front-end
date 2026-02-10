@@ -78,9 +78,11 @@ function Divider() {
 export default function ForumReplyEditor({
   placeholder = "Write your reply...",
   onContentChange,
+  onHtmlChange,
 }: {
   placeholder?: string
   onContentChange?: (isEmpty: boolean) => void
+  onHtmlChange?: (html: string) => void
 }) {
   const [showLinkInput, setShowLinkInput] = React.useState(false)
   const [linkUrl, setLinkUrl] = React.useState("")
@@ -110,6 +112,7 @@ export default function ForumReplyEditor({
     },
     onUpdate: ({ editor: e }) => {
       onContentChange?.(e.isEmpty)
+      onHtmlChange?.(e.getHTML())
     },
   })
 
