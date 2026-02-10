@@ -6,6 +6,7 @@ import { useParams, usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { mockCourses } from "@/lib/mock-courses"
 import { mockThreads } from "@/lib/mock-forum"
+import { mockWikiPages } from "@/lib/mock-wiki"
 
 const tabs = [
   { label: "Course", href: "" },
@@ -58,15 +59,28 @@ export default function CourseLayout({
       href: tabPath,
     })
 
-    // Handle nested sub-pages (e.g. forum thread detail)
-    if (isNestedRoute && activeTab.label === "Forum") {
-      const threadId = pathname.split("/").pop()
-      const thread = mockThreads.find((t) => t.id === threadId)
-      if (thread) {
-        breadcrumbSegments.push({
-          label: thread.topic,
-          href: pathname,
-        })
+    // Handle nested sub-pages
+    if (isNestedRoute) {
+      const subId = pathname.split("/").pop()
+
+      if (activeTab.label === "Forum") {
+        const thread = mockThreads.find((t) => t.id === subId)
+        if (thread) {
+          breadcrumbSegments.push({
+            label: thread.topic,
+            href: pathname,
+          })
+        }
+      }
+
+      if (activeTab.label === "Wiki") {
+        const wikiPage = mockWikiPages.find((p) => p.id === subId)
+        if (wikiPage) {
+          breadcrumbSegments.push({
+            label: wikiPage.title,
+            href: pathname,
+          })
+        }
       }
     }
   }
