@@ -192,6 +192,7 @@ export default function ParticipantsPage() {
                   {role}
                 </SelectItem>
               ))}
+              <SelectItem value="archived">Archived</SelectItem>
             </SelectContent>
           </Select>
 

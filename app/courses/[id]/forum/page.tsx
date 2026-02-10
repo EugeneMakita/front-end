@@ -152,6 +152,7 @@ export default function ForumPage() {
               <SelectItem value="replies">Most Replies</SelectItem>
               <SelectItem value="flagged">Flagged</SelectItem>
               <SelectItem value="unflagged">Unflagged</SelectItem>
+              <SelectItem value="archived">Archived</SelectItem>
             </SelectContent>
           </Select>
 
