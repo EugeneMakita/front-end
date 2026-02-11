@@ -181,3 +181,151 @@
   float: left;
   height: 0;
 }
+
+/* Forum reply editor styles */
+.forum-reply-editor .tiptap {
+  outline: none;
+  min-height: 120px;
+  padding: 0.75rem 1rem;
+  cursor: text;
+  overflow-x: hidden;
+  overflow-y: auto;
+  @apply text-gray-900 dark:text-gray-100;
+}
+.forum-reply-editor .tiptap p {
+  @apply text-sm text-gray-900 dark:text-gray-100;
+}
+.forum-reply-editor .tiptap h1 {
+  @apply text-lg font-bold mb-2 mt-4 first:mt-0;
+}
+.forum-reply-editor .tiptap h2 {
+  @apply text-base font-bold mb-2 mt-3 first:mt-0;
+}
+.forum-reply-editor .tiptap h3 {
+  @apply text-sm font-bold mb-1.5 mt-2.5 first:mt-0;
+}
+.forum-reply-editor .tiptap ul {
+  @apply ml-4 list-disc;
+}
+.forum-reply-editor .tiptap ol {
+  @apply ml-4 list-decimal;
+}
+.forum-reply-editor .tiptap li {
+  @apply text-sm;
+}
+.forum-reply-editor .tiptap li p {
+  @apply inline;
+}
+.forum-reply-editor .tiptap pre {
+  @apply bg-muted p-3 rounded text-sm font-mono my-2;
+}
+.forum-reply-editor .tiptap code {
+  @apply bg-muted px-1 py-0.5 text-sm font-mono rounded;
+}
+.forum-reply-editor .tiptap a {
+  @apply text-primary underline;
+}
+.forum-reply-editor .tiptap s {
+  @apply line-through;
+}
+.forum-reply-editor .tiptap blockquote {
+  @apply border-l-2 border-primary/30 pl-3 my-2 text-muted-foreground italic;
+}
+.forum-reply-editor .tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--muted-foreground);
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
+.forum-reply-editor .tiptap table {
+  @apply border-collapse my-2;
+  table-layout: fixed;
+  min-width: max-content;
+  cursor: text;
+}
+.forum-reply-editor .tiptap .tableWrapper {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.forum-reply-editor .tiptap .tableWrapper > table {
+  height: auto;
+}
+.forum-reply-editor .tiptap table th {
+  @apply border border-border bg-muted/50 px-3 py-1.5 text-left text-xs font-semibold;
+}
+.forum-reply-editor .tiptap table td {
+  @apply border border-border px-3 py-1.5 text-sm;
+}
+.forum-reply-editor .tiptap table td,
+.forum-reply-editor .tiptap table th {
+  min-width: 64px;
+  min-height: 40px;
+  cursor: text;
+  vertical-align: top;
+}
+.forum-reply-editor .tiptap table .selectedCell {
+  @apply bg-primary/10;
+}
+.forum-reply-editor .tiptap .column-resize-handle {
+  background-color: hsl(var(--primary));
+  bottom: 0;
+  pointer-events: none;
+  cursor: col-resize;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 2px;
+}
+.forum-reply-editor .tiptap.resize-cursor {
+  cursor: col-resize;
+}
+.forum-reply-editor .tiptap.resize-cursor * {
+  cursor: col-resize !important;
+}
+.forum-reply-editor .tiptap img {
+  @apply max-w-full h-auto my-2 rounded;
+}
+.forum-reply-editor .tiptap .mention-highlight {
+  @apply bg-primary/15 text-primary font-medium px-1 py-0.5 rounded-sm;
+}
+
+/* Wiki content styles (rendered HTML) */
+.wiki-content h2 {
+  @apply text-base font-bold mt-5 mb-2 text-gray-900 dark:text-gray-100;
+}
+.wiki-content h3 {
+  @apply text-sm font-bold mt-4 mb-1.5 text-gray-900 dark:text-gray-100;
+}
+.wiki-content p {
+  @apply mb-3;
+}
+.wiki-content ul {
+  @apply ml-5 mb-3 list-disc;
+}
+.wiki-content ol {
+  @apply ml-5 mb-3 list-decimal;
+}
+.wiki-content li {
+  @apply mb-1;
+}
+.wiki-content a {
+  @apply text-primary underline;
+}
+.wiki-content code {
+  @apply bg-muted px-1.5 py-0.5 text-xs font-mono rounded;
+}
+.wiki-content pre {
+  @apply bg-muted p-3 rounded text-xs font-mono my-3 overflow-x-auto;
+}
+.wiki-content blockquote {
+  @apply border-l-2 border-primary/30 pl-3 my-3 text-muted-foreground italic;
+}
+.wiki-content em {
+  @apply italic;
+}
+.wiki-content strong {
+  @apply font-semibold;
+}
