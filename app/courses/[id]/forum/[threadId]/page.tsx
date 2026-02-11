@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -26,17 +27,24 @@ import {
   EyeSlashIcon,
 } from "@phosphor-icons/react"
 import { mockThreads, type ForumReply } from "@/lib/mock-forum"
+import { mockParticipants } from "@/lib/mock-participants"
 
 function ReplyCard({
   reply,
+  courseId,
+  participantIdByName,
   depth = 0,
 }: {
   reply: ForumReply
+  courseId: string
+  participantIdByName: Map<string, string>
   depth?: number
 }) {
   const [collapsed, setCollapsed] = React.useState(false)
   const [showReplyBox, setShowReplyBox] = React.useState(false)
   const [replyEmpty, setReplyEmpty] = React.useState(true)
+
+  const participantId = participantIdByName.get(reply.author.toLowerCase())
 
   return (
     <div className={depth > 0 ? "ml-8 border-l-2 border-primary/10 pl-4" : ""}>
@@ -52,7 +60,17 @@ function ReplyCard({
             </button>
             <UserCircleIcon size={28} weight="thin" className="text-muted-foreground" />
             <div className="flex items-center gap-2 text-sm">
-              <span className="font-semibold">{depth > 0 ? `Re: ` : ""}{reply.author}</span>
+              {participantId ? (
+                <Link
+                  href={`/courses/${courseId}/participants/${participantId}`}
+                  className="font-semibold text-primary hover:underline"
+                >
+                  {depth > 0 ? "Re: " : ""}
+                  {reply.author}
+                </Link>
+              ) : (
+                <span className="font-semibold">{depth > 0 ? `Re: ` : ""}{reply.author}</span>
+              )}
               <span className="text-muted-foreground">{reply.postedAt}</span>
               {reply.isNew && (
                 <Badge className="bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200 text-[10px] px-1.5 py-0">
@@ -141,7 +159,13 @@ function ReplyCard({
       {!collapsed && reply.replies && reply.replies.length > 0 && (
         <div className="mt-3 space-y-3">
           {reply.replies.map((nested) => (
-            <ReplyCard key={nested.id} reply={nested} depth={depth + 1} />
+            <ReplyCard
+              key={nested.id}
+              reply={nested}
+              courseId={courseId}
+              participantIdByName={participantIdByName}
+              depth={depth + 1}
+            />
           ))}
         </div>
       )}
@@ -157,6 +181,13 @@ export default function ThreadDetailPage() {
 
   const [showReplyBox, setShowReplyBox] = React.useState(false)
   const [replyEmpty, setReplyEmpty] = React.useState(true)
+  const participantIdByName = React.useMemo(() => {
+    const map = new Map<string, string>()
+    for (const participant of mockParticipants) {
+      map.set(`${participant.firstName} ${participant.lastName}`.toLowerCase(), participant.id)
+    }
+    return map
+  }, [])
 
   if (!thread) {
     return (
@@ -165,6 +196,8 @@ export default function ThreadDetailPage() {
       </div>
     )
   }
+
+  const startedById = participantIdByName.get(thread.startedBy.toLowerCase())
 
   return (
     <div className="space-y-6">
@@ -177,7 +210,18 @@ export default function ThreadDetailPage() {
           )}
         </div>
         <p className="text-sm text-muted-foreground">
-          Posted by <span className="font-medium text-foreground">{thread.startedBy}</span> &middot; {thread.lastPost}
+          Posted by{" "}
+          {startedById ? (
+            <Link
+              href={`/courses/${courseId}/participants/${startedById}`}
+              className="font-medium text-primary hover:underline"
+            >
+              {thread.startedBy}
+            </Link>
+          ) : (
+            <span className="font-medium text-foreground">{thread.startedBy}</span>
+          )}{" "}
+          &middot; {thread.lastPost}
         </p>
       </div>
 
@@ -187,7 +231,16 @@ export default function ThreadDetailPage() {
           <div className="flex items-center gap-2">
             <UserCircleIcon size={28} weight="thin" className="text-muted-foreground" />
             <div className="flex items-center gap-2 text-sm">
-              <span className="font-semibold">{thread.startedBy}</span>
+              {startedById ? (
+                <Link
+                  href={`/courses/${courseId}/participants/${startedById}`}
+                  className="font-semibold text-primary hover:underline"
+                >
+                  {thread.startedBy}
+                </Link>
+              ) : (
+                <span className="font-semibold">{thread.startedBy}</span>
+              )}
               <span className="text-muted-foreground">{thread.lastPost}</span>
             </div>
           </div>
@@ -271,7 +324,12 @@ export default function ThreadDetailPage() {
           </h3>
           <div className="space-y-4">
             {thread.posts.map((post) => (
-              <ReplyCard key={post.id} reply={post} />
+              <ReplyCard
+                key={post.id}
+                reply={post}
+                courseId={courseId}
+                participantIdByName={participantIdByName}
+              />
             ))}
           </div>
         </div>

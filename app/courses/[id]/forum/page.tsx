@@ -31,6 +31,7 @@ import {
   ChatCircleDotsIcon,
 } from "@phosphor-icons/react"
 import { mockThreads } from "@/lib/mock-forum"
+import { mockParticipants } from "@/lib/mock-participants"
 
 export default function ForumPage() {
   const params = useParams()
@@ -54,6 +55,14 @@ export default function ForumPage() {
       if (filter === "replies") return b.replies - a.replies
       return 0
     })
+
+  const participantIdByName = React.useMemo(() => {
+    const map = new Map<string, string>()
+    for (const participant of mockParticipants) {
+      map.set(`${participant.firstName} ${participant.lastName}`.toLowerCase(), participant.id)
+    }
+    return map
+  }, [])
 
   const allSelected =
     filtered.length > 0 &&
@@ -212,7 +221,18 @@ export default function ForumPage() {
                     )}
                   </div>
                 </TableCell>
-                <TableCell className="text-gray-600 dark:text-gray-400">{thread.startedBy}</TableCell>
+                <TableCell className="text-gray-600 dark:text-gray-400">
+                  {participantIdByName.get(thread.startedBy.toLowerCase()) ? (
+                    <Link
+                      href={`/courses/${courseId}/participants/${participantIdByName.get(thread.startedBy.toLowerCase())}`}
+                      className="hover:underline text-primary"
+                    >
+                      {thread.startedBy}
+                    </Link>
+                  ) : (
+                    thread.startedBy
+                  )}
+                </TableCell>
                 <TableCell className="text-center">
                   <div className="flex items-center justify-center gap-1 text-gray-600 dark:text-gray-400">
                     <ChatCircleDotsIcon size={14} className="shrink-0" />

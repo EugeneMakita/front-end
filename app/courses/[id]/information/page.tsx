@@ -1,9 +1,12 @@
 "use client"
 
+import Link from "next/link"
 import { useParams } from "next/navigation"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { CalendarIcon, ClockIcon } from "@phosphor-icons/react"
 import { mockCourses } from "@/lib/mock-courses"
+import { mockParticipants } from "@/lib/mock-participants"
 
 function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("en-US", {
@@ -17,6 +20,12 @@ export default function InformationPage() {
   const params = useParams()
   const courseId = params.id as string
   const course = mockCourses.find((c) => c.id === courseId)
+  const teachingAssistants = mockParticipants.filter((p) => p.role === "Teaching Assistant")
+  const instructors = mockParticipants.filter((p) => p.role === "Instructor")
+  const teachingTeam = [
+    ...instructors.map((p) => ({ ...p, roleLabel: "Instructor" })),
+    ...teachingAssistants.map((p) => ({ ...p, roleLabel: "Teaching Assistant" })),
+  ]
 
   if (!course) return null
 
@@ -57,24 +66,41 @@ export default function InformationPage() {
         </div>
       </div>
 
-      {/* Dates */}
+      {/* Instructors */}
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold">Schedule</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="border rounded-lg p-4 bg-card space-y-1">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <CalendarIcon size={16} />
-              <span>Start date</span>
-            </div>
-            <p className="text-sm font-medium">{formatDate(course.startDate)}</p>
-          </div>
-          <div className="border rounded-lg p-4 bg-card space-y-1">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <CalendarIcon size={16} />
-              <span>End date</span>
-            </div>
-            <p className="text-sm font-medium">{formatDate(course.endDate)}</p>
-          </div>
+        <h2 className="text-lg font-semibold">Instructors</h2>
+        <div className="space-y-2">
+          {teachingTeam.length > 0 ? (
+            teachingTeam.map((person) => (
+              <div
+                key={person.id}
+                className="flex items-center justify-between gap-3 py-1"
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  <Avatar size="sm">
+                    <AvatarFallback>
+                      {person.firstName.charAt(0)}
+                      {person.lastName.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <Link
+                    href={`/courses/${courseId}/participants/${person.id}`}
+                    className="truncate text-sm font-medium text-primary hover:underline"
+                  >
+                    {person.firstName} {person.lastName}
+                  </Link>
+                  <Badge variant="outline" className="rounded-full text-[11px]">
+                    {person.roleLabel}
+                  </Badge>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  Last access: {person.lastAccess}
+                </span>
+              </div>
+            ))
+          ) : (
+            <p className="text-xs text-muted-foreground">No teaching team assigned.</p>
+          )}
         </div>
       </div>
 
@@ -95,6 +121,27 @@ export default function InformationPage() {
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
             <ClockIcon size={14} />
             <span>Last updated {course.updatedAt}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Dates */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-semibold">Schedule</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="border rounded-lg p-4 bg-card space-y-1">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <CalendarIcon size={16} />
+              <span>Start date</span>
+            </div>
+            <p className="text-sm font-medium">{formatDate(course.startDate)}</p>
+          </div>
+          <div className="border rounded-lg p-4 bg-card space-y-1">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <CalendarIcon size={16} />
+              <span>End date</span>
+            </div>
+            <p className="text-sm font-medium">{formatDate(course.endDate)}</p>
           </div>
         </div>
       </div>
