@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { PlusIcon, FileTextIcon, EyeIcon, PencilSimpleIcon } from "@phosphor-icons/react"
 import { mockWikiPages } from "@/lib/mock-wiki"
 import ForumReplyEditor from "@/components/forum-reply-editor"
@@ -80,27 +81,36 @@ export default function NewWikiPage() {
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+          <div className="space-y-5">
+            <div className="max-w-2xl space-y-2">
+              <Label
+                htmlFor="wiki-title"
+                className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"
+              >
                 Title
-              </label>
+              </Label>
               <Input
+                id="wiki-title"
                 className="text-gray-900 dark:text-gray-100"
                 placeholder="Page title..."
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
               />
             </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+            <div className="max-w-2xl space-y-2">
+              <Label
+                htmlFor="wiki-content"
+                className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"
+              >
                 Content
-              </label>
+              </Label>
+              <div id="wiki-content">
               <ForumReplyEditor
                 placeholder="Write page content..."
                 onContentChange={(empty) => setIsEmpty(empty)}
                 onHtmlChange={(h) => setHtml(h)}
               />
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <Button size="sm" disabled={!title.trim() || isEmpty}>

@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { PlusIcon, EyeIcon, PencilSimpleIcon } from "@phosphor-icons/react"
 import ForumReplyEditor from "@/components/forum-reply-editor"
 
@@ -77,27 +78,36 @@ export default function NewThreadPage() {
           </div>
         </div>
       ) : (
-        <div className="space-y-4">
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+        <div className="space-y-5">
+          <div className="max-w-2xl space-y-2">
+            <Label
+              htmlFor="thread-title"
+              className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"
+            >
               Title
-            </label>
+            </Label>
             <Input
+              id="thread-title"
               className="text-gray-900 dark:text-gray-100"
               placeholder="Thread title..."
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
           </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+          <div className="max-w-2xl space-y-2">
+            <Label
+              htmlFor="thread-content"
+              className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"
+            >
               Content
-            </label>
+            </Label>
+            <div id="thread-content">
             <ForumReplyEditor
               placeholder="Write your thread content..."
               onContentChange={(empty) => setIsEmpty(empty)}
               onHtmlChange={(h) => setHtml(h)}
             />
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Button size="sm" disabled={!title.trim() || isEmpty}>
