@@ -47,6 +47,11 @@ export default function LibraryItemLayout({
     tab.href === "" ? pathname === basePath : pathname.startsWith(`${basePath}${tab.href}`)
   )
   const displayDescription = buildDisplayDescription(item.description)
+  const isQuestionWorkPage = /^\/library\/[^/]+\/questions\/[^/]+\/(view|edit)$/.test(pathname)
+
+  if (isQuestionWorkPage) {
+    return <div className="max-w-4xl mx-auto">{children}</div>
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
