@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "katex/dist/katex.min.css";
+@import "mathlive/static.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -122,6 +124,36 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  math-field {
+    --hue: 220;
+    --primary: var(--foreground);
+    --caret-color: var(--foreground);
+    --caret-width: 1px;
+    --selection-color: var(--foreground);
+    --contains-highlight-color: var(--foreground);
+    --contains-highlight-background-color: color-mix(in oklch, var(--muted-foreground) 14%, transparent);
+    --selection-background-color: color-mix(in oklch, var(--muted-foreground) 18%, transparent);
+    --placeholder-background-color: transparent;
+    color: var(--foreground);
+    background: transparent;
+  }
+  math-field::part(container) {
+    border: 0;
+    background: transparent;
+  }
+  math-field::part(menu-toggle),
+  math-field::part(virtual-keyboard-toggle) {
+    display: none;
+  }
+  math-field .ML__caret,
+  math-field .ML__text-caret {
+    width: 1px !important;
+    min-width: 1px !important;
+    border-right-width: 1px !important;
+  }
+  math-field .ML__text-caret {
+    height: 1em !important;
   }
 }
 
