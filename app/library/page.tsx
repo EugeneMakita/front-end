@@ -168,7 +168,7 @@ export default function LibraryPage() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       {/* Breadcrumb + Header */}
       <div className="mb-6">
         {activeFolderId && (
@@ -197,7 +197,7 @@ export default function LibraryPage() {
         {folders.map((folder) => (
           <div
             key={folder.id}
-            className={`group flex items-center gap-3 border bg-card px-4 py-3 cursor-pointer transition-colors hover:shadow-sm min-w-[180px] ${
+            className={`group flex items-center gap-3 border bg-card px-3 py-2 cursor-pointer transition-colors hover:shadow-sm min-w-[170px] ${
               activeFolderId === folder.id ? "border-primary shadow-sm" : ""
             }`}
             onClick={() =>
@@ -241,7 +241,7 @@ export default function LibraryPage() {
         {/* New Folder button */}
         <Button
           variant="outline"
-          className="h-auto px-4 py-3 gap-2"
+          className="h-auto px-3 py-2 gap-2"
           onClick={handleNewFolder}
         >
           <PlusIcon size={18} />
@@ -336,7 +336,7 @@ export default function LibraryPage() {
                 className={`group border bg-card overflow-hidden transition-shadow hover:shadow-md cursor-pointer ${
                   isSelected ? "ring-2 ring-primary" : ""
                 }`}
-                onClick={() => router.push(`/library/${item.id}/questions`)}
+                onClick={() => router.push(`/library/${item.id}`)}
               >
                 {/* Image */}
                 <div className="relative aspect-[5/3] overflow-hidden bg-muted">

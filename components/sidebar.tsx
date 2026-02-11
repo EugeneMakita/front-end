@@ -59,7 +59,7 @@ function NavRow({
       onClick={onClick}
       variant="ghost"
       className={cn(
-        "h-10 w-full text-base font-medium",
+        "h-10 w-full text-sm font-medium",
         "bg-transparent hover:bg-muted/20",
         // Active style: primary background with white text
         active ? "bg-primary text-white hover:bg-primary/95" : "",
@@ -74,7 +74,7 @@ function NavRow({
       <div className={cn("flex items-center gap-3 w-full", collapsed ? "px-0" : "px-4")}> 
         <span
           className={cn(
-            "shrink-0 text-xl",
+            "shrink-0 text-lg",
             // icon inherits white when active, otherwise keep accent/muted/default
             active
               ? "text-white"
@@ -151,8 +151,8 @@ export default function Sidebar({
             </div>
 
             {!collapsed && (
-              <div className="mt-10 px-3 text-sm font-semibold text-muted-foreground">
-                Documents
+              <div className="mt-10 px-3 text-xs font-semibold text-muted-foreground">
+                Your chats
               </div>
             )}
 
@@ -187,7 +187,7 @@ export default function Sidebar({
           {!collapsed ? (
             <a
               href="/terms"
-              className="text-sm font-medium text-primary hover:underline"
+              className="text-xs font-medium text-primary hover:underline"
             >
               Terms & Privacy
             </a>
