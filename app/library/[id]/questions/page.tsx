@@ -1,8 +1,6 @@
 "use client"
 
 import * as React from "react"
-import Link from "next/link"
-import { useRouter, useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -38,14 +36,9 @@ import {
   TrashIcon,
   FolderSimpleIcon,
 } from "@phosphor-icons/react"
-import { mockQuestions, questionTypes, type Question } from "@/lib/mock-questions"
-import { initialItems } from "@/lib/mock-library"
+import { mockQuestions, questionTypes } from "@/lib/mock-questions"
 
 export default function QuestionsPage() {
-  const router = useRouter()
-  const params = useParams()
-  const itemId = params.id as string
-  const item = initialItems.find((i) => i.id === itemId)
   const [search, setSearch] = React.useState("")
   const [selectedItems, setSelectedItems] = React.useState<Set<number>>(new Set())
   const [expanded, setExpanded] = React.useState(true)
@@ -84,32 +77,15 @@ export default function QuestionsPage() {
     setSelectedItems(new Set())
   }
 
+  function truncateDescription(text: string, max = 120) {
+    return text.length > max ? `${text.slice(0, max).trimEnd()}...` : text
+  }
+
   return (
-    <div className="max-w-6xl mx-auto">
-      {/* Breadcrumb + Header */}
-      <div className="mb-6">
-        <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-2">
-          <Link
-            href="/library"
-            className="hover:text-foreground transition-colors"
-          >
-            Library
-          </Link>
-          <span>/</span>
-          <Link
-            href={`/library/${itemId}/questions`}
-            className="hover:text-foreground transition-colors"
-          >
-            {item?.title ?? `Item ${itemId}`}
-          </Link>
-          <span>/</span>
-          <span className="text-foreground font-medium">Questions</span>
-        </nav>
-        <h1 className="text-2xl font-bold">Questions</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          {filtered.length} question{filtered.length !== 1 ? "s" : ""} total
-        </p>
-      </div>
+    <div className="space-y-4">
+      <p className="text-sm text-muted-foreground">
+        {filtered.length} question{filtered.length !== 1 ? "s" : ""} total
+      </p>
 
       {/* Toolbar */}
       <div className="flex items-center gap-4 mb-4">
@@ -215,7 +191,7 @@ export default function QuestionsPage() {
             <TableRow className="bg-gray-100 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800">
               <TableHead className="w-[40px]" />
               <TableHead className="w-[60px] text-gray-700 dark:text-gray-300 text-center font-bold">ID</TableHead>
-              <TableHead className="min-w-[280px] text-gray-700 dark:text-gray-300 font-bold">Description</TableHead>
+              <TableHead className="w-[420px] text-gray-700 dark:text-gray-300 font-bold">Description</TableHead>
               <TableHead className="w-[140px] text-gray-700 dark:text-gray-300 font-bold">Actions</TableHead>
               <TableHead className="w-[160px] text-gray-700 dark:text-gray-300 font-bold">Type</TableHead>
               <TableHead className="w-[100px] text-gray-700 dark:text-gray-300 text-center font-bold">Times Used</TableHead>
@@ -239,8 +215,10 @@ export default function QuestionsPage() {
                     />
                   </TableCell>
                   <TableCell className="text-center text-gray-600 dark:text-gray-400">{question.id}</TableCell>
-                  <TableCell className="font-medium whitespace-normal max-w-[320px] text-gray-800 dark:text-gray-200">
-                    {question.description}
+                  <TableCell className="w-[420px] max-w-[420px] text-gray-800 dark:text-gray-200" title={question.description}>
+                    <span className="block overflow-hidden text-ellipsis whitespace-nowrap font-medium">
+                      {truncateDescription(question.description)}
+                    </span>
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>

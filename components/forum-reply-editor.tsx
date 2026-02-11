@@ -71,7 +71,7 @@ function ToolbarButton({
       aria-pressed={active}
       disabled={disabled}
       className={cn(
-        "flex h-8 w-8 items-center justify-center rounded text-gray-600 dark:text-gray-400 transition-colors hover:bg-accent hover:text-gray-900 dark:hover:text-gray-100",
+        "flex h-7 w-7 items-center justify-center rounded text-gray-600 dark:text-gray-400 transition-colors hover:bg-accent hover:text-gray-900 dark:hover:text-gray-100",
         active && "bg-accent text-gray-900 dark:text-gray-100",
         disabled && "opacity-40 pointer-events-none"
       )}
@@ -340,19 +340,19 @@ export default function ForumReplyEditor({
       />
 
       {/* Toolbar */}
-      <div className="flex items-center gap-0.5 px-1.5 py-1 border-b">
+      <div className="flex items-center gap-0.5 px-1.5 py-0.5 border-b">
         {/* Block type dropdown */}
         <div className="relative" ref={blockMenuRef}>
           <button
             type="button"
-            className="flex h-8 items-center gap-1 rounded px-2 text-xs font-medium text-gray-600 dark:text-gray-400 transition-colors hover:bg-accent hover:text-gray-900 dark:hover:text-gray-100"
+            className="flex h-7 items-center gap-1 rounded px-2 text-[11px] font-medium text-gray-600 dark:text-gray-400 transition-colors hover:bg-accent hover:text-gray-900 dark:hover:text-gray-100"
             onMouseDown={(e) => {
               e.preventDefault()
               setShowBlockMenu(!showBlockMenu)
             }}
           >
             {getCurrentBlockLabel()}
-            <CaretDownIcon size={12} />
+            <CaretDownIcon size={10} />
           </button>
           {showBlockMenu && (
             <div className="absolute left-0 top-full z-10 mt-1 w-36 rounded-md border bg-popover py-1 shadow-md">
@@ -361,7 +361,7 @@ export default function ForumReplyEditor({
                   key={opt.label}
                   type="button"
                   className={cn(
-                    "flex w-full items-center px-3 py-1.5 text-xs hover:bg-accent transition-colors",
+                    "flex w-full items-center px-3 py-1.5 text-[11px] hover:bg-accent transition-colors",
                     getCurrentBlockLabel() === opt.label && "font-semibold text-primary"
                   )}
                   onMouseDown={(e) => {
@@ -524,7 +524,7 @@ export default function ForumReplyEditor({
                   aria-label="Table"
                   aria-pressed={showTableMenu}
                   className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded text-gray-600 dark:text-gray-400 transition-colors hover:bg-accent hover:text-gray-900 dark:hover:text-gray-100",
+                    "flex h-7 w-7 items-center justify-center rounded text-gray-600 dark:text-gray-400 transition-colors hover:bg-accent hover:text-gray-900 dark:hover:text-gray-100",
                     showTableMenu && "bg-accent text-gray-900 dark:text-gray-100"
                   )}
                   onMouseDown={(e) => {
