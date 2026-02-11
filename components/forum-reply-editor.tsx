@@ -2,6 +2,8 @@
 
 import * as React from "react"
 import { useEditor, EditorContent } from "@tiptap/react"
+import { NodeSelection } from "@tiptap/pm/state"
+import { CellSelection } from "@tiptap/pm/tables"
 import StarterKit from "@tiptap/starter-kit"
 import LinkExtension from "@tiptap/extension-link"
 import Image from "@tiptap/extension-image"
@@ -12,6 +14,13 @@ import { TableCell } from "@tiptap/extension-table-cell"
 import { Mark, mergeAttributes } from "@tiptap/core"
 import { cn } from "@/lib/utils"
 import { mockParticipants } from "@/lib/mock-participants"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   TextBIcon,
   TextItalicIcon,
@@ -25,6 +34,11 @@ import {
   CodeIcon,
   InfoIcon,
   CaretDownIcon,
+  RowsPlusTopIcon,
+  RowsPlusBottomIcon,
+  ColumnsPlusLeftIcon,
+  ColumnsPlusRightIcon,
+  TrashIcon,
 } from "@phosphor-icons/react"
 
 const MentionMark = Mark.create({
@@ -91,13 +105,21 @@ export default function ForumReplyEditor({
   const mentionRef = React.useRef<HTMLDivElement>(null)
   const [mentionSearch, setMentionSearch] = React.useState("")
   const fileInputRef = React.useRef<HTMLInputElement>(null)
+  const tableContextMenuRef = React.useRef<HTMLDivElement>(null)
+  const [showTableContextMenu, setShowTableContextMenu] = React.useState(false)
+  const [tableContextMenuPos, setTableContextMenuPos] = React.useState({ x: 0, y: 0 })
 
   const editor = useEditor({
     extensions: [
       StarterKit,
       LinkExtension.configure({ openOnClick: false }),
       Image,
-      Table.configure({ resizable: false }),
+      Table.configure({
+        resizable: true,
+        handleWidth: 4,
+        cellMinWidth: 40,
+        allowTableNodeSelection: true,
+      }),
       TableRow,
       TableHeader,
       TableCell,
@@ -108,6 +130,53 @@ export default function ForumReplyEditor({
     editorProps: {
       attributes: {
         class: "forum-reply-editor-content",
+        "data-placeholder": placeholder,
+      },
+      handleDOMEvents: {
+        contextmenu: (view, event) => {
+          if (!(event instanceof MouseEvent)) return false
+          const target = event.target as HTMLElement | null
+          if (!target) return false
+
+          const cell = target.closest("td, th")
+          const table = target.closest("table")
+
+          if (!table) {
+            setShowTableContextMenu(false)
+            return false
+          }
+
+          event.preventDefault()
+          event.stopPropagation()
+
+          const findCellPosFromResolved = (startPos: number) => {
+            const resolved = view.state.doc.resolve(startPos)
+            for (let depth = resolved.depth; depth > 0; depth -= 1) {
+              const nodeAtDepth = resolved.node(depth)
+              if (nodeAtDepth.type.name === "tableCell" || nodeAtDepth.type.name === "tableHeader") {
+                return resolved.before(depth)
+              }
+            }
+            return null
+          }
+
+          if (cell) {
+            const pos = view.posAtDOM(cell, 0)
+            const safeCellPos = findCellPosFromResolved(pos)
+            if (safeCellPos !== null) {
+              const tr = view.state.tr.setSelection(CellSelection.create(view.state.doc, safeCellPos))
+              view.dispatch(tr)
+            }
+          } else {
+            const pos = view.posAtDOM(table, 0)
+            const tr = view.state.tr.setSelection(NodeSelection.create(view.state.doc, pos))
+            view.dispatch(tr)
+          }
+
+          setTableContextMenuPos({ x: event.clientX, y: event.clientY })
+          setShowTableContextMenu(true)
+          return true
+        },
       },
     },
     onUpdate: ({ editor: e }) => {
@@ -121,6 +190,29 @@ export default function ForumReplyEditor({
       linkInputRef.current.focus()
     }
   }, [showLinkInput])
+
+  React.useEffect(() => {
+    function handleOutsideClick(e: MouseEvent) {
+      if (tableContextMenuRef.current && !tableContextMenuRef.current.contains(e.target as Node)) {
+        setShowTableContextMenu(false)
+      }
+    }
+
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        setShowTableContextMenu(false)
+      }
+    }
+
+    if (showTableContextMenu) {
+      document.addEventListener("mousedown", handleOutsideClick)
+      document.addEventListener("keydown", handleEscape)
+      return () => {
+        document.removeEventListener("mousedown", handleOutsideClick)
+        document.removeEventListener("keydown", handleEscape)
+      }
+    }
+  }, [showTableContextMenu])
 
   // Close mention menu on outside click
   React.useEffect(() => {
@@ -183,6 +275,12 @@ export default function ForumReplyEditor({
     return "Normal text"
   }
 
+  const [showTableMenu, setShowTableMenu] = React.useState(false)
+  const [hoveredRows, setHoveredRows] = React.useState(0)
+  const [hoveredCols, setHoveredCols] = React.useState(0)
+  const [tableRows, setTableRows] = React.useState("3")
+  const [tableCols, setTableCols] = React.useState("3")
+
   const [showBlockMenu, setShowBlockMenu] = React.useState(false)
   const blockMenuRef = React.useRef<HTMLDivElement>(null)
 
@@ -213,9 +311,25 @@ export default function ForumReplyEditor({
     const full = `${p.firstName} ${p.lastName}`.toLowerCase()
     return full.includes(mentionSearch.toLowerCase())
   })
+  const tableActive = editor.isActive("table")
+  const contextMenuX =
+    typeof window === "undefined" ? tableContextMenuPos.x : Math.max(8, Math.min(tableContextMenuPos.x, window.innerWidth - 248))
+  const contextMenuY =
+    typeof window === "undefined" ? tableContextMenuPos.y : Math.max(8, Math.min(tableContextMenuPos.y, window.innerHeight - 320))
+
+  function parseTableDimension(value: string, fallback: number) {
+    const parsed = Number.parseInt(value, 10)
+    if (Number.isNaN(parsed)) return fallback
+    return Math.min(20, Math.max(1, parsed))
+  }
+
+  function insertTable(rows: number, cols: number) {
+    editor.chain().focus().insertTable({ rows, cols, withHeaderRow: true }).run()
+    setShowTableMenu(false)
+  }
 
   return (
-    <div className="forum-reply-editor border rounded-lg overflow-hidden bg-background text-gray-900 dark:text-gray-100 transition-[border-color,box-shadow] focus-within:border-primary focus-within:ring-[3px] focus-within:ring-primary/30">
+    <div className="forum-reply-editor border rounded-lg bg-background text-gray-900 dark:text-gray-100 transition-[border-color,box-shadow] focus-within:border-primary focus-within:ring-[3px] focus-within:ring-primary/30">
       {/* Hidden file input for images */}
       <input
         ref={fileInputRef}
@@ -226,7 +340,7 @@ export default function ForumReplyEditor({
       />
 
       {/* Toolbar */}
-      <div className="flex items-center gap-0.5 px-2 py-1.5 border-b bg-muted/30">
+      <div className="flex items-center gap-0.5 px-1.5 py-1 border-b">
         {/* Block type dropdown */}
         <div className="relative" ref={blockMenuRef}>
           <button
@@ -403,12 +517,90 @@ export default function ForumReplyEditor({
               )}
             </div>
 
-            <ToolbarButton
-              label="Table"
-              onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
-            >
-              <TableIcon size={16} />
-            </ToolbarButton>
+            <DropdownMenu open={showTableMenu} onOpenChange={setShowTableMenu}>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="Table"
+                  aria-pressed={showTableMenu}
+                  className={cn(
+                    "flex h-8 w-8 items-center justify-center rounded text-gray-600 dark:text-gray-400 transition-colors hover:bg-accent hover:text-gray-900 dark:hover:text-gray-100",
+                    showTableMenu && "bg-accent text-gray-900 dark:text-gray-100"
+                  )}
+                  onMouseDown={(e) => {
+                    e.preventDefault()
+                    setHoveredRows(0)
+                    setHoveredCols(0)
+                  }}
+                >
+                  <TableIcon size={16} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[320px] p-0" align="start">
+                <div className="space-y-2 p-2">
+                  <p className="text-xs font-medium">Insert table</p>
+                  <div className="grid gap-[4px]" style={{ gridTemplateColumns: "repeat(8, 22px)" }}>
+                    {Array.from({ length: 8 }, (_, row) =>
+                      Array.from({ length: 8 }, (_, col) => {
+                        const isHighlighted = row < hoveredRows && col < hoveredCols
+                        return (
+                          <button
+                            key={`${row}-${col}`}
+                            type="button"
+                            className={cn(
+                              "h-[22px] w-[22px] rounded-[2px] border transition-colors",
+                              isHighlighted
+                                ? "border-primary/50 bg-primary/25"
+                                : "border-border bg-muted/40 hover:border-primary/30"
+                            )}
+                            onMouseEnter={() => {
+                              setHoveredRows(row + 1)
+                              setHoveredCols(col + 1)
+                            }}
+                            onMouseDown={(e) => {
+                              e.preventDefault()
+                              insertTable(row + 1, col + 1)
+                            }}
+                          />
+                        )
+                      })
+                    )}
+                  </div>
+                  <p className="text-center text-xs text-muted-foreground">
+                    {hoveredRows > 0 && hoveredCols > 0 ? `${hoveredCols} x ${hoveredRows}` : "Hover to pick table size"}
+                  </p>
+                  <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
+                    <Input
+                      type="number"
+                      min={1}
+                      max={20}
+                      value={tableRows}
+                      onChange={(e) => setTableRows(e.target.value)}
+                      placeholder="Rows"
+                    />
+                    <Input
+                      type="number"
+                      min={1}
+                      max={20}
+                      value={tableCols}
+                      onChange={(e) => setTableCols(e.target.value)}
+                      placeholder="Cols"
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      className="h-8 rounded-none px-3 text-xs"
+                      onMouseDown={(e) => {
+                        e.preventDefault()
+                        insertTable(parseTableDimension(tableRows, 3), parseTableDimension(tableCols, 3))
+                      }}
+                    >
+                      Insert
+                    </Button>
+                  </div>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <ToolbarButton
               label="Code"
               active={editor.isActive("codeBlock")}
@@ -429,6 +621,107 @@ export default function ForumReplyEditor({
 
       {/* Editor */}
       <EditorContent editor={editor} />
+      {showTableContextMenu && tableActive && (
+        <div
+          ref={tableContextMenuRef}
+          className="fixed z-50 min-w-[220px] rounded-none border border-border bg-popover p-1 shadow-md"
+          style={{ left: contextMenuX, top: contextMenuY }}
+        >
+          <button
+            type="button"
+            disabled={!editor.can().chain().focus().addRowBefore().run()}
+            className="flex w-full items-center gap-2 px-2 py-2 text-left text-xs hover:bg-accent disabled:opacity-40"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              editor.chain().focus().addRowBefore().run()
+              setShowTableContextMenu(false)
+            }}
+          >
+            <RowsPlusTopIcon size={16} />
+            Insert row above
+          </button>
+          <button
+            type="button"
+            disabled={!editor.can().chain().focus().addRowAfter().run()}
+            className="flex w-full items-center gap-2 px-2 py-2 text-left text-xs hover:bg-accent disabled:opacity-40"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              editor.chain().focus().addRowAfter().run()
+              setShowTableContextMenu(false)
+            }}
+          >
+            <RowsPlusBottomIcon size={16} />
+            Insert row below
+          </button>
+          <button
+            type="button"
+            disabled={!editor.can().chain().focus().deleteRow().run()}
+            className="flex w-full items-center gap-2 px-2 py-2 text-left text-xs hover:bg-accent disabled:opacity-40"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              editor.chain().focus().deleteRow().run()
+              setShowTableContextMenu(false)
+            }}
+          >
+            <TrashIcon size={16} />
+            Delete row
+          </button>
+          <div className="my-1 h-px bg-border" />
+          <button
+            type="button"
+            disabled={!editor.can().chain().focus().addColumnBefore().run()}
+            className="flex w-full items-center gap-2 px-2 py-2 text-left text-xs hover:bg-accent disabled:opacity-40"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              editor.chain().focus().addColumnBefore().run()
+              setShowTableContextMenu(false)
+            }}
+          >
+            <ColumnsPlusLeftIcon size={16} />
+            Insert column left
+          </button>
+          <button
+            type="button"
+            disabled={!editor.can().chain().focus().addColumnAfter().run()}
+            className="flex w-full items-center gap-2 px-2 py-2 text-left text-xs hover:bg-accent disabled:opacity-40"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              editor.chain().focus().addColumnAfter().run()
+              setShowTableContextMenu(false)
+            }}
+          >
+            <ColumnsPlusRightIcon size={16} />
+            Insert column right
+          </button>
+          <button
+            type="button"
+            disabled={!editor.can().chain().focus().deleteColumn().run()}
+            className="flex w-full items-center gap-2 px-2 py-2 text-left text-xs hover:bg-accent disabled:opacity-40"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              editor.chain().focus().deleteColumn().run()
+              setShowTableContextMenu(false)
+            }}
+          >
+            <TrashIcon size={16} />
+            Delete column
+          </button>
+          <div className="my-1 h-px bg-border" />
+          <button
+            type="button"
+            disabled={!editor.can().chain().focus().deleteTable().run()}
+            className="flex w-full items-center gap-2 px-2 py-2 text-left text-xs text-destructive hover:bg-destructive/10 disabled:opacity-40"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              editor.chain().focus().deleteTable().run()
+              setShowTableContextMenu(false)
+            }}
+          >
+            <TrashIcon size={16} />
+            Delete table
+          </button>
+        </div>
+      )}
     </div>
   )
 }
