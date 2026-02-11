@@ -185,7 +185,7 @@
 /* Forum reply editor styles */
 .forum-reply-editor .tiptap {
   outline: none;
-  min-height: 120px;
+  min-height: 180px;
   padding: 0.75rem 1rem;
   cursor: text;
   overflow-x: hidden;
