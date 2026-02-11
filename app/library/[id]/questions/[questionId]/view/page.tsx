@@ -5,7 +5,6 @@ import Link from "next/link"
 import * as React from "react"
 import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   ArrowArcLeftIcon,
@@ -34,7 +33,7 @@ const basicKeys: KeyDef[] = [
   { labelLatex: "(", insertLatex: "(" },
   { labelLatex: ")", insertLatex: ")" },
   { labelLatex: "\\sqrt{\\Box}", insertLatex: "\\sqrt{#?}" },
-  { labelLatex: "x^{\\Box}", insertLatex: "x^{#?}" },
+  { labelLatex: "\\Box^{\\Box}", insertLatex: "{#?}^{#?}" },
   { labelLatex: "1", insertLatex: "1" },
   { labelLatex: "2", insertLatex: "2" },
   { labelLatex: "3", insertLatex: "3" },
@@ -89,12 +88,12 @@ function KeyButton({
     <Button
       type="button"
       variant="outline"
-      className="h-10 min-w-10 px-2 text-sm"
+      className="h-7 w-full px-0 text-xs"
       onMouseDown={(e) => e.preventDefault()}
       onClick={() => onInsert(keyDef.insertLatex)}
     >
       <span
-        className="inline-flex items-center"
+        className="inline-flex items-center text-[13px] leading-none [&_.katex]:text-[13px]"
         dangerouslySetInnerHTML={{ __html: renderLatex(keyDef.labelLatex) }}
       />
     </Button>
@@ -129,6 +128,7 @@ export default function QuestionViewPage() {
 
     field.setOptions({
       smartMode: false,
+      smartFence: false,
       virtualKeyboardMode: "manual",
       mathVirtualKeyboardPolicy: "manual",
       defaultMode: "math",
@@ -137,6 +137,20 @@ export default function QuestionViewPage() {
     })
 
     const onFocus = () => setShowPad(true)
+    const onPointerDown = () => setShowPad(true)
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) {
+        return
+      }
+      if (event.key === ")" || event.key === "]" || event.key === "}") {
+        event.preventDefault()
+        field.insert(event.key, { format: "latex" })
+      }
+    }
+    const onContextMenu = (event: Event) => {
+      event.preventDefault()
+      event.stopPropagation()
+    }
     const hideBuiltInToggles = () => {
       const root = field.shadowRoot
       if (!root) {
@@ -146,6 +160,14 @@ export default function QuestionViewPage() {
         const caretStyle = document.createElement("style")
         caretStyle.setAttribute("data-custom-caret-style", "true")
         caretStyle.textContent = `
+          .ML__content {
+            overflow: visible !important;
+            padding-top: 0.14em !important;
+            padding-bottom: 0.08em !important;
+          }
+          .ML__content .ML__latex {
+            line-height: 1.24 !important;
+          }
           .ML__caret::after,
           .ML__text-caret::after,
           .ML__latex-caret::after {
@@ -154,6 +176,16 @@ export default function QuestionViewPage() {
             border-radius: 0 !important;
             bottom: -0.02em !important;
             left: -0.01em !important;
+          }
+          .ML__selection,
+          .ML__focused .ML__selected {
+            color: #111827 !important;
+            background: rgba(148, 163, 184, 0.28) !important;
+          }
+          .ML__contains-highlight,
+          .ML__focused .ML__contains-highlight {
+            color: #111827 !important;
+            background: rgba(148, 163, 184, 0.2) !important;
           }
         `
         root.appendChild(caretStyle)
@@ -174,10 +206,18 @@ export default function QuestionViewPage() {
     })
 
     field.addEventListener("focus", onFocus)
+    field.addEventListener("pointerdown", onPointerDown)
+    field.addEventListener("click", onPointerDown)
+    field.addEventListener("keydown", onKeyDown)
+    field.addEventListener("contextmenu", onContextMenu, true)
 
     return () => {
       observer?.disconnect()
       field.removeEventListener("focus", onFocus)
+      field.removeEventListener("pointerdown", onPointerDown)
+      field.removeEventListener("click", onPointerDown)
+      field.removeEventListener("keydown", onKeyDown)
+      field.removeEventListener("contextmenu", onContextMenu, true)
     }
   }, [getField, isMounted])
 
@@ -197,15 +237,6 @@ export default function QuestionViewPage() {
     }
     field.focus()
     field.executeCommand(command as never)
-  }, [getField])
-
-  const clearAll = React.useCallback(() => {
-    const field = getField()
-    if (!field) {
-      return
-    }
-    field.setValue("", { silenceNotifications: false })
-    field.focus()
   }, [getField])
 
   if (!question) {
@@ -267,25 +298,45 @@ export default function QuestionViewPage() {
 
         {showPad && (
           <div
-            className="w-[min(640px,100%)] border bg-popover"
+            className="w-[25.5rem] max-w-full"
             onMouseDown={(e) => e.preventDefault()}
           >
-            <div className="flex items-center justify-between px-3 py-2">
-              <p className="text-xs font-medium text-muted-foreground">Math keypad</p>
-              <Button type="button" size="xs" variant="ghost" onClick={() => setShowPad(false)}>
-                Done
-              </Button>
-            </div>
-            <Separator />
-            <Tabs defaultValue="basic" className="p-3">
-              <TabsList variant="line" className="w-full justify-start">
-                <TabsTrigger value="basic">Basic</TabsTrigger>
-                <TabsTrigger value="funcs">Funcs</TabsTrigger>
-                <TabsTrigger value="trig">Trig</TabsTrigger>
-              </TabsList>
+          <div className="w-full border bg-popover shadow-md">
+            <Tabs defaultValue="basic" className="px-1.5 py-2">
+              <div className="flex items-center gap-1">
+                <TabsList className="grid h-8 flex-1 grid-cols-3 gap-1 bg-muted/40 p-1">
+                  <TabsTrigger
+                    value="basic"
+                    className="h-6 w-full border border-transparent bg-transparent px-2 text-xs data-active:border-border data-active:bg-background data-active:text-foreground"
+                  >
+                    Basic
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="funcs"
+                    className="h-6 w-full border border-transparent bg-transparent px-2 text-xs data-active:border-border data-active:bg-background data-active:text-foreground"
+                  >
+                    Funcs
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="trig"
+                    className="h-6 w-full border border-transparent bg-transparent px-2 text-xs data-active:border-border data-active:bg-background data-active:text-foreground"
+                  >
+                    Trig
+                  </TabsTrigger>
+                </TabsList>
+                <Button
+                  type="button"
+                  size="icon-xs"
+                  variant="ghost"
+                  className="h-8 w-8"
+                  onClick={() => setShowPad(false)}
+                >
+                  <XIcon size={12} />
+                </Button>
+              </div>
 
               <TabsContent value="basic">
-                <div className="mt-2.5 grid grid-cols-10 gap-1.5">
+                <div className="mt-2 grid grid-cols-10 gap-1">
                   {basicKeys.map((keyDef) => (
                     <KeyButton key={keyDef.labelLatex} keyDef={keyDef} onInsert={insertLatex} />
                   ))}
@@ -293,7 +344,7 @@ export default function QuestionViewPage() {
               </TabsContent>
 
               <TabsContent value="funcs">
-                <div className="mt-2.5 grid grid-cols-4 gap-1.5">
+                <div className="mt-2 grid grid-cols-4 gap-1">
                   {funcKeys.map((keyDef) => (
                     <KeyButton key={keyDef.labelLatex} keyDef={keyDef} onInsert={insertLatex} />
                   ))}
@@ -301,38 +352,35 @@ export default function QuestionViewPage() {
               </TabsContent>
 
               <TabsContent value="trig">
-                <div className="mt-2.5 grid grid-cols-3 gap-1.5">
+                <div className="mt-2 grid grid-cols-3 gap-1">
                   {trigKeys.map((keyDef) => (
                     <KeyButton key={keyDef.labelLatex} keyDef={keyDef} onInsert={insertLatex} />
                   ))}
                 </div>
               </TabsContent>
             </Tabs>
-            <Separator />
-            <div className="flex items-center justify-between px-3 py-2.5">
-              <div className="flex items-center gap-2">
-                <Button type="button" variant="outline" className="h-9 w-9" onClick={() => runCommand("undo")}> 
+            <div className="flex items-center justify-between px-1.5 py-2">
+              <div className="flex items-center gap-1">
+                <Button type="button" variant="outline" className="h-7 w-7" onClick={() => runCommand("undo")}> 
                   <ArrowArcLeftIcon size={16} />
                 </Button>
-                <Button type="button" variant="outline" className="h-9 w-9" onClick={() => runCommand("redo")}> 
+                <Button type="button" variant="outline" className="h-7 w-7" onClick={() => runCommand("redo")}> 
                   <ArrowArcRightIcon size={16} />
                 </Button>
               </div>
-              <div className="flex items-center gap-2">
-                <Button type="button" variant="outline" className="h-9 w-9" onClick={() => runCommand("moveToPreviousChar")}>
+              <div className="flex items-center gap-1">
+                <Button type="button" variant="outline" className="h-7 w-7" onClick={() => runCommand("moveToPreviousChar")}>
                   <ArrowLeftIcon size={16} />
                 </Button>
-                <Button type="button" variant="outline" className="h-9 w-9" onClick={() => runCommand("moveToNextChar")}>
+                <Button type="button" variant="outline" className="h-7 w-7" onClick={() => runCommand("moveToNextChar")}>
                   <ArrowRightIcon size={16} />
                 </Button>
-                <Button type="button" variant="outline" className="h-9 w-14" onClick={() => runCommand("deleteBackward")}>
+                <Button type="button" variant="outline" className="h-7 w-10" onClick={() => runCommand("deleteBackward")}>
                   <BackspaceIcon size={16} />
-                </Button>
-                <Button type="button" variant="outline" className="h-9 w-9" onClick={clearAll}>
-                  <XIcon size={16} />
                 </Button>
               </div>
             </div>
+          </div>
           </div>
         )}
       </div>
