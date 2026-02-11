@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -39,6 +40,9 @@ import {
 import { mockQuestions, questionTypes } from "@/lib/mock-questions"
 
 export default function QuestionsPage() {
+  const params = useParams()
+  const router = useRouter()
+  const itemId = params.id as string
   const [search, setSearch] = React.useState("")
   const [selectedItems, setSelectedItems] = React.useState<Set<number>>(new Set())
   const [expanded, setExpanded] = React.useState(true)
@@ -229,11 +233,11 @@ export default function QuestionsPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start" className="w-44">
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => router.push(`/library/${itemId}/questions/${question.id}/view`)}>
                           <EyeIcon size={16} />
                           <span>Preview</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => router.push(`/library/${itemId}/questions/${question.id}/edit`)}>
                           <PencilSimpleIcon size={16} />
                           <span>Edit</span>
                         </DropdownMenuItem>
