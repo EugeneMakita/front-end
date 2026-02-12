@@ -9,9 +9,11 @@ import {
   PlusCircleIcon,
   BookOpenIcon,
   GraduationCapIcon,
+  ClipboardIcon,
   ChartBarIcon,
   FolderSimpleIcon,
   UsersThreeIcon,
+  ChalkboardSimpleIcon,
   DatabaseIcon,
   ClipboardTextIcon,
   FileTextIcon,
@@ -24,6 +26,8 @@ type NavKey =
   | "quickCreate"
   | "library"
   | "courses"
+  | "classes"
+  | "assignments"
   | "analytics"
   | "projects"
   | "team"
@@ -109,6 +113,8 @@ export default function Sidebar({
     { key: "quickCreate", label: "Quick Create", icon: <PlusCircleIcon size={22} /> },
     { key: "library", label: "Library", icon: <BookOpenIcon size={22} /> },
     { key: "courses", label: "Courses", icon: <GraduationCapIcon size={22} /> },
+    { key: "classes", label: "Classes", icon: <ChalkboardSimpleIcon size={22} /> },
+    { key: "assignments", label: "Assignments", icon: <ClipboardIcon size={22} /> },
     { key: "analytics", label: "Analytics", icon: <ChartBarIcon size={22} /> },
     { key: "projects", label: "Projects", icon: <FolderSimpleIcon size={22} /> },
     { key: "team", label: "Team", icon: <UsersThreeIcon size={22} /> },

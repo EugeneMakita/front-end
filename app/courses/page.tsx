@@ -36,10 +36,10 @@ export default function CoursesPage() {
   })
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Courses</h1>
+        <h1 className="text-2xl font-bold mb-2">Courses</h1>
         <p className="text-muted-foreground">
           Browse and manage your courses, projects, and resources.
         </p>

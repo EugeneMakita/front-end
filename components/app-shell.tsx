@@ -241,6 +241,8 @@ function TopBar({
 const navRoutes: Partial<Record<NavKey, string>> = {
   library: "/library",
   courses: "/courses",
+  classes: "/classes",
+  assignments: "/assignments",
   quickCreate: "/",
 }
 
@@ -328,11 +330,40 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
       })
     }
 
+    function clearSelectionAction(event?: Event) {
+      const target = event?.target as Element | null
+      if (target?.closest("[data-note-capture-button='true']")) {
+        return
+      }
+      const selection = window.getSelection()
+      if (!selection || selection.toString().trim() === "") {
+        setSelectionAction(null)
+      }
+    }
+
+    function hideSelectionActionOnPointerDown(event: Event) {
+      const target = event.target as Element | null
+      if (target?.closest("[data-note-capture-button='true']")) {
+        return
+      }
+      setSelectionAction(null)
+    }
+
+    document.addEventListener("selectionchange", updateSelectionAction)
     document.addEventListener("mouseup", updateSelectionAction)
     document.addEventListener("keyup", updateSelectionAction)
+    document.addEventListener("mousedown", hideSelectionActionOnPointerDown)
+    document.addEventListener("click", clearSelectionAction)
+    window.addEventListener("scroll", clearSelectionAction, true)
+    window.addEventListener("resize", clearSelectionAction)
     return () => {
+      document.removeEventListener("selectionchange", updateSelectionAction)
       document.removeEventListener("mouseup", updateSelectionAction)
       document.removeEventListener("keyup", updateSelectionAction)
+      document.removeEventListener("mousedown", hideSelectionActionOnPointerDown)
+      document.removeEventListener("click", clearSelectionAction)
+      window.removeEventListener("scroll", clearSelectionAction, true)
+      window.removeEventListener("resize", clearSelectionAction)
     }
   }, [])
 
@@ -366,6 +397,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
         <button
           type="button"
           aria-label="Add selection to notes"
+          data-note-capture-button="true"
           className="fixed z-[75] flex h-8 w-8 items-center justify-center border bg-background shadow-md hover:bg-accent"
           style={{ left: selectionAction.x, top: selectionAction.y }}
           onMouseDown={(e) => e.preventDefault()}

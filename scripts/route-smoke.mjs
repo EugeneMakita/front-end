@@ -11,6 +11,8 @@ const routeChecks = [
   { route: "/courses/1", file: "app/courses/[id]/page.tsx" },
   { route: "/courses/1/information", file: "app/courses/[id]/information/page.tsx" },
   { route: "/courses/1/wiki/home", file: "app/courses/[id]/wiki/[pageId]/page.tsx" },
+  { route: "/classes", file: "app/classes/page.tsx" },
+  { route: "/classes/c-1/students", file: "app/classes/[id]/students/page.tsx" },
   { route: "/library", file: "app/library/page.tsx" },
   { route: "/library/1", file: "app/library/[id]/page.tsx" },
   { route: "/library/1/questions", file: "app/library/[id]/questions/page.tsx" },
