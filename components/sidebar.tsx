@@ -10,9 +10,6 @@ import {
   BookOpenIcon,
   GraduationCapIcon,
   ClipboardIcon,
-  ChartBarIcon,
-  FolderSimpleIcon,
-  UsersThreeIcon,
   ChalkboardSimpleIcon,
   DatabaseIcon,
   ClipboardTextIcon,
@@ -115,9 +112,6 @@ export default function Sidebar({
     { key: "courses", label: "Courses", icon: <GraduationCapIcon size={22} /> },
     { key: "classes", label: "Classes", icon: <ChalkboardSimpleIcon size={22} /> },
     { key: "assignments", label: "Assignments", icon: <ClipboardIcon size={22} /> },
-    { key: "analytics", label: "Analytics", icon: <ChartBarIcon size={22} /> },
-    { key: "projects", label: "Projects", icon: <FolderSimpleIcon size={22} /> },
-    { key: "team", label: "Team", icon: <UsersThreeIcon size={22} /> },
   ]
 
   const documents: NavItem[] = [
