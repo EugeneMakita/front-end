@@ -32,7 +32,13 @@ import {
   NoteBlankIcon,
 } from "@phosphor-icons/react"
 
-function TopBar({ onOpenNotes }: { onOpenNotes?: () => void }) {
+function TopBar({
+  onOpenNotes,
+  onLogout,
+}: {
+  onOpenNotes?: () => void
+  onLogout?: () => void
+}) {
   const [locale, setLocale] = React.useState("EN")
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
   const [isNotificationsOpen, setIsNotificationsOpen] = React.useState(false)
@@ -209,7 +215,7 @@ function TopBar({ onOpenNotes }: { onOpenNotes?: () => void }) {
                   <RocketIcon size={18} weight="bold" />
                   <span>Upgrade</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem variant="destructive">
+                <DropdownMenuItem variant="destructive" onSelect={onLogout}>
                   <SignOutIcon size={18} weight="bold" />
                   <span>Log Out</span>
                 </DropdownMenuItem>
@@ -239,6 +245,14 @@ const navRoutes: Partial<Record<NavKey, string>> = {
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
+  const isAuthPage =
+    pathname.startsWith("/create-account") ||
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/verify-email") ||
+    pathname.startsWith("/onboarding") ||
+    pathname.startsWith("/terms") ||
+    pathname.startsWith("/privacy-policy")
 
   const pathToKey = Object.entries(navRoutes).find(([, path]) => pathname === path || pathname.startsWith(path + "/"))?.[0] as NavKey | undefined
   const [activeKey, setActiveKey] = React.useState<NavKey>(pathToKey ?? "quickCreate")
@@ -254,9 +268,16 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     }
   }
 
+  if (isAuthPage) {
+    return <div className="min-h-screen bg-background">{children}</div>
+  }
+
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-background">
-      <TopBar onOpenNotes={() => setShowNotes(true)} />
+      <TopBar
+        onOpenNotes={() => setShowNotes(true)}
+        onLogout={() => router.push("/create-account")}
+      />
 
       {/* Row under the topbar */}
       <div className="flex min-h-0 flex-1 overflow-hidden">
