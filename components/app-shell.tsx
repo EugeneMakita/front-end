@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { useRouter, usePathname } from "next/navigation"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -257,6 +257,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 function AppShellContent({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const { capturedNotes, addCapturedNote } = useNotes()
   const isAuthPage =
     pathname.startsWith("/create-account") ||
@@ -268,22 +269,59 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
     pathname.startsWith("/privacy-policy")
 
   const pathToKey = Object.entries(navRoutes).find(([, path]) => pathname === path || pathname.startsWith(path + "/"))?.[0] as NavKey | undefined
-  const [activeKey, setActiveKey] = React.useState<NavKey>(pathToKey ?? "quickCreate")
-  const showRightPanel = activeKey === "quickCreate"
+  const hasQuickCreateParam = searchParams.get("quickCreate") === "1"
+  const [quickCreateOpen, setQuickCreateOpen] = React.useState<boolean>(() => hasQuickCreateParam)
+  const showRightPanel = quickCreateOpen
+  const activeKey: NavKey =
+    pathToKey && pathToKey !== "quickCreate"
+      ? pathToKey
+      : quickCreateOpen
+      ? "quickCreate"
+      : "quickCreate"
   const [showNotes, setShowNotes] = React.useState(false)
   const [notesPinned, setNotesPinned] = React.useState(false)
   const contentRef = React.useRef<HTMLDivElement>(null)
+  const closingQuickCreateRef = React.useRef(false)
   const [selectionAction, setSelectionAction] = React.useState<{
     text: string
     x: number
     y: number
   } | null>(null)
 
+  const buildPathWithQuickCreate = React.useCallback(
+    (path: string, open: boolean) => {
+      const params = new URLSearchParams(searchParams.toString())
+      if (open) {
+        params.set("quickCreate", "1")
+      } else {
+        params.delete("quickCreate")
+      }
+      const query = params.toString()
+      return query ? `${path}?${query}` : path
+    },
+    [searchParams]
+  )
+
+  function closeQuickCreate() {
+    closingQuickCreateRef.current = true
+    setQuickCreateOpen(false)
+    router.replace(buildPathWithQuickCreate(pathname, false))
+  }
+
   function handleNavSelect(key: NavKey) {
-    setActiveKey(key)
+    if (key === "quickCreate") {
+      if (quickCreateOpen) {
+        closeQuickCreate()
+      } else {
+        closingQuickCreateRef.current = false
+        setQuickCreateOpen(true)
+        router.push(buildPathWithQuickCreate(pathname, true))
+      }
+      return
+    }
     const route = navRoutes[key]
     if (route) {
-      router.push(route)
+      router.push(buildPathWithQuickCreate(route, quickCreateOpen))
     }
   }
 
@@ -367,6 +405,25 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  React.useEffect(() => {
+    if (!hasQuickCreateParam) {
+      closingQuickCreateRef.current = false
+    }
+  }, [hasQuickCreateParam])
+
+  React.useEffect(() => {
+    if (closingQuickCreateRef.current) return
+    if (hasQuickCreateParam && !quickCreateOpen) {
+      setQuickCreateOpen(true)
+    }
+  }, [hasQuickCreateParam, quickCreateOpen])
+
+  React.useEffect(() => {
+    if (isAuthPage) return
+    if (!quickCreateOpen || hasQuickCreateParam) return
+    router.replace(buildPathWithQuickCreate(pathname, true))
+  }, [buildPathWithQuickCreate, hasQuickCreateParam, isAuthPage, pathname, quickCreateOpen, router])
+
   if (isAuthPage) {
     return <div className="min-h-screen bg-background">{children}</div>
   }
@@ -384,7 +441,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
 
         {showRightPanel && (
           <aside className="h-full w-[420px] overflow-hidden border-r bg-background">
-            <QuickCreatePanel onClose={() => handleNavSelect("library")} />
+            <QuickCreatePanel onClose={closeQuickCreate} />
           </aside>
         )}
 

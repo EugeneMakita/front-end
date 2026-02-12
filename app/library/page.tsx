@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -41,6 +41,13 @@ import { initialFolders, initialItems, type Folder, type LibraryItem } from "@/l
 
 export default function LibraryPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const quickCreateOpen = searchParams.get("quickCreate") === "1"
+  const withQuickCreate = React.useCallback(
+    (path: string) =>
+      quickCreateOpen ? `${path}${path.includes("?") ? "&" : "?"}quickCreate=1` : path,
+    [quickCreateOpen]
+  )
   const [search, setSearch] = React.useState("")
   const [sortBy, setSortBy] = React.useState("recent")
   const [folders, setFolders] = React.useState(initialFolders)
@@ -177,7 +184,7 @@ export default function LibraryPage() {
           <div
             key={folder.id}
             className="group flex items-center gap-3 border bg-card px-3 py-2 cursor-pointer transition-colors hover:shadow-sm min-w-[170px]"
-            onClick={() => router.push(`/library/folder/${folder.id}`)}
+            onClick={() => router.push(withQuickCreate(`/library/folder/${folder.id}`))}
           >
             {folder.icon === "star" ? (
               <StarIcon size={20} weight="fill" className="text-primary shrink-0" />
@@ -311,7 +318,7 @@ export default function LibraryPage() {
                 className={`group border bg-card overflow-hidden transition-shadow hover:shadow-md cursor-pointer ${
                   isSelected ? "ring-2 ring-primary" : ""
                 }`}
-                onClick={() => router.push(`/library/${item.id}`)}
+                onClick={() => router.push(withQuickCreate(`/library/${item.id}`))}
               >
                 {/* Image */}
                 <div className="relative aspect-[5/3] overflow-hidden bg-muted">
