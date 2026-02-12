@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { useParams, usePathname } from "next/navigation"
+import { useParams, usePathname, useSearchParams } from "next/navigation"
 import { initialItems } from "@/lib/mock-library"
 import { cn } from "@/lib/utils"
 
@@ -31,8 +31,16 @@ export default function LibraryItemLayout({
 }) {
   const params = useParams()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const itemId = params.id as string
   const item = initialItems.find((entry) => entry.id === itemId)
+  const quickCreateOpen = searchParams.get("quickCreate") === "1"
+
+  const withQuickCreate = React.useCallback(
+    (path: string) =>
+      quickCreateOpen ? `${path}${path.includes("?") ? "&" : "?"}quickCreate=1` : path,
+    [quickCreateOpen]
+  )
 
   if (!item) {
     return (
@@ -56,12 +64,12 @@ export default function LibraryItemLayout({
   return (
     <div className="max-w-4xl mx-auto">
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-2">
-        <Link href="/library" className="hover:text-foreground transition-colors" title="Library">
+        <Link href={withQuickCreate("/library")} className="hover:text-foreground transition-colors" title="Library">
           Library
         </Link>
         <span>/</span>
         <Link
-          href={basePath}
+          href={withQuickCreate(basePath)}
           className="hover:text-foreground transition-colors"
           title={item.title}
         >
@@ -96,7 +104,7 @@ export default function LibraryItemLayout({
             return (
               <Link
                 key={tab.label}
-                href={href}
+                href={withQuickCreate(href)}
                 className={cn(
                   "pb-3 text-sm font-medium transition-colors border-b-2 -mb-px",
                   isActive

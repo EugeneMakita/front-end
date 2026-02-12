@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { useParams, usePathname } from "next/navigation"
+import { useParams, usePathname, useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { mockCourses } from "@/lib/mock-courses"
 import { mockThreads } from "@/lib/mock-forum"
@@ -30,8 +30,16 @@ export default function CourseLayout({
 }) {
   const params = useParams()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const courseId = params.id as string
   const course = mockCourses.find((c) => c.id === courseId)
+  const quickCreateOpen = searchParams.get("quickCreate") === "1"
+
+  const withQuickCreate = React.useCallback(
+    (path: string) =>
+      quickCreateOpen ? `${path}${path.includes("?") ? "&" : "?"}quickCreate=1` : path,
+    [quickCreateOpen]
+  )
 
   if (!course) {
     return (
@@ -154,7 +162,7 @@ export default function CourseLayout({
                 </span>
               ) : (
                 <Link
-                  href={segment.href}
+                  href={withQuickCreate(segment.href)}
                   className="hover:text-foreground transition-colors"
                   title={segment.label}
                 >
@@ -181,7 +189,7 @@ export default function CourseLayout({
               return (
                 <Link
                   key={tab.label}
-                  href={tabPath}
+                  href={withQuickCreate(tabPath)}
                   className={cn(
                     "pb-3 text-sm font-medium transition-colors border-b-2 -mb-px",
                     isActive

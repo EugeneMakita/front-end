@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -23,6 +23,13 @@ const categoryColors: Record<string, string> = {
 
 export default function CoursesPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const quickCreateOpen = searchParams.get("quickCreate") === "1"
+  const withQuickCreate = React.useCallback(
+    (path: string) =>
+      quickCreateOpen ? `${path}${path.includes("?") ? "&" : "?"}quickCreate=1` : path,
+    [quickCreateOpen]
+  )
   const [search, setSearch] = React.useState("")
   const [filter, setFilter] = React.useState<"all" | "course" | "project" | "resource">("all")
   const [view, setView] = React.useState<"grid" | "list">("grid")
@@ -108,7 +115,7 @@ export default function CoursesPage() {
             <div
               key={item.id}
               className="border bg-card p-5 hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => router.push(`/courses/${item.id}`)}
+              onClick={() => router.push(withQuickCreate(`/courses/${item.id}`))}
             >
               <div className="flex items-start justify-between mb-3">
                 <Badge className={`rounded-none text-xs ${categoryColors[item.category]}`}>
@@ -148,7 +155,7 @@ export default function CoursesPage() {
             <div
               key={item.id}
               className="flex items-center gap-4 border bg-card p-4 hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => router.push(`/courses/${item.id}`)}
+              onClick={() => router.push(withQuickCreate(`/courses/${item.id}`))}
             >
               <StarIcon
                 size={18}

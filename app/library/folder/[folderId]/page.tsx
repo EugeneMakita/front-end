@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { useParams, useRouter } from "next/navigation"
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -30,8 +30,15 @@ import { initialFolders, initialItems, type LibraryItem } from "@/lib/mock-libra
 export default function LibraryFolderPage() {
   const params = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const folderId = params.folderId as string
   const folder = initialFolders.find((entry) => entry.id === folderId)
+  const quickCreateOpen = searchParams.get("quickCreate") === "1"
+  const withQuickCreate = React.useCallback(
+    (path: string) =>
+      quickCreateOpen ? `${path}${path.includes("?") ? "&" : "?"}quickCreate=1` : path,
+    [quickCreateOpen]
+  )
 
   const [items, setItems] = React.useState(initialItems)
   const [search, setSearch] = React.useState("")
@@ -107,7 +114,7 @@ export default function LibraryFolderPage() {
   return (
     <div className="max-w-4xl mx-auto">
       <nav className="mb-2 flex items-center gap-1.5 text-sm text-muted-foreground">
-        <Link href="/library" className="hover:text-foreground transition-colors">
+        <Link href={withQuickCreate("/library")} className="hover:text-foreground transition-colors">
           Library
         </Link>
         <span>/</span>
@@ -194,7 +201,7 @@ export default function LibraryFolderPage() {
                 className={`group border bg-card overflow-hidden transition-shadow hover:shadow-md cursor-pointer ${
                   isSelected ? "ring-2 ring-primary" : ""
                 }`}
-                onClick={() => router.push(`/library/${item.id}`)}
+                onClick={() => router.push(withQuickCreate(`/library/${item.id}`))}
               >
                 <div className="relative aspect-[5/3] overflow-hidden bg-muted">
                   <img
@@ -221,7 +228,7 @@ export default function LibraryFolderPage() {
                         </button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem onSelect={() => router.push("/library")}>
+                        <DropdownMenuItem onSelect={() => router.push(withQuickCreate("/library"))}>
                           <ArrowRightIcon size={16} />
                           <span>Move to folder</span>
                         </DropdownMenuItem>
