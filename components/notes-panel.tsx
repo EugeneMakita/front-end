@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import NotesEditor from "@/components/notes-editor"
+import type { CapturedNote } from "@/components/notes-context"
 import {
   MagnifyingGlassIcon,
   DownloadSimpleIcon,
@@ -115,10 +116,12 @@ export default function NotesPanel({
   onClose,
   isPinned,
   onTogglePin,
+  capturedNotes,
 }: {
   onClose: () => void
   isPinned: boolean
   onTogglePin: () => void
+  capturedNotes: CapturedNote[]
 }) {
   const [activeTab, setActiveTab] = React.useState("instructor")
   const [searchValue, setSearchValue] = React.useState("")
@@ -247,6 +250,23 @@ export default function NotesPanel({
           </div>
         ) : (
           <div className="px-4 pb-4 space-y-2">
+            {capturedNotes.length > 0 && (
+              <div className="border rounded-md overflow-hidden">
+                <div className="w-full px-4 py-3 text-left bg-muted/30">
+                  <span className="text-sm font-bold">Captured from selection</span>
+                </div>
+                <div className="px-4 py-3 space-y-3">
+                  {capturedNotes.map((note) => (
+                    <div key={note.id} className="rounded-md border p-3">
+                      <p className="text-sm">{note.text}</p>
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        {note.sourcePath} · {note.createdAt}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             {userNotes.map((note) => {
               const isExpanded = expandedSections.has(note.title)
               return (

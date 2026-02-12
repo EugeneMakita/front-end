@@ -36,6 +36,8 @@ import {
   CopyIcon,
   TrashIcon,
   FolderSimpleIcon,
+  PlusIcon,
+  GraduationCapIcon,
 } from "@phosphor-icons/react"
 import { mockQuestions, questionTypes } from "@/lib/mock-questions"
 
@@ -81,6 +83,16 @@ export default function QuestionsPage() {
     setSelectedItems(new Set())
   }
 
+  function handleBulkAddToAssignment() {
+    // Placeholder action hook
+    setSelectedItems(new Set())
+  }
+
+  function handleBulkCreateAssignment() {
+    // Placeholder action hook
+    setSelectedItems(new Set())
+  }
+
   function truncateDescription(text: string, max = 120) {
     return text.length > max ? `${text.slice(0, max).trimEnd()}...` : text
   }
@@ -113,12 +125,26 @@ export default function QuestionsPage() {
             value=""
             onValueChange={(value) => {
               if (value === "delete") handleBulkDelete()
+              if (value === "add-to-assignment") handleBulkAddToAssignment()
+              if (value === "create-assignment") handleBulkCreateAssignment()
             }}
           >
             <SelectTrigger className="w-[200px] h-10">
               <SelectValue placeholder="Select the action..." />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="add-to-assignment">
+                <div className="flex items-center gap-2">
+                  <GraduationCapIcon size={16} />
+                  <span>Add to assignment</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="create-assignment">
+                <div className="flex items-center gap-2">
+                  <PlusIcon size={16} />
+                  <span>Create new assignment</span>
+                </div>
+              </SelectItem>
               <SelectItem value="move">
                 <div className="flex items-center gap-2">
                   <FolderSimpleIcon size={16} />
