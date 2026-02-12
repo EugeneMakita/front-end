@@ -24,10 +24,8 @@ import {
   GlobeIcon,
   BellIcon,
   CaretDownIcon,
-  UserIcon,
   GearIcon,
   QuestionIcon,
-  BookmarkSimpleIcon,
   RocketIcon,
   SignOutIcon,
   NoteBlankIcon,
@@ -37,9 +35,11 @@ import {
 function TopBar({
   onOpenNotes,
   onLogout,
+  onOpenSettings,
 }: {
   onOpenNotes?: () => void
   onLogout?: () => void
+  onOpenSettings?: () => void
 }) {
   const [locale, setLocale] = React.useState("EN")
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
@@ -193,21 +193,13 @@ function TopBar({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem>
-                  <UserIcon size={18} weight="bold" />
-                  <span>My Portfolio</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => onOpenSettings?.()}>
                   <GearIcon size={18} weight="bold" />
                   <span>Account Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <QuestionIcon size={18} weight="bold" />
                   <span>Support</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <BookmarkSimpleIcon size={18} weight="bold" />
-                  <span>My Library</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => onOpenNotes?.()}>
                   <NoteBlankIcon size={18} weight="bold" />
@@ -243,6 +235,7 @@ const navRoutes: Partial<Record<NavKey, string>> = {
   courses: "/courses",
   classes: "/classes",
   assignments: "/assignments",
+  settings: "/settings",
   quickCreate: "/",
 }
 
@@ -433,6 +426,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
       <TopBar
         onOpenNotes={() => setShowNotes(true)}
         onLogout={() => router.push("/create-account")}
+        onOpenSettings={() => router.push("/settings")}
       />
 
       {/* Row under the topbar */}
