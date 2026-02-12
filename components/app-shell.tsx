@@ -310,9 +310,13 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
 
   function handleNavSelect(key: NavKey) {
     if (key === "quickCreate") {
-      closingQuickCreateRef.current = false
-      setQuickCreateOpen(true)
-      router.push(buildPathWithQuickCreate(pathname, true))
+      if (quickCreateOpen) {
+        closeQuickCreate()
+      } else {
+        closingQuickCreateRef.current = false
+        setQuickCreateOpen(true)
+        router.push(buildPathWithQuickCreate(pathname, true))
+      }
       return
     }
     const route = navRoutes[key]
