@@ -46,7 +46,6 @@ export default function LibraryPage() {
   const [folders, setFolders] = React.useState(initialFolders)
   const [items, setItems] = React.useState(initialItems)
   const [selectedItems, setSelectedItems] = React.useState<Set<string>>(new Set())
-  const [activeFolderId, setActiveFolderId] = React.useState<string | null>(null)
   const [moveDialogOpen, setMoveDialogOpen] = React.useState(false)
   const [moveItemId, setMoveItemId] = React.useState<string | null>(null)
   const [moveTargetFolderId, setMoveTargetFolderId] = React.useState<string | null>(null)
@@ -60,8 +59,7 @@ export default function LibraryPage() {
       const matchesSearch =
         item.title.toLowerCase().includes(search.toLowerCase()) ||
         item.description.toLowerCase().includes(search.toLowerCase())
-      const matchesFolder = activeFolderId ? item.folderId === activeFolderId : true
-      return matchesSearch && matchesFolder
+      return matchesSearch
     })
     .sort((a, b) => {
       if (sortBy === "az") return a.title.localeCompare(b.title)
@@ -145,7 +143,6 @@ export default function LibraryPage() {
     setItems((prev) =>
       prev.map((i) => (i.folderId === folderId ? { ...i, folderId: undefined } : i))
     )
-    if (activeFolderId === folderId) setActiveFolderId(null)
   }
 
   function openRenameDialog(folderId: string) {
@@ -171,25 +168,7 @@ export default function LibraryPage() {
     <div className="max-w-4xl mx-auto">
       {/* Breadcrumb + Header */}
       <div className="mb-6">
-        {activeFolderId && (
-          <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-2">
-            <button
-              onClick={() => setActiveFolderId(null)}
-              className="hover:text-foreground transition-colors"
-            >
-              Library
-            </button>
-            <span>/</span>
-            <span className="text-foreground font-medium">
-              {folders.find((f) => f.id === activeFolderId)?.name}
-            </span>
-          </nav>
-        )}
-        <h1 className="text-2xl font-bold">
-          {activeFolderId
-            ? folders.find((f) => f.id === activeFolderId)?.name ?? "Library"
-            : "Library"}
-        </h1>
+        <h1 className="text-2xl font-bold">Library</h1>
       </div>
 
       {/* Folders row */}
@@ -197,12 +176,8 @@ export default function LibraryPage() {
         {folders.map((folder) => (
           <div
             key={folder.id}
-            className={`group flex items-center gap-3 border bg-card px-3 py-2 cursor-pointer transition-colors hover:shadow-sm min-w-[170px] ${
-              activeFolderId === folder.id ? "border-primary shadow-sm" : ""
-            }`}
-            onClick={() =>
-              setActiveFolderId(activeFolderId === folder.id ? null : folder.id)
-            }
+            className="group flex items-center gap-3 border bg-card px-3 py-2 cursor-pointer transition-colors hover:shadow-sm min-w-[170px]"
+            onClick={() => router.push(`/library/folder/${folder.id}`)}
           >
             {folder.icon === "star" ? (
               <StarIcon size={20} weight="fill" className="text-primary shrink-0" />

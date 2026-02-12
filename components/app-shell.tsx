@@ -17,6 +17,7 @@ import Sidebar, { type NavKey } from "@/components/sidebar"
 import QuickCreatePanel from "@/components/quick-create-panel"
 import SystemBanner from "@/components/ui/system-banner"
 import NotesPanel from "@/components/notes-panel"
+import { NotesProvider, useNotes } from "@/components/notes-context"
 import {
   ArrowCircleUpIcon,
   MagnifyingGlassIcon,
@@ -30,6 +31,7 @@ import {
   RocketIcon,
   SignOutIcon,
   NoteBlankIcon,
+  NotePencilIcon,
 } from "@phosphor-icons/react"
 
 function TopBar({
@@ -243,8 +245,17 @@ const navRoutes: Partial<Record<NavKey, string>> = {
 }
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
+  return (
+    <NotesProvider>
+      <AppShellContent>{children}</AppShellContent>
+    </NotesProvider>
+  )
+}
+
+function AppShellContent({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
+  const { capturedNotes, addCapturedNote } = useNotes()
   const isAuthPage =
     pathname.startsWith("/create-account") ||
     pathname.startsWith("/login") ||
@@ -259,6 +270,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const showRightPanel = activeKey === "quickCreate"
   const [showNotes, setShowNotes] = React.useState(false)
   const [notesPinned, setNotesPinned] = React.useState(false)
+  const contentRef = React.useRef<HTMLDivElement>(null)
+  const [selectionAction, setSelectionAction] = React.useState<{
+    text: string
+    x: number
+    y: number
+  } | null>(null)
 
   function handleNavSelect(key: NavKey) {
     setActiveKey(key)
@@ -267,6 +284,57 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       router.push(route)
     }
   }
+
+  React.useEffect(() => {
+    function updateSelectionAction() {
+      const selection = window.getSelection()
+      if (!selection || selection.rangeCount === 0) {
+        setSelectionAction(null)
+        return
+      }
+
+      const text = selection.toString().trim()
+      if (!text) {
+        setSelectionAction(null)
+        return
+      }
+
+      const anchorNode = selection.anchorNode
+      if (!anchorNode || !contentRef.current?.contains(anchorNode)) {
+        setSelectionAction(null)
+        return
+      }
+
+      const element =
+        anchorNode.nodeType === Node.ELEMENT_NODE
+          ? (anchorNode as Element)
+          : anchorNode.parentElement
+      if (element?.closest("input, textarea, [contenteditable='true'], math-field")) {
+        setSelectionAction(null)
+        return
+      }
+
+      const range = selection.getRangeAt(0)
+      const rect = range.getBoundingClientRect()
+      if (!rect.width && !rect.height) {
+        setSelectionAction(null)
+        return
+      }
+
+      setSelectionAction({
+        text,
+        x: rect.right + 8,
+        y: rect.top - 8,
+      })
+    }
+
+    document.addEventListener("mouseup", updateSelectionAction)
+    document.addEventListener("keyup", updateSelectionAction)
+    return () => {
+      document.removeEventListener("mouseup", updateSelectionAction)
+      document.removeEventListener("keyup", updateSelectionAction)
+    }
+  }, [])
 
   if (isAuthPage) {
     return <div className="min-h-screen bg-background">{children}</div>
@@ -290,9 +358,28 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         )}
 
         <main className="min-w-0 flex-1 overflow-auto">
-          <div className="p-6">{children}</div>
+          <div ref={contentRef} className="p-6">{children}</div>
         </main>
       </div>
+
+      {selectionAction && (
+        <button
+          type="button"
+          aria-label="Add selection to notes"
+          className="fixed z-[75] flex h-8 w-8 items-center justify-center border bg-background shadow-md hover:bg-accent"
+          style={{ left: selectionAction.x, top: selectionAction.y }}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={() => {
+            addCapturedNote(selectionAction.text, pathname)
+            setShowNotes(true)
+            setSelectionAction(null)
+            const selection = window.getSelection()
+            selection?.removeAllRanges()
+          }}
+        >
+          <NotePencilIcon size={16} />
+        </button>
+      )}
 
       {/* Notes panel — overlays on right */}
       {showNotes && (
@@ -317,6 +404,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               }}
               isPinned={notesPinned}
               onTogglePin={() => setNotesPinned((p) => !p)}
+              capturedNotes={capturedNotes}
             />
           </aside>
         </>
