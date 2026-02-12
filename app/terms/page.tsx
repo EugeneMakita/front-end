@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 
@@ -9,39 +8,46 @@ export default function TermsPage() {
     <main className="min-h-screen bg-muted/40 p-8">
       <Card className="mx-auto max-w-4xl">
         <CardHeader className="space-y-2 p-8">
-          <CardTitle className="text-2xl font-semibold">Terms & Privacy</CardTitle>
+          <CardTitle className="text-2xl font-semibold">Terms and Conditions</CardTitle>
         </CardHeader>
 
         <Separator />
 
         <CardContent className="p-8 space-y-6 text-base text-muted-foreground">
           <p>
-            Welcome. These Terms & Privacy describe how we collect and use information
-            when you use the app. This page uses the site theme for readable contrast
-            so content is visible in light and dark modes.
+            These Terms and Conditions govern your use of this platform, including
+            account registration, acceptable use, and service access.
           </p>
 
           <section>
-            <h3 className="mb-2 text-lg font-medium text-foreground">1. Data we collect</h3>
+            <h3 className="mb-2 text-lg font-medium text-foreground">1. Account and access</h3>
             <p>
-              We may collect personal data you provide, usage data, and aggregated
-              analytics. We use this to improve the product and for diagnostics.
+              You are responsible for maintaining the confidentiality of your account
+              credentials and any actions taken under your account.
             </p>
           </section>
 
           <section>
-            <h3 className="mb-2 text-lg font-medium text-foreground">2. How we use information</h3>
+            <h3 className="mb-2 text-lg font-medium text-foreground">2. Acceptable use</h3>
             <p>
-              Information is used to provide features, improve services, and comply
-              with legal obligations. We do not sell your data.
+              You agree not to misuse the service, attempt unauthorized access, or
+              interfere with platform reliability, security, or other users.
             </p>
           </section>
 
           <section>
-            <h3 className="mb-2 text-lg font-medium text-foreground">3. Contact</h3>
+            <h3 className="mb-2 text-lg font-medium text-foreground">3. Service updates</h3>
             <p>
-              If you have questions about these terms, please contact support via the
-              Help link in the app.
+              We may update features or terms over time. Continued use of the service
+              after updates means you accept the revised terms.
+            </p>
+          </section>
+
+          <section>
+            <h3 className="mb-2 text-lg font-medium text-foreground">4. Contact</h3>
+            <p>
+              If you have questions about these terms, contact support via the Help
+              section in the app.
             </p>
           </section>
         </CardContent>
