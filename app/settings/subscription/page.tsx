@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { CalendarBlankIcon, CreditCardIcon, TreeStructureIcon } from "@phosphor-icons/react"
@@ -43,9 +44,11 @@ export default function SubscriptionSettingsPage() {
             <CreditCardIcon size={20} className="text-muted-foreground" />
             <p className="text-sm">Mastercard •••• 4984</p>
           </div>
-          <Button variant="outline" className="h-10 cursor-pointer rounded-none">
-            Update
-          </Button>
+          <Link href="/settings/subscription/add-payment">
+            <Button variant="outline" className="h-10 cursor-pointer rounded-none">
+              Add payment
+            </Button>
+          </Link>
         </div>
       </div>
 
