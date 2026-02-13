@@ -1,10 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { TAccountTable, type TAccountData, type TAccountVariant } from "@/components/t-account-table"
+import { TrialBalanceTable, type TrialBalanceVariant } from "@/components/trial-balance-table"
 import {
   Table,
   TableBody,
@@ -132,51 +131,358 @@ function LedgerTable() {
   )
 }
 
-function TrialBalanceTable() {
-  return (
-    <div className="space-y-3">
-      <SectionTitle title="TRIAL BALANCE" />
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Account Title</TableHead>
-            <TableHead className="w-[160px] text-right">Debit (Dr)</TableHead>
-            <TableHead className="w-[160px] text-right">Credit (Cr)</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow>
-            <TableCell>Cash</TableCell>
-            <TableCell className="align-middle">
-              <div className="flex justify-end">
-                <AmountInput placeholder="______" />
-              </div>
-            </TableCell>
-            <TableCell />
-          </TableRow>
-          <TableRow>
-            <TableCell>Supplies</TableCell>
-            <TableCell className="text-right">600</TableCell>
-            <TableCell />
-          </TableRow>
-          <TableRow>
-            <TableCell>Service Revenue</TableCell>
-            <TableCell />
-            <TableCell className="align-middle">
-              <div className="flex justify-end">
-                <AmountInput placeholder="______" />
-              </div>
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell className="font-semibold">TOTALS</TableCell>
-            <TableCell className="text-right font-semibold">5,000</TableCell>
-            <TableCell className="text-right font-semibold">5,000</TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    </div>
-  )
+const tbColumnsBase = [
+  { id: "account", label: "Account", type: "account" as const, widthClass: "min-w-[280px]" },
+  { id: "debit", label: "Debit (Dr)", type: "amount" as const, widthClass: "w-[180px]" },
+  { id: "credit", label: "Credit (Cr)", type: "amount" as const, widthClass: "w-[180px]" },
+]
+
+const tbRowsStandard = [
+  {
+    rowId: "cash",
+    cells: {
+      account: { value: "Cash", editable: false },
+      debit: { value: "4400.00", editable: false, inputId: "tb.acct:cash.dr" },
+      credit: { value: "0.00", editable: false, inputId: "tb.acct:cash.cr" },
+    },
+  },
+  {
+    rowId: "supplies",
+    cells: {
+      account: { value: "Supplies", editable: false },
+      debit: { value: "600.00", editable: false, inputId: "tb.acct:supplies.dr" },
+      credit: { value: "0.00", editable: false, inputId: "tb.acct:supplies.cr" },
+    },
+  },
+  {
+    rowId: "service_revenue",
+    cells: {
+      account: { value: "Service Revenue", editable: false },
+      debit: { value: "0.00", editable: false, inputId: "tb.acct:service_revenue.dr" },
+      credit: { value: "5000.00", editable: false, inputId: "tb.acct:service_revenue.cr" },
+    },
+  },
+  {
+    rowId: "totals",
+    kind: "total" as const,
+    cells: {
+      account: { value: "TOTALS", editable: false },
+      debit: { value: "", editable: false },
+      credit: { value: "", editable: false },
+    },
+  },
+]
+
+function mapTBRows(
+  rows: typeof tbRowsStandard,
+  mutate: (row: (typeof tbRowsStandard)[number]) => (typeof tbRowsStandard)[number]
+) {
+  return rows.map((row) => mutate(row))
+}
+
+const trialBalanceVariants: TrialBalanceVariant[] = [
+  {
+    key: "tb_standard_locked",
+    label: "Standard TB (all locked)",
+    description: "Display-only canonical trial balance with computed totals.",
+    columns: tbColumnsBase.map((column) => ({ ...column, locked: true })),
+    rows: tbRowsStandard,
+    totalsFor: ["debit", "credit"],
+    totalsLabel: "TOTALS",
+  },
+  {
+    key: "tb_ending_balances_editable",
+    label: "Ending balances only practice",
+    description: "Account names locked; debit and credit balances editable.",
+    columns: tbColumnsBase,
+    rows: mapTBRows(tbRowsStandard, (row) =>
+      row.kind === "total"
+        ? row
+        : {
+            ...row,
+            cells: {
+              ...row.cells,
+              debit: { ...row.cells.debit, editable: true, value: "" },
+              credit: { ...row.cells.credit, editable: true, value: "" },
+            },
+          }
+    ),
+    totalsFor: ["debit", "credit"],
+    exclusivePairs: [["debit", "credit"]],
+  },
+  {
+    key: "tb_partial_blanks",
+    label: "Partial blanks (targeted)",
+    description: "Only selected cells are editable for remediation.",
+    columns: tbColumnsBase,
+    rows: mapTBRows(tbRowsStandard, (row) => {
+      if (row.rowId === "cash") {
+        return { ...row, cells: { ...row.cells, debit: { ...row.cells.debit, editable: true, value: "" } } }
+      }
+      if (row.rowId === "service_revenue") {
+        return { ...row, cells: { ...row.cells, credit: { ...row.cells.credit, editable: true, value: "" } } }
+      }
+      return row
+    }),
+    totalsFor: ["debit", "credit"],
+    exclusivePairs: [["debit", "credit"]],
+  },
+  {
+    key: "tb_full_blank",
+    label: "Full blank TB",
+    description: "Complete reconstruction: all amount cells editable.",
+    columns: tbColumnsBase,
+    rows: mapTBRows(tbRowsStandard, (row) =>
+      row.kind === "total"
+        ? row
+        : {
+            ...row,
+            cells: {
+              ...row.cells,
+              debit: { ...row.cells.debit, editable: true, value: "" },
+              credit: { ...row.cells.credit, editable: true, value: "" },
+            },
+          }
+    ),
+    totalsFor: ["debit", "credit"],
+    exclusivePairs: [["debit", "credit"]],
+  },
+  {
+    key: "tb_totals_only_practice",
+    label: "Totals-only practice",
+    description: "Rows locked; compute and fill only totals.",
+    columns: tbColumnsBase,
+    rows: mapTBRows(tbRowsStandard, (row) =>
+      row.kind === "total"
+        ? {
+            ...row,
+            cells: {
+              ...row.cells,
+              debit: { ...row.cells.debit, editable: true, value: "" },
+              credit: { ...row.cells.credit, editable: true, value: "" },
+            },
+          }
+        : row
+    ),
+    totalsFor: [],
+    exclusivePairs: [["debit", "credit"]],
+  },
+  {
+    key: "tb_error_finding",
+    label: "Error-finding (unbalanced)",
+    description: "Correct wrong balances and bring TB back in balance.",
+    columns: tbColumnsBase,
+    rows: mapTBRows(tbRowsStandard, (row) => {
+      if (row.rowId === "supplies") {
+        return {
+          ...row,
+          cells: {
+            ...row.cells,
+            debit: { ...row.cells.debit, value: "650.00", editable: true },
+          },
+        }
+      }
+      return row
+    }),
+    totalsFor: ["debit", "credit"],
+    showDifference: { leftColId: "debit", rightColId: "credit", label: "Out of balance by" },
+    exclusivePairs: [["debit", "credit"]],
+  },
+  {
+    key: "tb_phase_adjusted",
+    label: "Adjusted TB phase",
+    description: "Adjusted phase with reference column and editable amount blanks.",
+    columns: [
+      { id: "account_number", label: "Account Number", type: "account", widthClass: "w-[140px]", locked: true },
+      { id: "account", label: "Account", type: "account", widthClass: "min-w-[260px]" },
+      { id: "debit", label: "Debit (Dr)", type: "amount", widthClass: "w-[170px]" },
+      { id: "credit", label: "Credit (Cr)", type: "amount", widthClass: "w-[170px]" },
+    ],
+    rows: [
+      {
+        rowId: "cash",
+        cells: {
+          account_number: { value: "1010", editable: false },
+          account: { value: "Cash", editable: false },
+          debit: { value: "4400.00", editable: true, inputId: "tb.adjusted.cash.dr" },
+          credit: { value: "0.00", editable: true, inputId: "tb.adjusted.cash.cr" },
+        },
+      },
+      {
+        rowId: "supplies_expense",
+        cells: {
+          account_number: { value: "5120", editable: false },
+          account: { value: "Supplies Expense", editable: false },
+          debit: { value: "", editable: true, inputId: "tb.adjusted.supplies_expense.dr" },
+          credit: { value: "0.00", editable: true, inputId: "tb.adjusted.supplies_expense.cr" },
+        },
+      },
+      {
+        rowId: "totals",
+        kind: "total",
+        cells: {
+          account_number: { value: "", editable: false },
+          account: { value: "TOTALS", editable: false },
+          debit: { value: "", editable: false },
+          credit: { value: "", editable: false },
+        },
+      },
+    ],
+    totalsFor: ["debit", "credit"],
+    exclusivePairs: [["debit", "credit"]],
+  },
+  {
+    key: "tb_comparative_multi_column",
+    label: "Comparative TB (period 1 vs period 2)",
+    description: "Four amount columns to compare two periods.",
+    columns: [
+      { id: "account", label: "Account", type: "account", widthClass: "min-w-[220px]", group: "Account" },
+      { id: "p1dr", label: "Dr", type: "amount", widthClass: "w-[130px]", group: "Period 1" },
+      { id: "p1cr", label: "Cr", type: "amount", widthClass: "w-[130px]", group: "Period 1" },
+      { id: "p2dr", label: "Dr", type: "amount", widthClass: "w-[130px]", group: "Period 2" },
+      { id: "p2cr", label: "Cr", type: "amount", widthClass: "w-[130px]", group: "Period 2" },
+    ],
+    rows: [
+      {
+        rowId: "cash",
+        cells: {
+          account: { value: "Cash", editable: false },
+          p1dr: { value: "4400.00", editable: false },
+          p1cr: { value: "0.00", editable: false },
+          p2dr: { value: "5200.00", editable: false },
+          p2cr: { value: "0.00", editable: false },
+        },
+      },
+      {
+        rowId: "service_revenue",
+        cells: {
+          account: { value: "Service Revenue", editable: false },
+          p1dr: { value: "0.00", editable: false },
+          p1cr: { value: "5000.00", editable: false },
+          p2dr: { value: "0.00", editable: false },
+          p2cr: { value: "6100.00", editable: false },
+        },
+      },
+      {
+        rowId: "totals",
+        kind: "total",
+        cells: {
+          account: { value: "TOTALS", editable: false },
+          p1dr: { value: "", editable: false },
+          p1cr: { value: "", editable: false },
+          p2dr: { value: "", editable: false },
+          p2cr: { value: "", editable: false },
+        },
+      },
+    ],
+    totalsFor: ["p1dr", "p1cr", "p2dr", "p2cr"],
+  },
+  {
+    key: "tb_grouped_sections",
+    label: "Grouped accounts",
+    description: "Section headers for asset, revenue, and expense groups.",
+    columns: tbColumnsBase,
+    rows: [
+      { rowId: "sec-assets", kind: "section", sectionLabel: "Assets", cells: {} },
+      {
+        rowId: "cash",
+        cells: {
+          account: { value: "Cash", editable: false },
+          debit: { value: "4400.00", editable: false },
+          credit: { value: "0.00", editable: false },
+        },
+      },
+      {
+        rowId: "supplies",
+        cells: {
+          account: { value: "Supplies", editable: false },
+          debit: { value: "600.00", editable: false },
+          credit: { value: "0.00", editable: false },
+        },
+      },
+      { rowId: "sec-revenues", kind: "section", sectionLabel: "Revenues", cells: {} },
+      {
+        rowId: "service_revenue",
+        cells: {
+          account: { value: "Service Revenue", editable: false },
+          debit: { value: "0.00", editable: false },
+          credit: { value: "5000.00", editable: false },
+        },
+      },
+      {
+        rowId: "totals",
+        kind: "total",
+        cells: {
+          account: { value: "TOTALS", editable: false },
+          debit: { value: "", editable: false },
+          credit: { value: "", editable: false },
+        },
+      },
+    ],
+    totalsFor: ["debit", "credit"],
+  },
+  {
+    key: "tb_account_dropdown_and_input",
+    label: "Account label practice (input + dropdown)",
+    description: "Account labels can be entered or selected with searchable options.",
+    columns: tbColumnsBase,
+    rows: [
+      {
+        rowId: "r1",
+        cells: {
+          account: {
+            value: "Cash",
+            editable: true,
+            editor: "input",
+            inputId: "tb.labels.cash",
+          },
+          debit: { value: "4400.00", editable: true },
+          credit: { value: "0.00", editable: true },
+        },
+      },
+      {
+        rowId: "r2",
+        cells: {
+          account: {
+            value: "",
+            editable: true,
+            editor: "select",
+            options: ["Supplies", "Accounts Receivable", "Service Revenue", "Rent Expense", "Owner Capital"],
+          },
+          debit: { value: "600.00", editable: true },
+          credit: { value: "0.00", editable: true },
+        },
+      },
+      {
+        rowId: "r3",
+        cells: {
+          account: {
+            value: "",
+            editable: true,
+            editor: "select",
+            options: ["Service Revenue", "Supplies Expense", "Owner Drawings", "Unearned Revenue"],
+          },
+          debit: { value: "0.00", editable: true },
+          credit: { value: "5000.00", editable: true },
+        },
+      },
+      {
+        rowId: "totals",
+        kind: "total",
+        cells: {
+          account: { value: "TOTALS", editable: false },
+          debit: { value: "", editable: false },
+          credit: { value: "", editable: false },
+        },
+      },
+    ],
+    totalsFor: ["debit", "credit"],
+    exclusivePairs: [["debit", "credit"]],
+  },
+]
+
+function TrialBalanceVariantsTable() {
+  return <TrialBalanceTable variants={trialBalanceVariants} />
 }
 
 function IncomeStatementTable() {
@@ -686,8 +992,8 @@ const tableMap: Record<number, { title: string; description: string; view: JSX.E
   },
   203: {
     title: "Trial Balance",
-    description: "Trial balance with locked totals and selected input blanks.",
-    view: <TrialBalanceTable />,
+    description: "Full variant-driven trial balance schemas with locks, blanks, totals, and practice modes.",
+    view: <TrialBalanceVariantsTable />,
   },
   204: {
     title: "Income Statement",
@@ -723,24 +1029,5 @@ export function AccountingQuestionView({ questionId }: Props) {
     return null
   }
 
-  if (questionId === 206) {
-    return <div>{entry.view}</div>
-  }
-
-  return (
-    <Card className="rounded-none">
-      <CardHeader className="pb-3">
-        <div className="flex items-center gap-2">
-          <CardTitle className="text-lg">{entry.title}</CardTitle>
-          <Badge variant="secondary" className="rounded-none">
-            Accounting
-          </Badge>
-        </div>
-        <CardDescription>{entry.description}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="overflow-x-auto">{entry.view}</div>
-      </CardContent>
-    </Card>
-  )
+  return <div className="overflow-x-auto">{entry.view}</div>
 }

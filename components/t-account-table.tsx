@@ -62,7 +62,13 @@ export type TAccountTableProps = {
   footnoteText?: string
 }
 
-export function TAccountAmountField({ cell }: { cell: TAccountCell }) {
+export function TAccountAmountField({
+  cell,
+  onCommit,
+}: {
+  cell: TAccountCell
+  onCommit?: (value: string) => void
+}) {
   const normalizedValue = cell.value.replace(/\$/g, "").trim()
   const [rawValue, setRawValue] = React.useState(normalizedValue)
   const [isEditing, setIsEditing] = React.useState(false)
@@ -91,12 +97,25 @@ export function TAccountAmountField({ cell }: { cell: TAccountCell }) {
     return (
       <Input
         id={cell.inputId}
+        type="text"
         inputMode="decimal"
         placeholder="0.00"
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="off"
+        spellCheck={false}
+        enterKeyHint="done"
         value={isEditing ? rawValue : formatCurrencyDisplay(rawValue)}
         onFocus={() => setIsEditing(true)}
-        onBlur={() => setIsEditing(false)}
-        onChange={(event) => setRawValue(normalizeAmountInput(event.target.value))}
+        onBlur={() => {
+          setIsEditing(false)
+          onCommit?.(rawValue || "0")
+        }}
+        onChange={(event) => {
+          const next = normalizeAmountInput(event.target.value)
+          setRawValue(next)
+          onCommit?.(next || "0")
+        }}
         className="h-7 w-full max-w-[120px] rounded-none border-0 bg-transparent px-2 text-right !text-[14px] md:!text-[14px] !leading-5 text-foreground [font-family:inherit] font-normal shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
       />
     )
@@ -212,14 +231,17 @@ export function TAccountDescriptionSelectField({
 export function TAccountDescriptionTextField({
   value,
   placeholder,
+  onCommit,
 }: {
   value: string
   placeholder: string
+  onCommit?: (value: string) => void
 }) {
   return (
     <Textarea
       defaultValue={value}
       rows={1}
+      onBlur={(event) => onCommit?.(event.target.value)}
       className="min-h-7 h-auto w-full max-w-full resize-none overflow-hidden rounded-none border-0 bg-transparent px-2 py-1 !text-[14px] md:!text-[14px] !leading-5 text-foreground [font-family:inherit] font-normal shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
       placeholder={placeholder}
     />
