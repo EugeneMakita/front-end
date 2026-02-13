@@ -4,15 +4,7 @@ import * as React from "react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { CalendarBlankIcon, LockSimpleIcon } from "@phosphor-icons/react"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { TAccountTable, type TAccountData, type TAccountVariant } from "@/components/t-account-table"
 import {
   Table,
   TableBody,
@@ -25,29 +17,6 @@ import {
 type Props = {
   questionId: number
 }
-
-type TAccountCell = {
-  value: string
-  editable: boolean
-  inputId?: string
-}
-
-type TAccountLine = {
-  rowId: string
-  debitInfo: TAccountCell
-  debitAmount: TAccountCell
-  creditInfo: TAccountCell
-  creditAmount: TAccountCell
-}
-
-type TAccountData = {
-  tableId: string
-  title: string
-  rows: TAccountLine[]
-}
-
-type TAccountInfoMode = "date_desc" | "date_only" | "desc_only" | "hidden"
-type DescriptionEditorMode = "text" | "select" | "both"
 
 function AmountInput({ placeholder = "" }: { placeholder?: string }) {
   return (
@@ -286,91 +255,6 @@ function BalanceSheetTable() {
   )
 }
 
-function TAmountCell({ cell }: { cell: TAccountCell }) {
-  const normalizedValue = cell.value.replace(/\$/g, "").trim()
-  const displayValue = normalizedValue ? `$${normalizedValue}` : ""
-  const [rawValue, setRawValue] = React.useState(normalizedValue)
-  const [isEditing, setIsEditing] = React.useState(false)
-
-  if (cell.editable) {
-    return (
-      <Input
-        id={cell.inputId}
-        inputMode="decimal"
-        placeholder="0.00"
-        value={isEditing ? rawValue : (rawValue ? `$${rawValue}` : "")}
-        onFocus={() => setIsEditing(true)}
-        onBlur={() => setIsEditing(false)}
-        onChange={(event) => setRawValue(event.target.value.replace(/\$/g, "").trim())}
-        className="h-7 w-[120px] rounded-none border-0 bg-transparent px-2 text-right !text-[14px] md:!text-[14px] !leading-5 text-foreground [font-family:inherit] font-normal shadow-none focus-visible:ring-0"
-      />
-    )
-  }
-
-  return (
-    <span className="inline-flex h-7 w-[120px] items-center justify-end px-2 text-right text-[14px] leading-5 text-foreground [font-family:inherit] font-normal">
-      {displayValue || "\u00A0"}
-    </span>
-  )
-}
-
-function DateEditorCell({ value }: { value: string }) {
-  const pickerRef = React.useRef<HTMLInputElement>(null)
-  const [dateValue, setDateValue] = React.useState(value)
-
-  function formatDateDisplay(raw: string) {
-    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw)
-    if (!match) return raw
-    const [, year, month, day] = match
-    return `${day}/${month}/${year}`
-  }
-
-  function openPicker() {
-    pickerRef.current?.showPicker?.()
-  }
-
-  return (
-    <div className="group/date relative w-[132px]">
-      <Input
-        type="text"
-        value={formatDateDisplay(dateValue)}
-        readOnly
-        className="h-7 rounded-none border-0 bg-transparent px-2 pr-8 !text-[14px] md:!text-[14px] !leading-5 text-foreground [font-family:inherit] font-normal shadow-none focus-visible:ring-0"
-        onClick={openPicker}
-        onFocus={openPicker}
-      />
-      <Input
-        ref={pickerRef}
-        type="date"
-        value={dateValue}
-        onChange={(event) => setDateValue(event.target.value)}
-        className="pointer-events-none absolute h-0 w-0 overflow-hidden opacity-0"
-        tabIndex={-1}
-        aria-hidden
-      />
-      <button
-        type="button"
-        aria-label="Open calendar"
-        className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-muted-foreground opacity-0 transition-opacity group-hover/date:opacity-100 group-focus-within/date:opacity-100"
-        onMouseDown={(event) => event.preventDefault()}
-        onClick={openPicker}
-      >
-        <CalendarBlankIcon size={14} />
-      </button>
-    </div>
-  )
-}
-
-function splitInfo(value: string) {
-  const trimmed = value.trim()
-  if (!trimmed) return { date: "", description: "" }
-  if (trimmed.includes(" - ")) {
-    const [date, ...rest] = trimmed.split(" - ")
-    return { date, description: rest.join(" - ") }
-  }
-  const isDate = /^\d{4}-\d{2}-\d{2}$/.test(trimmed)
-  return isDate ? { date: trimmed, description: "" } : { date: "", description: trimmed }
-}
 
 const cashAdjustedDateDesc: TAccountData = {
   tableId: "tacct:cash",
@@ -431,6 +315,17 @@ function mapInfo(
       ...row,
       debitInfo: { ...row.debitInfo, value: mapper(row.debitInfo.value) },
       creditInfo: { ...row.creditInfo, value: mapper(row.creditInfo.value) },
+    })),
+  }
+}
+
+function mapDescriptionValue(account: TAccountData, from: string, to: string): TAccountData {
+  return {
+    ...account,
+    rows: account.rows.map((row) => ({
+      ...row,
+      debitInfo: row.debitInfo.value === from ? { ...row.debitInfo, value: to } : row.debitInfo,
+      creditInfo: row.creditInfo.value === from ? { ...row.creditInfo, value: to } : row.creditInfo,
     })),
   }
 }
@@ -510,18 +405,6 @@ const rentExpenseAccount: TAccountData = {
   ],
 }
 
-type TAccountVariant = {
-  key: string
-  label: string
-  accounts: TAccountData[]
-  infoMode: TAccountInfoMode
-  sideHeaders?: string[]
-  dateEditable: boolean
-  descriptionEditor: DescriptionEditorMode
-  descriptionEditable: boolean
-  descriptionOptions?: string[]
-}
-
 const tAccountVariants: TAccountVariant[] = [
   {
     key: "t_accounts_adjusted_date_desc",
@@ -578,6 +461,33 @@ const tAccountVariants: TAccountVariant[] = [
     dateEditable: false,
     descriptionEditor: "both",
     descriptionEditable: true,
+  },
+  {
+    key: "t_accounts_adjusted_desc_dropdown_only",
+    label: "Adjusted (description dropdown only)",
+    accounts: [
+      mapDescriptionValue(
+        mapInfo(cashAdjustedDateDesc, descOnly),
+        "Owner investment",
+        "Owner investment from long-term capital contribution with supporting documentation"
+      ),
+      mapInfo(suppliesAdjustedDateDesc, descOnly),
+    ],
+    infoMode: "desc_only",
+    sideHeaders: ["Description"],
+    dateEditable: false,
+    descriptionEditor: "select",
+    descriptionEditable: true,
+    descriptionOptions: [
+      "Owner investment",
+      "Owner investment from long-term capital contribution with supporting documentation",
+      "Services for cash",
+      "Paid rent",
+      "Purchased supplies",
+      "Supplies expense adj.",
+      "Owner drawings",
+      "Adjustment entry",
+    ],
   },
   {
     key: "t_accounts_adjusted_info_hidden",
@@ -637,357 +547,7 @@ const tAccountVariants: TAccountVariant[] = [
 ]
 
 function TAccountsTable() {
-  function hoverClass(editable: boolean) {
-    return editable
-      ? "border border-transparent hover:border-primary/70 focus-within:border-primary/70"
-      : "border border-transparent hover:border-muted-foreground/40"
-  }
-
-  function renderDateCell(value: string, editable: boolean) {
-    if (!editable) {
-      return (
-        <span className="inline-flex h-7 w-[132px] items-center px-2 text-[14px] leading-5 text-foreground [font-family:inherit] font-normal">
-          {value || "\u00A0"}
-        </span>
-      )
-    }
-    return <DateEditorCell value={value} />
-  }
-
-  function renderDescriptionCell(
-    value: string,
-    mode: DescriptionEditorMode,
-    options: string[] | undefined,
-    editable: boolean,
-    datalistId: string
-  ) {
-    if (!editable) {
-      return (
-        <span className="inline-flex min-h-7 h-auto w-[200px] items-center whitespace-normal break-words px-2 py-1 text-[14px] leading-5 text-foreground [font-family:inherit] font-normal">
-          {value || "\u00A0"}
-        </span>
-      )
-    }
-
-    const normalizedOptions = (options || []).filter(Boolean)
-    const selectValue = normalizedOptions.includes(value) ? value : undefined
-    const textEditor = (
-      <Textarea
-        defaultValue={value}
-        rows={1}
-        className="min-h-7 h-auto w-[200px] resize-none overflow-hidden rounded-none border-0 bg-transparent px-2 py-1 !text-[14px] md:!text-[14px] !leading-5 text-foreground [font-family:inherit] font-normal shadow-none focus-visible:ring-0"
-        placeholder="Enter description"
-      />
-    )
-
-    if (mode === "both") {
-      return (
-        <>
-          {textEditor}
-          <datalist id={datalistId}>
-            {normalizedOptions.map((option) => (
-              <option key={option} value={option} />
-            ))}
-          </datalist>
-        </>
-      )
-    }
-
-    if (mode === "select") {
-      return (
-        <Select defaultValue={selectValue}>
-          <SelectTrigger className="h-7 w-[200px] rounded-none border-0 bg-transparent px-2 !text-[14px] md:!text-[14px] !leading-5 text-foreground [font-family:inherit] font-normal shadow-none focus:ring-0 focus:ring-offset-0">
-            <SelectValue placeholder="Pick description" />
-          </SelectTrigger>
-          <SelectContent className="rounded-none">
-            {normalizedOptions.map((option) => (
-              <SelectItem key={option} value={option}>
-                {option}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      )
-    }
-
-    return textEditor
-  }
-
-  function renderVariantAccount(
-    account: TAccountData,
-    infoMode: TAccountInfoMode,
-    sideHeaders: string[] | undefined,
-    dateEditable: boolean,
-    descriptionEditor: DescriptionEditorMode,
-    descriptionEditable: boolean,
-    descriptionOptions?: string[]
-  ) {
-    const amountsEditableInAccount = account.rows.some(
-      (row) => row.debitAmount.editable || row.creditAmount.editable
-    )
-    const debitAmountEditable = account.rows.some((row) => row.debitAmount.editable)
-    const creditAmountEditable = account.rows.some((row) => row.creditAmount.editable)
-
-    const rowCount = Math.max(account.rows.length, 4)
-    const paddedRows = [
-      ...account.rows,
-      ...Array.from({ length: Math.max(0, rowCount - account.rows.length) }).map((_, index) => ({
-        rowId: `blank-${index}`,
-        debitInfo: { value: "", editable: false },
-        debitAmount: { value: "", editable: amountsEditableInAccount },
-        creditInfo: { value: "", editable: false },
-        creditAmount: { value: "", editable: amountsEditableInAccount },
-      })),
-    ]
-
-    const defaultSideInfoHeaders =
-      infoMode === "date_desc"
-        ? ["Date", "Description"]
-        : infoMode === "date_only"
-          ? ["Date"]
-          : infoMode === "desc_only"
-            ? ["Description"]
-            : []
-    const sideInfoHeaders = sideHeaders && sideHeaders.length > 0 ? sideHeaders : defaultSideInfoHeaders
-    const sideColSpan = sideInfoHeaders.length + 1
-    const hasDescriptionColumn = sideInfoHeaders.some((header) => header.toLowerCase() === "description")
-
-    function infoColumnClass(header: string) {
-      if (header.toLowerCase() === "date") {
-        return "w-[132px] min-w-[132px] max-w-[132px] whitespace-nowrap"
-      }
-      if (header.toLowerCase() === "description") {
-        return "w-[200px] min-w-[200px] max-w-[200px]"
-      }
-      return "w-[132px] min-w-[132px] max-w-[132px]"
-    }
-
-    function isDescriptionColumn(header: string) {
-      return header.toLowerCase() === "description"
-    }
-
-    function infoHeaderLocked(header: string) {
-      const normalized = header.toLowerCase()
-      if (normalized === "date") return !dateEditable
-      if (normalized === "description") return !descriptionEditable
-      return false
-    }
-
-    const parseAmount = (value: string) => {
-      const cleaned = value.replace(/[^0-9.-]/g, "")
-      const parsed = Number.parseFloat(cleaned)
-      return Number.isFinite(parsed) ? parsed : 0
-    }
-    const debitTotal = account.rows.reduce((sum, row) => sum + parseAmount(row.debitAmount.value), 0)
-    const creditTotal = account.rows.reduce((sum, row) => sum + parseAmount(row.creditAmount.value), 0)
-
-    function formatTotal(value: number) {
-      return value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-    }
-
-    function buildInfoValues(value: string) {
-      const split = splitInfo(value)
-      const baseValues =
-        infoMode === "date_desc"
-          ? [split.date, split.description]
-          : infoMode === "date_only"
-            ? [split.date]
-            : infoMode === "desc_only"
-              ? [split.description]
-              : []
-      if (sideInfoHeaders.length <= baseValues.length) {
-        return baseValues.slice(0, sideInfoHeaders.length)
-      }
-      return [...baseValues, ...Array.from({ length: sideInfoHeaders.length - baseValues.length }).map(() => "")]
-    }
-
-    return (
-      <div className="text-[14px] leading-5 text-foreground [font-family:inherit]">
-        <div className="overflow-x-auto">
-          <Table className="table-fixed">
-            <TableHeader>
-            <TableRow className="!bg-transparent hover:!bg-transparent data-[state=selected]:!bg-transparent">
-              <TableHead colSpan={sideColSpan * 2} className="py-1">
-                <div className="grid grid-cols-3 items-center text-sm font-medium text-foreground">
-                  <span className="text-left">Debit (Dr)</span>
-                  <span className="text-center font-semibold">{account.title}</span>
-                  <span className="text-right">Credit (Cr)</span>
-                </div>
-              </TableHead>
-            </TableRow>
-            <TableRow className="bg-[#e7edf9] hover:bg-[#e7edf9]">
-                {sideInfoHeaders.map((header) => (
-                  <TableHead
-                    key={`dr-${account.tableId}-${header}`}
-                    className={`!h-7 py-0 text-left text-sm font-medium text-foreground ${infoColumnClass(header)}`}
-                  >
-                    <span className="inline-flex items-center gap-1">
-                      <span>{header}</span>
-                      {infoHeaderLocked(header) ? <LockSimpleIcon size={12} className="text-muted-foreground" /> : null}
-                    </span>
-                  </TableHead>
-                ))}
-                <TableHead className="w-[120px] !h-7 py-0 text-right text-sm font-medium text-foreground border-r">
-                  <span className="inline-flex w-full items-center justify-end gap-1">
-                    {!debitAmountEditable ? <LockSimpleIcon size={12} className="text-muted-foreground" /> : null}
-                    <span>Amount</span>
-                  </span>
-                </TableHead>
-                {sideInfoHeaders.map((header) => (
-                  <TableHead
-                    key={`cr-${account.tableId}-${header}`}
-                    className={`!h-7 py-0 text-left text-sm font-medium text-foreground ${infoColumnClass(header)}`}
-                  >
-                    <span className="inline-flex items-center gap-1">
-                      <span>{header}</span>
-                      {infoHeaderLocked(header) ? <LockSimpleIcon size={12} className="text-muted-foreground" /> : null}
-                    </span>
-                  </TableHead>
-                ))}
-                <TableHead className="w-[120px] !h-7 py-0 text-right text-sm font-medium text-foreground">
-                  <span className="inline-flex w-full items-center justify-end gap-1">
-                    {!creditAmountEditable ? <LockSimpleIcon size={12} className="text-muted-foreground" /> : null}
-                    <span>Amount</span>
-                  </span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {paddedRows.map((row) => {
-                const debitInfoValues = buildInfoValues(row.debitInfo.value)
-                const creditInfoValues = buildInfoValues(row.creditInfo.value)
-
-                return (
-                  <TableRow key={row.rowId}>
-                    {debitInfoValues.map((value, index) => (
-                      <TableCell
-                        key={`dr-${row.rowId}-${index}`}
-                        className={`p-1 ${infoColumnClass(sideInfoHeaders[index] ?? "")} ${
-                          isDescriptionColumn(sideInfoHeaders[index] ?? "")
-                            ? "!whitespace-normal break-words align-top"
-                            : "align-top"
-                        }`}
-                      >
-                      <div
-                          className={`${hoverClass(
-                            (infoMode === "date_desc" || infoMode === "date_only")
-                              ? index === 0 && dateEditable
-                              : descriptionEditable
-                          )} inline-flex items-center`}
-                        >
-                          {(infoMode === "date_desc" || infoMode === "date_only") && index === 0
-                            ? renderDateCell(value, dateEditable)
-                            : renderDescriptionCell(
-                                value,
-                                descriptionEditor,
-                                descriptionOptions,
-                                descriptionEditable,
-                                `${account.tableId}-dr-desc-${row.rowId}`
-                              )}
-                        </div>
-                      </TableCell>
-                    ))}
-                    <TableCell className="border-r p-1 text-right align-top">
-                      <div className={`${hoverClass(row.debitAmount.editable)} ml-auto inline-flex items-center`}>
-                        <TAmountCell cell={row.debitAmount} />
-                      </div>
-                    </TableCell>
-                    {creditInfoValues.map((value, index) => (
-                      <TableCell
-                        key={`cr-${row.rowId}-${index}`}
-                        className={`p-1 ${infoColumnClass(sideInfoHeaders[index] ?? "")} ${
-                          isDescriptionColumn(sideInfoHeaders[index] ?? "")
-                            ? "!whitespace-normal break-words align-top"
-                            : "align-top"
-                        }`}
-                      >
-                        <div
-                          className={`${hoverClass(
-                            (infoMode === "date_desc" || infoMode === "date_only")
-                              ? index === 0 && dateEditable
-                              : descriptionEditable
-                          )} inline-flex items-center`}
-                        >
-                          {(infoMode === "date_desc" || infoMode === "date_only") && index === 0
-                            ? renderDateCell(value, dateEditable)
-                            : renderDescriptionCell(
-                                value,
-                                descriptionEditor,
-                                descriptionOptions,
-                                descriptionEditable,
-                                `${account.tableId}-cr-desc-${row.rowId}`
-                              )}
-                        </div>
-                      </TableCell>
-                    ))}
-                    <TableCell className="p-1 text-right align-top">
-                      <div className={`${hoverClass(row.creditAmount.editable)} ml-auto inline-flex items-center`}>
-                        <TAmountCell cell={row.creditAmount} />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-              <TableRow>
-                {sideInfoHeaders.map((_, index) => (
-                  <TableCell key={`dr-balance-label-${account.tableId}-${index}`} className="p-1">
-                    {hasDescriptionColumn && index === sideInfoHeaders.length - 1 ? (
-                      <span className="block px-2 text-[14px] leading-5 font-medium text-foreground [font-family:inherit]">Balance</span>
-                    ) : null}
-                  </TableCell>
-                ))}
-                <TableCell className="border-r p-1 align-middle">
-                  <div className="ml-auto w-[120px] border-b-4 border-double border-foreground px-2 py-1 text-right text-[14px] leading-5 font-semibold [font-family:inherit]">
-                    ${formatTotal(debitTotal)}
-                  </div>
-                </TableCell>
-                {sideInfoHeaders.map((_, index) => (
-                  <TableCell key={`cr-balance-label-${account.tableId}-${index}`} className="p-1">
-                    {hasDescriptionColumn && index === sideInfoHeaders.length - 1 ? (
-                      <span className="block px-2 text-[14px] leading-5 font-medium text-foreground [font-family:inherit]">Balance</span>
-                    ) : null}
-                  </TableCell>
-                ))}
-                <TableCell className="p-1 align-middle">
-                  <div className="ml-auto w-[120px] border-b-4 border-double border-foreground px-2 py-1 text-right text-[14px] leading-5 font-semibold [font-family:inherit]">
-                    ${formatTotal(creditTotal)}
-                  </div>
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="space-y-8">
-      {tAccountVariants.map((variant) => (
-        <div key={variant.key} className="space-y-3">
-          <h3 className="text-sm font-semibold text-foreground">{variant.label}</h3>
-          <div className="grid gap-6 grid-cols-1">
-            {variant.accounts.map((account) => (
-              <div key={`${variant.key}-${account.tableId}`}>
-                {renderVariantAccount(
-                  account,
-                  variant.infoMode,
-                  variant.sideHeaders,
-                  variant.dateEditable,
-                  variant.descriptionEditor,
-                  variant.descriptionEditable,
-                  variant.descriptionOptions
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-      <div className="text-xs text-muted-foreground">
-        All variants above are fully viewable; editable amount cells can be entered on both debit and credit sides.
-      </div>
-    </div>
-  )
+  return <TAccountTable variants={tAccountVariants} />
 }
 
 function PipelineTable() {
