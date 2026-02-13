@@ -16,6 +16,14 @@ export type QuestionType =
   | "Chemical"
   | "Multipart"
   | "Conditional"
+  | "Journal (locked)"
+  | "General ledger"
+  | "Trial balance"
+  | "Income statement"
+  | "Balance sheet"
+  | "T-accounts"
+  | "Worksheet"
+  | "Pipeline flow"
 
 export const questionTypes: QuestionType[] = [
   "Numeric",
@@ -35,6 +43,14 @@ export const questionTypes: QuestionType[] = [
   "Chemical",
   "Multipart",
   "Conditional",
+  "Journal (locked)",
+  "General ledger",
+  "Trial balance",
+  "Income statement",
+  "Balance sheet",
+  "T-accounts",
+  "Worksheet",
+  "Pipeline flow",
 ]
 
 export type Question = {
@@ -224,3 +240,83 @@ export const mockQuestions: Question[] = [
     group: "Unassigned",
   },
 ]
+
+export const accountingQuestions: Question[] = [
+  {
+    id: 201,
+    description: "Journal (given / locked): debit-credit layout with indented credit lines.",
+    type: "Journal (locked)",
+    timesUsed: 4,
+    lastModified: "02/12/26",
+    group: "Unassigned",
+  },
+  {
+    id: 202,
+    description:
+      "General ledger: running balance by account, with optional ending-balance and debit-credit blanks.",
+    type: "General ledger",
+    timesUsed: 3,
+    lastModified: "02/12/26",
+    group: "Unassigned",
+  },
+  {
+    id: 203,
+    description: "Trial balance: account debit/credit listing with totals and blank-cell practice variants.",
+    type: "Trial balance",
+    timesUsed: 5,
+    lastModified: "02/11/26",
+    group: "Unassigned",
+  },
+  {
+    id: 204,
+    description: "Income statement: standard two-column and three-column (% of revenue) formats.",
+    type: "Income statement",
+    timesUsed: 3,
+    lastModified: "02/10/26",
+    group: "Unassigned",
+  },
+  {
+    id: 205,
+    description: "Balance sheet: standard assets-liabilities-equity and actual-budget-variance views.",
+    type: "Balance sheet",
+    timesUsed: 2,
+    lastModified: "02/10/26",
+    group: "Unassigned",
+  },
+  {
+    id: 206,
+    description: "T-accounts: debit and credit split with blank practice cells.",
+    type: "T-accounts",
+    timesUsed: 1,
+    lastModified: "02/09/26",
+    group: "Unassigned",
+  },
+  {
+    id: 207,
+    description: "Pipeline exercise flow: journal → ledger → trial balance → income statement → balance sheet.",
+    type: "Pipeline flow",
+    timesUsed: 2,
+    lastModified: "02/09/26",
+    group: "Unassigned",
+  },
+  {
+    id: 208,
+    description:
+      "Worksheet (10-column): unadjusted, adjustments, adjusted trial balance, income statement, balance sheet columns.",
+    type: "Worksheet",
+    timesUsed: 2,
+    lastModified: "02/08/26",
+    group: "Unassigned",
+  },
+]
+
+export function getQuestionsForLibraryItem(itemId: string): Question[] {
+  if (itemId === "7") {
+    return accountingQuestions
+  }
+  return mockQuestions
+}
+
+export function getQuestionForLibraryItem(itemId: string, questionId: number): Question | undefined {
+  return getQuestionsForLibraryItem(itemId).find((question) => question.id === questionId)
+}

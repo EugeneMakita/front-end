@@ -15,8 +15,9 @@ import {
   XIcon,
 } from "@phosphor-icons/react"
 import katex from "katex"
-import { mockQuestions } from "@/lib/mock-questions"
+import { getQuestionForLibraryItem } from "@/lib/mock-questions"
 import type { MathfieldElement } from "mathlive"
+import { AccountingQuestionView } from "@/components/accounting-question-view"
 
 type KeyDef = {
   labelLatex: string
@@ -104,7 +105,8 @@ export default function QuestionViewPage() {
   const params = useParams()
   const itemId = params.id as string
   const questionId = Number(params.questionId as string)
-  const question = mockQuestions.find((q) => q.id === questionId)
+  const question = getQuestionForLibraryItem(itemId, questionId)
+  const isAccountingQuestion = itemId === "7"
   const fieldContainerRef = React.useRef<HTMLDivElement | null>(null)
   const [showPad, setShowPad] = React.useState(false)
   const [isMounted, setIsMounted] = React.useState(false)
@@ -241,6 +243,31 @@ export default function QuestionViewPage() {
 
   if (!question) {
     return <p className="text-sm text-muted-foreground">Question not found.</p>
+  }
+
+  if (isAccountingQuestion) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs text-muted-foreground">
+              Question #{question.id} • {question.type}
+            </p>
+            <h2 className="mt-1 text-xl font-semibold">{question.description}</h2>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link href={`/library/${itemId}/questions`}>
+              <Button variant="ghost">Back</Button>
+            </Link>
+            <Link href={`/library/${itemId}/questions/${question.id}/edit`}>
+              <Button>Edit question</Button>
+            </Link>
+          </div>
+        </div>
+
+        <AccountingQuestionView questionId={questionId} />
+      </div>
+    )
   }
 
   return (
