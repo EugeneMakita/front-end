@@ -39,19 +39,20 @@ import {
   PlusIcon,
   GraduationCapIcon,
 } from "@phosphor-icons/react"
-import { mockQuestions, questionTypes } from "@/lib/mock-questions"
+import { getQuestionsForLibraryItem } from "@/lib/mock-questions"
 
 export default function QuestionsPage() {
   const params = useParams()
   const router = useRouter()
   const itemId = params.id as string
+  const questions = React.useMemo(() => getQuestionsForLibraryItem(itemId), [itemId])
   const [search, setSearch] = React.useState("")
   const [selectedItems, setSelectedItems] = React.useState<Set<number>>(new Set())
   const [expanded, setExpanded] = React.useState(true)
   const [filterGroup, setFilterGroup] = React.useState("all")
   const [filterType, setFilterType] = React.useState("all")
 
-  const filtered = mockQuestions.filter((q) => {
+  const filtered = questions.filter((q) => {
     const matchesSearch =
       q.description.toLowerCase().includes(search.toLowerCase()) ||
       q.type.toLowerCase().includes(search.toLowerCase())
@@ -61,6 +62,10 @@ export default function QuestionsPage() {
   })
 
   const allSelected = filtered.length > 0 && filtered.every((q) => selectedItems.has(q.id))
+  const availableTypes = React.useMemo(
+    () => Array.from(new Set(questions.map((question) => question.type))),
+    [questions]
+  )
 
   function toggleSelectAll() {
     if (allSelected) {
@@ -179,7 +184,7 @@ export default function QuestionsPage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
-              {questionTypes.map((type) => (
+              {availableTypes.map((type) => (
                 <SelectItem key={type} value={type}>
                   {type}
                 </SelectItem>

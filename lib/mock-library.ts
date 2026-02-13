@@ -15,7 +15,7 @@ export type LibraryItem = {
 }
 
 export const initialFolders: Folder[] = [
-  { id: "favorites", name: "Favorites", count: 1, icon: "star" },
+  { id: "favorites", name: "Favorites", count: 2, icon: "star" },
   { id: "eugee", name: "EuGee", count: 1, icon: "folder" },
 ]
 
@@ -63,5 +63,15 @@ export const initialItems: LibraryItem[] = [
     description: "Step-by-step onboarding process for new team members",
     updatedAt: "2 weeks ago",
     image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=240&fit=crop",
+  },
+  {
+    id: "7",
+    title: "Accounting Details Workbook",
+    description:
+      "Journal, ledger, trial balance, income statement, balance sheet, T-accounts, and worksheet practice tables",
+    updatedAt: "1 day ago",
+    image:
+      "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&h=240&fit=crop",
+    folderId: "favorites",
   },
 ]
