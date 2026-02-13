@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { CalendarBlankIcon } from "@phosphor-icons/react"
+import { CalendarBlankIcon, LockSimpleIcon } from "@phosphor-icons/react"
 import {
   Select,
   SelectContent,
@@ -130,7 +130,7 @@ function LedgerTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
+            <TableRow className="!bg-transparent hover:!bg-transparent">
               <TableCell>Jan 01</TableCell>
               <TableCell>J1</TableCell>
               <TableCell>Service revenue</TableCell>
@@ -288,6 +288,9 @@ function BalanceSheetTable() {
 
 function TAmountCell({ cell }: { cell: TAccountCell }) {
   const normalizedValue = cell.value.replace(/\$/g, "").trim()
+  const displayValue = normalizedValue ? `$${normalizedValue}` : ""
+  const [rawValue, setRawValue] = React.useState(normalizedValue)
+  const [isEditing, setIsEditing] = React.useState(false)
 
   if (cell.editable) {
     return (
@@ -295,7 +298,10 @@ function TAmountCell({ cell }: { cell: TAccountCell }) {
         id={cell.inputId}
         inputMode="decimal"
         placeholder="0.00"
-        defaultValue={normalizedValue}
+        value={isEditing ? rawValue : (rawValue ? `$${rawValue}` : "")}
+        onFocus={() => setIsEditing(true)}
+        onBlur={() => setIsEditing(false)}
+        onChange={(event) => setRawValue(event.target.value.replace(/\$/g, "").trim())}
         className="h-7 w-[120px] rounded-none border-0 bg-transparent px-2 text-right !text-[14px] md:!text-[14px] !leading-5 text-foreground [font-family:inherit] font-normal shadow-none focus-visible:ring-0"
       />
     )
@@ -303,7 +309,7 @@ function TAmountCell({ cell }: { cell: TAccountCell }) {
 
   return (
     <span className="inline-flex h-7 w-[120px] items-center justify-end px-2 text-right text-[14px] leading-5 text-foreground [font-family:inherit] font-normal">
-      {cell.value || "\u00A0"}
+      {displayValue || "\u00A0"}
     </span>
   )
 }
@@ -719,6 +725,8 @@ function TAccountsTable() {
     const amountsEditableInAccount = account.rows.some(
       (row) => row.debitAmount.editable || row.creditAmount.editable
     )
+    const debitAmountEditable = account.rows.some((row) => row.debitAmount.editable)
+    const creditAmountEditable = account.rows.some((row) => row.creditAmount.editable)
 
     const rowCount = Math.max(account.rows.length, 4)
     const paddedRows = [
@@ -758,6 +766,13 @@ function TAccountsTable() {
       return header.toLowerCase() === "description"
     }
 
+    function infoHeaderLocked(header: string) {
+      const normalized = header.toLowerCase()
+      if (normalized === "date") return !dateEditable
+      if (normalized === "description") return !descriptionEditable
+      return false
+    }
+
     const parseAmount = (value: string) => {
       const cleaned = value.replace(/[^0-9.-]/g, "")
       const parsed = Number.parseFloat(cleaned)
@@ -791,7 +806,7 @@ function TAccountsTable() {
         <div className="overflow-x-auto">
           <Table className="table-fixed">
             <TableHeader>
-            <TableRow>
+            <TableRow className="!bg-transparent hover:!bg-transparent data-[state=selected]:!bg-transparent">
               <TableHead colSpan={sideColSpan * 2} className="py-1">
                 <div className="grid grid-cols-3 items-center text-sm font-medium text-foreground">
                   <span className="text-left">Debit (Dr)</span>
@@ -806,21 +821,35 @@ function TAccountsTable() {
                     key={`dr-${account.tableId}-${header}`}
                     className={`!h-7 py-0 text-left text-sm font-medium text-foreground ${infoColumnClass(header)}`}
                   >
-                    {header}
+                    <span className="inline-flex items-center gap-1">
+                      <span>{header}</span>
+                      {infoHeaderLocked(header) ? <LockSimpleIcon size={12} className="text-muted-foreground" /> : null}
+                    </span>
                   </TableHead>
                 ))}
                 <TableHead className="w-[120px] !h-7 py-0 text-right text-sm font-medium text-foreground border-r">
-                  Amount
+                  <span className="inline-flex w-full items-center justify-end gap-1">
+                    {!debitAmountEditable ? <LockSimpleIcon size={12} className="text-muted-foreground" /> : null}
+                    <span>Amount</span>
+                  </span>
                 </TableHead>
                 {sideInfoHeaders.map((header) => (
                   <TableHead
                     key={`cr-${account.tableId}-${header}`}
                     className={`!h-7 py-0 text-left text-sm font-medium text-foreground ${infoColumnClass(header)}`}
                   >
-                    {header}
+                    <span className="inline-flex items-center gap-1">
+                      <span>{header}</span>
+                      {infoHeaderLocked(header) ? <LockSimpleIcon size={12} className="text-muted-foreground" /> : null}
+                    </span>
                   </TableHead>
                 ))}
-                <TableHead className="w-[120px] !h-7 py-0 text-right text-sm font-medium text-foreground">Amount</TableHead>
+                <TableHead className="w-[120px] !h-7 py-0 text-right text-sm font-medium text-foreground">
+                  <span className="inline-flex w-full items-center justify-end gap-1">
+                    {!creditAmountEditable ? <LockSimpleIcon size={12} className="text-muted-foreground" /> : null}
+                    <span>Amount</span>
+                  </span>
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -908,8 +937,8 @@ function TAccountsTable() {
                   </TableCell>
                 ))}
                 <TableCell className="border-r p-1 align-middle">
-                  <div className="ml-auto w-[120px] border-t-4 border-double border-foreground px-2 py-1 text-right text-[14px] leading-5 font-semibold [font-family:inherit]">
-                    {formatTotal(debitTotal)}
+                  <div className="ml-auto w-[120px] border-b-4 border-double border-foreground px-2 py-1 text-right text-[14px] leading-5 font-semibold [font-family:inherit]">
+                    ${formatTotal(debitTotal)}
                   </div>
                 </TableCell>
                 {sideInfoHeaders.map((_, index) => (
@@ -920,8 +949,8 @@ function TAccountsTable() {
                   </TableCell>
                 ))}
                 <TableCell className="p-1 align-middle">
-                  <div className="ml-auto w-[120px] border-t-4 border-double border-foreground px-2 py-1 text-right text-[14px] leading-5 font-semibold [font-family:inherit]">
-                    {formatTotal(creditTotal)}
+                  <div className="ml-auto w-[120px] border-b-4 border-double border-foreground px-2 py-1 text-right text-[14px] leading-5 font-semibold [font-family:inherit]">
+                    ${formatTotal(creditTotal)}
                   </div>
                 </TableCell>
               </TableRow>
