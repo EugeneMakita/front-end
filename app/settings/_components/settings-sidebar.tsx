@@ -3,17 +3,26 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Separator } from "@/components/ui/separator"
-import { FileTextIcon } from "@phosphor-icons/react"
+import {
+  BellIcon,
+  ChartBarIcon,
+  CreditCardIcon,
+  EnvelopeSimpleIcon,
+  GearIcon,
+  LockKeyIcon,
+  ShareNetworkIcon,
+  UserIcon,
+} from "@phosphor-icons/react"
 
 const sections = [
-  { label: "General", href: "/settings/general" },
-  { label: "Account", href: "/settings/account" },
-  { label: "Subscription", href: "/settings/subscription" },
-  { label: "Notifications", href: "/settings/notifications" },
-  { label: "Social", href: "/settings/social" },
-  { label: "Password", href: "/settings/password" },
-  { label: "Emails", href: "/settings/emails" },
-  { label: "Usage", href: "/settings/usage" },
+  { label: "General", href: "/settings/general", icon: GearIcon },
+  { label: "Account", href: "/settings/account", icon: UserIcon },
+  { label: "Subscription", href: "/settings/subscription", icon: CreditCardIcon },
+  { label: "Notifications", href: "/settings/notifications", icon: BellIcon },
+  { label: "Social", href: "/settings/social", icon: ShareNetworkIcon },
+  { label: "Password", href: "/settings/password", icon: LockKeyIcon },
+  { label: "Emails", href: "/settings/emails", icon: EnvelopeSimpleIcon },
+  { label: "Usage", href: "/settings/usage", icon: ChartBarIcon },
 ]
 
 export default function SettingsSidebar() {
@@ -29,6 +38,7 @@ export default function SettingsSidebar() {
       <div className="space-y-1 px-1.5">
         {sections.map((section) => {
           const active = pathname === section.href
+          const Icon = section.icon
           return (
             <Link
               key={section.href}
@@ -39,7 +49,7 @@ export default function SettingsSidebar() {
                   : "text-foreground hover:bg-accent"
               }`}
             >
-              <FileTextIcon size={16} />
+              <Icon size={16} />
               <span>{section.label}</span>
             </Link>
           )
