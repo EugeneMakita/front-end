@@ -4,6 +4,14 @@ import * as React from "react"
 import { LockSimpleIcon } from "@phosphor-icons/react"
 
 import {
+  ACCOUNTING_COLUMN_HEADER_ROW_CLASS,
+  AccountingDoubleUnderlineAmount,
+  TAccountAmountField,
+  TAccountDescriptionSelectField,
+  TAccountDescriptionTextField,
+  accountingCellFrameClass,
+} from "@/components/accounting-table-primitives"
+import {
   Table,
   TableBody,
   TableCell,
@@ -11,11 +19,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import {
-  TAccountAmountField,
-  TAccountDescriptionSelectField,
-  TAccountDescriptionTextField,
-} from "@/components/t-account-table"
 
 export type TrialBalanceCellKind = "label" | "amount" | "computed"
 export type TrialBalanceEditor = "input" | "select"
@@ -100,12 +103,6 @@ export function TrialBalanceTable({ variants, showTableHeading = true }: TrialBa
 
   function valueKey(variantKey: string, rowId: string, columnId: string) {
     return `${variantKey}:${rowId}:${columnId}`
-  }
-
-  function hoverClass(editable: boolean) {
-    return editable
-      ? "border border-transparent hover:border-primary/70 focus-within:border-ring focus-within:bg-background"
-      : "border border-transparent"
   }
 
   function updateAmount(
@@ -220,7 +217,7 @@ export function TrialBalanceTable({ variants, showTableHeading = true }: TrialBa
                 </colgroup>
                 <TableHeader>
                   {grouped ? (
-                    <TableRow className="bg-[#e7edf9] hover:bg-[#e7edf9]">
+                    <TableRow className={ACCOUNTING_COLUMN_HEADER_ROW_CLASS}>
                       {groups.map((group, index) => (
                         <TableHead
                           key={`${variant.key}-group-${index}`}
@@ -298,9 +295,10 @@ export function TrialBalanceTable({ variants, showTableHeading = true }: TrialBa
                                   index < variant.columns.length - 1 ? "border-r border-border" : ""
                                 }`}
                               >
-                                <div className="ml-auto w-full max-w-[132px] border-b-4 border-double border-border px-2 py-1 text-[14px] font-semibold text-foreground [font-family:inherit]">
-                                  {`$${computed.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                                </div>
+                                <AccountingDoubleUnderlineAmount
+                                  value={computed.toFixed(2)}
+                                  maxWidthClass="max-w-[132px]"
+                                />
                               </TableCell>
                             )
                           }
@@ -330,7 +328,7 @@ export function TrialBalanceTable({ variants, showTableHeading = true }: TrialBa
                                   index < variant.columns.length - 1 ? "border-r border-border" : ""
                                 }`}
                               >
-                                <div className={`${hoverClass(cell.editable)} ${getAlign(column) === "right" ? "ml-auto" : ""} inline-flex w-full max-w-[132px] items-center`}>
+                                <div className={`${accountingCellFrameClass(cell.editable)} ${getAlign(column) === "right" ? "ml-auto" : ""} inline-flex w-full max-w-[132px] items-center`}>
                                   <TAccountAmountField
                                     cell={{
                                       value: effectiveAmount,
@@ -352,7 +350,7 @@ export function TrialBalanceTable({ variants, showTableHeading = true }: TrialBa
                                 index < variant.columns.length - 1 ? "border-r border-border" : ""
                               }`}
                             >
-                              <div className={`${hoverClass(cell.editable)} flex w-full items-start`}>
+                              <div className={`${accountingCellFrameClass(cell.editable)} flex w-full items-start`}>
                                 {!cell.editable ? (
                                   <span className="inline-flex min-h-7 h-auto w-full items-center whitespace-normal break-words px-2 py-1 text-[14px] leading-5 text-foreground [font-family:inherit]">
                                     {effectiveTextValue || "\u00A0"}
