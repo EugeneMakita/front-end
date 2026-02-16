@@ -5,7 +5,6 @@ import Link from "next/link"
 import * as React from "react"
 import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   ArrowArcLeftIcon,
   ArrowArcRightIcon,
@@ -81,15 +80,20 @@ function renderLatex(latex: string) {
 function KeyButton({
   keyDef,
   onInsert,
+  variant = "default",
 }: {
   keyDef: KeyDef
   onInsert: (latex: string) => void
+  variant?: "default" | "digit"
 }) {
   return (
-    <Button
+    <button
       type="button"
-      variant="outline"
-      className="h-7 w-full px-0 text-xs"
+      className={
+        variant === "digit"
+          ? "flex h-[34px] items-center justify-center border border-border/50 bg-muted/30 text-[13px] font-medium tabular-nums text-foreground transition-colors hover:bg-muted/60 active:bg-muted"
+          : "flex h-[34px] items-center justify-center border border-border/50 bg-background text-foreground/70 transition-colors hover:bg-muted/40 hover:text-foreground active:bg-muted/60"
+      }
       onMouseDown={(e) => e.preventDefault()}
       onClick={() => onInsert(keyDef.insertLatex)}
     >
@@ -97,7 +101,28 @@ function KeyButton({
         className="inline-flex items-center text-[13px] leading-none [&_.katex]:text-[13px]"
         dangerouslySetInnerHTML={{ __html: renderLatex(keyDef.labelLatex) }}
       />
-    </Button>
+    </button>
+  )
+}
+
+function ControlButton({
+  onClick,
+  children,
+  wide,
+}: {
+  onClick: () => void
+  children: React.ReactNode
+  wide?: boolean
+}) {
+  return (
+    <button
+      type="button"
+      className={`flex h-[30px] items-center justify-center border border-border/40 bg-background text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground active:bg-muted/60 ${wide ? "w-10" : "w-[30px]"}`}
+      onMouseDown={(e) => e.preventDefault()}
+      onClick={onClick}
+    >
+      {children}
+    </button>
   )
 }
 
@@ -109,6 +134,7 @@ export default function QuestionViewPage() {
   const isAccountingQuestion = itemId === "7"
   const fieldContainerRef = React.useRef<HTMLDivElement | null>(null)
   const [showPad, setShowPad] = React.useState(false)
+  const [activeTab, setActiveTab] = React.useState<"basic" | "funcs" | "trig">("basic")
   const [isMounted, setIsMounted] = React.useState(false)
 
   const getField = React.useCallback(() => {
@@ -289,127 +315,147 @@ export default function QuestionViewPage() {
         </div>
       </div>
 
-      <div className="space-y-4">
-        <p className="text-sm text-muted-foreground">Compute x:</p>
-        <div
-          className="text-lg text-foreground"
-          dangerouslySetInnerHTML={{ __html: renderLatex("\\frac{3x+5}{2}=11") }}
-        />
+      <div className="space-y-5">
+        {/* Question prompt */}
+        <div className="space-y-2">
+          <p className="text-[13px] font-medium text-muted-foreground">Compute x:</p>
+          <div
+            className="inline-block border border-dashed border-border/70 bg-muted/20 px-4 py-2.5 text-lg text-foreground"
+            dangerouslySetInnerHTML={{ __html: renderLatex("\\frac{3x+5}{2}=11") }}
+          />
+        </div>
 
-        <div className="max-w-xl space-y-2">
-          <label htmlFor="math-answer" className="block text-sm font-medium text-foreground">
+        {/* Answer input + keypad zone */}
+        <div className="max-w-xl space-y-2" onMouseLeave={() => setShowPad(false)}>
+          <label htmlFor="math-answer" className="block text-[13px] font-medium text-foreground">
             Your answer
           </label>
-          <div ref={fieldContainerRef} className="border bg-background px-3 py-2">
+          <div
+            ref={fieldContainerRef}
+            className="border border-input bg-transparent px-2.5 py-1.5"
+          >
             {isMounted ? (
               React.createElement("math-field", {
                 id: "math-answer",
-                className: "block w-full min-h-6 text-base text-foreground",
-              style: {
-                fontSize: "1rem",
-                width: "100%",
-                border: "0",
-                outline: "none",
-                background: "transparent",
-                ["--selection-color" as string]: "#111827",
-                ["--selection-background-color" as string]: "rgba(148, 163, 184, 0.28)",
-                ["--contains-highlight-color" as string]: "#111827",
-                ["--contains-highlight-background-color" as string]: "rgba(148, 163, 184, 0.2)",
-              } as React.CSSProperties,
-            })
+                className: "block w-full text-foreground",
+                style: {
+                  fontSize: "0.85rem",
+                  width: "100%",
+                  border: "0",
+                  outline: "none",
+                  background: "transparent",
+                  ["--selection-color" as string]: "#111827",
+                  ["--selection-background-color" as string]: "rgba(148, 163, 184, 0.28)",
+                  ["--contains-highlight-color" as string]: "#111827",
+                  ["--contains-highlight-background-color" as string]: "rgba(148, 163, 184, 0.2)",
+                } as React.CSSProperties,
+              })
             ) : (
-              <div className="block min-h-6 w-full" aria-hidden="true" />
+              <div className="block min-h-5 w-full" aria-hidden="true" />
             )}
           </div>
-        </div>
 
-        {showPad && (
-          <div
-            className="w-[25.5rem] max-w-full"
-            onMouseDown={(e) => e.preventDefault()}
-          >
-          <div className="w-full border bg-popover shadow-md">
-            <Tabs defaultValue="basic" className="px-1.5 py-2">
-              <div className="flex items-center gap-1">
-                <TabsList className="grid h-8 flex-1 grid-cols-3 gap-1 bg-muted/40 p-1">
-                  <TabsTrigger
-                    value="basic"
-                    className="h-6 w-full border border-transparent bg-transparent px-2 text-xs data-active:border-border data-active:bg-background data-active:text-foreground"
+          {/* Math keypad */}
+          {showPad && (
+            <div
+              className="w-full max-w-[28rem]"
+              onMouseDown={(e) => e.preventDefault()}
+            >
+              <div className="overflow-hidden border border-border/70 bg-popover shadow-sm">
+                {/* Tab navigation */}
+                <div className="flex items-center justify-between px-2 pt-2">
+                  <div className="flex items-center">
+                    {(["basic", "funcs", "trig"] as const).map((tab) => (
+                      <button
+                        key={tab}
+                        type="button"
+                        className={`relative px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.05em] transition-colors ${
+                          activeTab === tab
+                            ? "text-foreground"
+                            : "text-muted-foreground/60 hover:text-muted-foreground"
+                        }`}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => setActiveTab(tab)}
+                      >
+                        {tab === "basic" ? "Basic" : tab === "funcs" ? "Functions" : "Trig"}
+                        {activeTab === tab && (
+                          <span className="absolute inset-x-3 -bottom-[1px] h-[1.5px] bg-foreground" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    className="flex h-6 w-6 items-center justify-center text-muted-foreground/50 transition-colors hover:text-foreground"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => setShowPad(false)}
                   >
-                    Basic
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="funcs"
-                    className="h-6 w-full border border-transparent bg-transparent px-2 text-xs data-active:border-border data-active:bg-background data-active:text-foreground"
-                  >
-                    Funcs
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="trig"
-                    className="h-6 w-full border border-transparent bg-transparent px-2 text-xs data-active:border-border data-active:bg-background data-active:text-foreground"
-                  >
-                    Trig
-                  </TabsTrigger>
-                </TabsList>
-                <Button
-                  type="button"
-                  size="icon-xs"
-                  variant="ghost"
-                  className="h-8 w-8"
-                  onClick={() => setShowPad(false)}
-                >
-                  <XIcon size={12} />
-                </Button>
-              </div>
-
-              <TabsContent value="basic">
-                <div className="mt-2 grid grid-cols-10 gap-1">
-                  {basicKeys.map((keyDef) => (
-                    <KeyButton key={keyDef.labelLatex} keyDef={keyDef} onInsert={insertLatex} />
-                  ))}
+                    <XIcon size={12} weight="bold" />
+                  </button>
                 </div>
-              </TabsContent>
 
-              <TabsContent value="funcs">
-                <div className="mt-2 grid grid-cols-4 gap-1">
-                  {funcKeys.map((keyDef) => (
-                    <KeyButton key={keyDef.labelLatex} keyDef={keyDef} onInsert={insertLatex} />
-                  ))}
-                </div>
-              </TabsContent>
+                <div className="mx-2 mt-1 border-t border-border/40" />
 
-              <TabsContent value="trig">
-                <div className="mt-2 grid grid-cols-3 gap-1">
-                  {trigKeys.map((keyDef) => (
-                    <KeyButton key={keyDef.labelLatex} keyDef={keyDef} onInsert={insertLatex} />
-                  ))}
+                {/* Key grid */}
+                <div className="p-2">
+                  {activeTab === "basic" && (
+                    <>
+                      <div className="grid grid-cols-10 gap-[3px]">
+                        {basicKeys.slice(0, 10).map((keyDef) => (
+                          <KeyButton key={keyDef.labelLatex} keyDef={keyDef} onInsert={insertLatex} />
+                        ))}
+                      </div>
+                      <div className="mt-[3px] grid grid-cols-10 gap-[3px]">
+                        {basicKeys.slice(10).map((keyDef) => (
+                          <KeyButton key={keyDef.labelLatex} keyDef={keyDef} onInsert={insertLatex} variant="digit" />
+                        ))}
+                      </div>
+                    </>
+                  )}
+
+                  {activeTab === "funcs" && (
+                    <div className="grid grid-cols-4 gap-[3px]">
+                      {funcKeys.map((keyDef) => (
+                        <KeyButton key={keyDef.labelLatex} keyDef={keyDef} onInsert={insertLatex} />
+                      ))}
+                    </div>
+                  )}
+
+                  {activeTab === "trig" && (
+                    <div className="grid grid-cols-3 gap-[3px]">
+                      {trigKeys.map((keyDef) => (
+                        <KeyButton key={keyDef.labelLatex} keyDef={keyDef} onInsert={insertLatex} />
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </TabsContent>
-            </Tabs>
-            <div className="flex items-center justify-between px-1.5 py-2">
-              <div className="flex items-center gap-1">
-                <Button type="button" variant="outline" className="h-7 w-7" onClick={() => runCommand("undo")}> 
-                  <ArrowArcLeftIcon size={16} />
-                </Button>
-                <Button type="button" variant="outline" className="h-7 w-7" onClick={() => runCommand("redo")}> 
-                  <ArrowArcRightIcon size={16} />
-                </Button>
-              </div>
-              <div className="flex items-center gap-1">
-                <Button type="button" variant="outline" className="h-7 w-7" onClick={() => runCommand("moveToPreviousChar")}>
-                  <ArrowLeftIcon size={16} />
-                </Button>
-                <Button type="button" variant="outline" className="h-7 w-7" onClick={() => runCommand("moveToNextChar")}>
-                  <ArrowRightIcon size={16} />
-                </Button>
-                <Button type="button" variant="outline" className="h-7 w-10" onClick={() => runCommand("deleteBackward")}>
-                  <BackspaceIcon size={16} />
-                </Button>
+
+                {/* Controls */}
+                <div className="flex items-center justify-between border-t border-border/40 px-2 py-1.5">
+                  <div className="flex items-center gap-[3px]">
+                    <ControlButton onClick={() => runCommand("undo")}>
+                      <ArrowArcLeftIcon size={13} />
+                    </ControlButton>
+                    <ControlButton onClick={() => runCommand("redo")}>
+                      <ArrowArcRightIcon size={13} />
+                    </ControlButton>
+                  </div>
+                  <div className="flex items-center gap-[3px]">
+                    <ControlButton onClick={() => runCommand("moveToPreviousChar")}>
+                      <ArrowLeftIcon size={13} />
+                    </ControlButton>
+                    <ControlButton onClick={() => runCommand("moveToNextChar")}>
+                      <ArrowRightIcon size={13} />
+                    </ControlButton>
+                    <ControlButton onClick={() => runCommand("deleteBackward")} wide>
+                      <BackspaceIcon size={13} />
+                    </ControlButton>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )
