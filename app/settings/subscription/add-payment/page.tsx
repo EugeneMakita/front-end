@@ -155,7 +155,7 @@ export default function AddPaymentPage() {
           className="h-12 w-full rounded-none"
           disabled={!acceptTerms || !acceptRenewal}
         >
-          <LockSimpleIcon size={16} />
+          <LockSimpleIcon size={16} weight="fill" />
           Subscribe now
         </Button>
       </div>

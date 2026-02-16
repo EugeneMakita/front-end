@@ -13,13 +13,13 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import BrandLogo from "@/components/brand-logo"
 import Sidebar, { type NavKey } from "@/components/sidebar"
 import QuickCreatePanel from "@/components/quick-create-panel"
 import SystemBanner from "@/components/ui/system-banner"
 import NotesPanel from "@/components/notes-panel"
 import { NotesProvider, useNotes } from "@/components/notes-context"
 import {
-  ArrowCircleUpIcon,
   MagnifyingGlassIcon,
   GlobeIcon,
   BellIcon,
@@ -64,11 +64,8 @@ function TopBar({
     <header className="relative sticky top-0 z-50 border-b bg-background/90 backdrop-blur">
       <div className="flex h-16 items-center gap-4 px-6">
         {/* LEFT: brand */}
-        <div className="flex items-center gap-2">
-          <ArrowCircleUpIcon size={28} weight="bold" className="text-primary" />
-          <div className="font-mono text-lg font-semibold tracking-tight text-primary">
-            Acme Inc.
-          </div>
+        <div className="flex items-center">
+          <BrandLogo />
         </div>
 
         {/* SPACER */}
@@ -99,7 +96,7 @@ function TopBar({
                 aria-label="Language"
                 onClick={handleLocaleChange}
               >
-                <GlobeIcon size={28} weight="bold" />
+                <GlobeIcon size={28} weight="fill" />
               </Button>
               <div className="text-sm font-semibold cursor-pointer hover:opacity-80 transition-opacity" onClick={handleLocaleChange}>
                 {locale}
@@ -116,7 +113,7 @@ function TopBar({
                     className="h-10 w-10 rounded-none"
                     aria-label="Notifications"
                   >
-                    <BellIcon size={28} weight="bold" />
+                    <BellIcon size={28} weight="fill" />
                   </Button>
                   {unreadCount > 0 && (
                     <span className="absolute top-1 right-1.5 h-2 w-2 rounded-full bg-red-500"></span>
@@ -185,7 +182,7 @@ function TopBar({
                   </Avatar>
                   <CaretDownIcon
                     size={22}
-                    weight="bold"
+                    weight="fill"
                     className={`opacity-80 transition-transform duration-200 ${
                       isMenuOpen ? "rotate-180" : ""
                     }`}
@@ -194,23 +191,23 @@ function TopBar({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem onSelect={() => onOpenSettings?.()}>
-                  <GearIcon size={18} weight="bold" />
+                  <GearIcon size={18} weight="fill" />
                   <span>Account Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <QuestionIcon size={18} weight="bold" />
+                  <QuestionIcon size={18} weight="fill" />
                   <span>Support</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => onOpenNotes?.()}>
-                  <NoteBlankIcon size={18} weight="bold" />
+                  <NoteBlankIcon size={18} weight="fill" />
                   <span>Notes</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="text-primary">
-                  <RocketIcon size={18} weight="bold" />
+                  <RocketIcon size={18} weight="fill" />
                   <span>Upgrade</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem variant="destructive" onSelect={onLogout}>
-                  <SignOutIcon size={18} weight="bold" />
+                  <SignOutIcon size={18} weight="fill" />
                   <span>Log Out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -271,6 +268,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
       : quickCreateOpen
       ? "quickCreate"
       : "quickCreate"
+  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false)
   const [showNotes, setShowNotes] = React.useState(false)
   const [notesPinned, setNotesPinned] = React.useState(false)
   const contentRef = React.useRef<HTMLDivElement>(null)
@@ -431,7 +429,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
 
       {/* Row under the topbar */}
       <div className="flex min-h-0 flex-1 overflow-hidden">
-        <Sidebar activeKey={activeKey} onSelect={handleNavSelect} />
+        <Sidebar activeKey={activeKey} onSelect={handleNavSelect} collapsed={sidebarCollapsed} onToggleCollapse={() => setSidebarCollapsed((c) => !c)} />
 
         {showRightPanel && (
           <aside className="h-full w-[420px] overflow-hidden border-r bg-background">
