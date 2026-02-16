@@ -13,6 +13,7 @@ import {
 } from "@phosphor-icons/react"
 import BrandLogo from "@/components/brand-logo"
 import { GoogleLogo } from "@/components/social-icons"
+import AuthFooter from "@/components/auth-footer"
 
 const CODE_LENGTH = 6
 
@@ -214,28 +215,10 @@ export default function VerifyEmailPage() {
             </CardContent>
           </Card>
 
-          {/* Footer links */}
-          <div className="mt-6 flex items-center justify-center gap-4">
-            <Link
-              href="/terms"
-              className="text-[11px] text-white/40 transition-colors hover:text-white/60"
-            >
-              Terms
-            </Link>
-            <span className="text-white/20">&middot;</span>
-            <Link
-              href="/privacy-policy"
-              className="text-[11px] text-white/40 transition-colors hover:text-white/60"
-            >
-              Privacy
-            </Link>
-            <span className="text-white/20">&middot;</span>
-            <span className="text-[11px] text-white/30">
-              &copy; {new Date().getFullYear()} asesley
-            </span>
-          </div>
         </div>
       </main>
+
+      <AuthFooter />
     </div>
   )
 }

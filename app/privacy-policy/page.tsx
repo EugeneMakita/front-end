@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import BrandLogo from "@/components/brand-logo"
 import { ArrowLeftIcon, ListIcon, XIcon } from "@phosphor-icons/react"
+import AuthFooter from "@/components/auth-footer"
 
 const tocSections = [
   { id: "information-collect", title: "What Information Do We Collect?" },
@@ -81,9 +82,14 @@ export default function PrivacyPolicyPage() {
 
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 border-b bg-white/90 backdrop-blur-lg">
-        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6">
+        <div className="mx-auto flex h-16 w-full max-w-7xl items-center px-6">
           <BrandLogo />
-          <Button asChild className="h-9 rounded-none px-5 text-[13px] font-semibold">
+          <nav className="ml-8 hidden items-center gap-7 md:flex">
+            <Link href="#" className="text-[13px] font-medium text-foreground/70 transition-colors hover:text-foreground">Product</Link>
+            <Link href="#" className="text-[13px] font-medium text-foreground/70 transition-colors hover:text-foreground">Pricing</Link>
+            <Link href="#" className="text-[13px] font-medium text-foreground/70 transition-colors hover:text-foreground">Resources</Link>
+          </nav>
+          <Button asChild className="ml-auto h-9 rounded-none px-5 text-[13px] font-semibold">
             <Link href="/login">Log in</Link>
           </Button>
         </div>
@@ -460,24 +466,12 @@ export default function PrivacyPolicyPage() {
                 </CardContent>
               </Card>
 
-              {/* Footer links */}
-              <div className="mt-6 flex items-center justify-center gap-4">
-                <Link href="/terms" className="text-[11px] text-white/40 transition-colors hover:text-white/60">
-                  Terms
-                </Link>
-                <span className="text-white/20">&middot;</span>
-                <Link href="/privacy-policy" className="text-[11px] text-white/40 transition-colors hover:text-white/60">
-                  Privacy
-                </Link>
-                <span className="text-white/20">&middot;</span>
-                <span className="text-[11px] text-white/30">
-                  &copy; {new Date().getFullYear()} asesley
-                </span>
-              </div>
             </div>
           </div>
         </div>
       </main>
+
+      <AuthFooter />
     </div>
   )
 }

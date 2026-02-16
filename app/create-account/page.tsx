@@ -21,6 +21,7 @@ import {
   LightningIcon,
 } from "@phosphor-icons/react"
 import { GoogleLogo, FacebookLogo } from "@/components/social-icons"
+import AuthFooter from "@/components/auth-footer"
 
 const socialOptions = [
   {
@@ -64,6 +65,14 @@ export default function CreateAccountPage() {
   const [submitted, setSubmitted] = React.useState(false)
   const [termsAccepted, setTermsAccepted] = React.useState(false)
   const [accountType, setAccountType] = React.useState<"educator" | "student" | null>(null)
+  const [mousePos, setMousePos] = React.useState({ x: -1000, y: -1000 })
+  const heroRef = React.useRef<HTMLDivElement>(null)
+
+  function handleMouseMove(e: React.MouseEvent) {
+    if (!heroRef.current) return
+    const rect = heroRef.current.getBoundingClientRect()
+    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top + heroRef.current.scrollTop })
+  }
 
   const passwordRules = [
     { label: "At least 8 characters", test: (value: string) => value.length >= 8 },
@@ -87,31 +96,56 @@ export default function CreateAccountPage() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#0f0e1a]">
-      {/* Ambient background glow */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-[20%] -top-[10%] h-[70vh] w-[70vh] rounded-full bg-primary/8 blur-[120px]" />
-        <div className="absolute -right-[10%] bottom-[5%] h-[50vh] w-[50vh] rounded-full bg-indigo-500/6 blur-[100px]" />
-      </div>
-
-      {/* Subtle grid texture */}
+    <div className="bg-[#0f0e1a]">
+      {/* Hero section with graph paper background */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-          backgroundSize: "64px 64px",
-        }}
-      />
-
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b bg-white/90 backdrop-blur-lg">
-        <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-6">
-          <BrandLogo />
-          <Button asChild className="h-9 rounded-none px-5 text-[13px] font-semibold">
-            <Link href="/login">Log in</Link>
-          </Button>
+        ref={heroRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={() => setMousePos({ x: -1000, y: -1000 })}
+        className="relative min-h-screen overflow-hidden"
+      >
+        {/* Ambient background glow */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -left-[20%] -top-[10%] h-[70vh] w-[70vh] rounded-full bg-primary/8 blur-[120px]" />
+          <div className="absolute -right-[10%] bottom-[5%] h-[50vh] w-[50vh] rounded-full bg-indigo-500/6 blur-[100px]" />
         </div>
-      </header>
+
+        {/* Graph paper — base layer with top-to-bottom fade */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)`,
+            backgroundSize: "100px 100px, 100px 100px, 20px 20px, 20px 20px",
+            maskImage: `linear-gradient(to bottom, black 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.15) 65%, transparent 90%)`,
+            WebkitMaskImage: `linear-gradient(to bottom, black 0%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.15) 65%, transparent 90%)`,
+          }}
+        />
+
+        {/* Graph paper — spotlight layer that follows cursor, full brightness everywhere */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)`,
+            backgroundSize: "100px 100px, 100px 100px, 20px 20px, 20px 20px",
+            maskImage: `radial-gradient(circle 250px at ${mousePos.x}px ${mousePos.y}px, black 0%, transparent 100%)`,
+            WebkitMaskImage: `radial-gradient(circle 250px at ${mousePos.x}px ${mousePos.y}px, black 0%, transparent 100%)`,
+          }}
+        />
+
+        {/* Header */}
+        <header className="fixed top-0 left-0 right-0 z-50 border-b bg-white/90 backdrop-blur-lg">
+          <div className="mx-auto flex h-16 w-full max-w-7xl items-center px-6">
+            <BrandLogo />
+            <nav className="ml-8 hidden items-center gap-7 md:flex">
+              <Link href="#" className="text-[13px] font-medium text-foreground/70 transition-colors hover:text-foreground">Product</Link>
+              <Link href="#" className="text-[13px] font-medium text-foreground/70 transition-colors hover:text-foreground">Pricing</Link>
+              <Link href="#" className="text-[13px] font-medium text-foreground/70 transition-colors hover:text-foreground">Resources</Link>
+            </nav>
+            <Button asChild className="ml-auto h-9 rounded-none px-5 text-[13px] font-semibold">
+              <Link href="/login">Log in</Link>
+            </Button>
+          </div>
+        </header>
 
       {/* Main */}
       <main className="relative z-10 px-6 pt-[calc(4rem+2.5rem)] pb-10 lg:pt-[calc(4rem+4rem)] lg:pb-16">
@@ -339,21 +373,10 @@ export default function CreateAccountPage() {
           </Card>
         </div>
 
-        {/* Footer links */}
-        <div className="mt-10 flex items-center justify-center gap-4">
-          <Link href="/terms" className="text-[11px] text-white/40 hover:text-white/60 transition-colors">
-            Terms
-          </Link>
-          <span className="text-white/20">&middot;</span>
-          <Link href="/privacy-policy" className="text-[11px] text-white/40 hover:text-white/60 transition-colors">
-            Privacy
-          </Link>
-          <span className="text-white/20">&middot;</span>
-          <span className="text-[11px] text-white/30">
-            &copy; {new Date().getFullYear()} asesley
-          </span>
-        </div>
       </main>
+      </div>
+
+      <AuthFooter />
     </div>
   )
 }

@@ -15,6 +15,7 @@ import {
   EyeSlashIcon,
 } from "@phosphor-icons/react"
 import { GoogleLogo, FacebookLogo } from "@/components/social-icons"
+import AuthFooter from "@/components/auth-footer"
 
 const socialOptions = [
   {
@@ -189,22 +190,10 @@ export default function LoginPage() {
             </CardContent>
           </Card>
 
-          {/* Footer links */}
-          <div className="mt-6 flex items-center justify-center gap-4">
-            <Link href="/terms" className="text-[11px] text-white/40 hover:text-white/60 transition-colors">
-              Terms
-            </Link>
-            <span className="text-white/20">·</span>
-            <Link href="/privacy-policy" className="text-[11px] text-white/40 hover:text-white/60 transition-colors">
-              Privacy
-            </Link>
-            <span className="text-white/20">·</span>
-            <span className="text-[11px] text-white/30">
-              &copy; {new Date().getFullYear()} asesley
-            </span>
-          </div>
         </div>
       </main>
+
+      <AuthFooter />
     </div>
   )
 }
