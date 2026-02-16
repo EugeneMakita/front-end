@@ -65,7 +65,7 @@ function TopBar({
       <div className="flex h-16 items-center gap-4 px-6">
         {/* LEFT: brand */}
         <div className="flex items-center">
-          <BrandLogo />
+          <BrandLogo href="/library" />
         </div>
 
         {/* SPACER */}
@@ -256,7 +256,9 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
     pathname.startsWith("/verify-email") ||
     pathname.startsWith("/onboarding") ||
     pathname.startsWith("/terms") ||
-    pathname.startsWith("/privacy-policy")
+    pathname.startsWith("/privacy-policy") ||
+    pathname.startsWith("/pricing") ||
+    pathname.startsWith("/contact")
 
   const pathToKey = Object.entries(navRoutes).find(([, path]) => pathname === path || pathname.startsWith(path + "/"))?.[0] as NavKey | undefined
   const hasQuickCreateParam = searchParams.get("quickCreate") === "1"

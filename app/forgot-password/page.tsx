@@ -43,7 +43,7 @@ export default function ForgotPasswordPage() {
 
       {/* Header */}
       <header className="relative z-10 flex justify-center px-6 pt-10 pb-6">
-        <BrandLogo className="text-white" />
+        <BrandLogo className="text-white" href="/create-account" />
       </header>
 
       {/* Main */}
