@@ -228,6 +228,7 @@ function TopBar({
 }
 
 const navRoutes: Partial<Record<NavKey, string>> = {
+  inbox: "/notifications",
   library: "/library",
   courses: "/courses",
   classes: "/classes",
@@ -362,8 +363,8 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
     }
 
     function clearSelectionAction(event?: Event) {
-      const target = event?.target as Element | null
-      if (target?.closest("[data-note-capture-button='true']")) {
+      const target = event?.target
+      if (target instanceof Element && target.closest("[data-note-capture-button='true']")) {
         return
       }
       const selection = window.getSelection()
@@ -373,8 +374,8 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
     }
 
     function hideSelectionActionOnPointerDown(event: Event) {
-      const target = event.target as Element | null
-      if (target?.closest("[data-note-capture-button='true']")) {
+      const target = event.target
+      if (target instanceof Element && target.closest("[data-note-capture-button='true']")) {
         return
       }
       setSelectionAction(null)
