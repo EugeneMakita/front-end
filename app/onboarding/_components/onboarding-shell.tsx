@@ -26,7 +26,7 @@ export function OnboardingShell({
       <div className="mx-auto w-full max-w-5xl">
         <div className="mb-8 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <BrandLogo />
+            <BrandLogo href="/create-account" />
             <span className="text-xl font-semibold text-foreground">Onboarding</span>
           </div>
           <p className="text-sm text-muted-foreground">

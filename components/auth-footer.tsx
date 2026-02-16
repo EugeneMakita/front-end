@@ -6,7 +6,7 @@ const columns = [
     heading: "Product",
     links: [
       { label: "Features", href: "#" },
-      { label: "Pricing", href: "#" },
+      { label: "Pricing", href: "/pricing" },
       { label: "Integrations", href: "#" },
       { label: "Changelog", href: "#" },
     ],
@@ -16,7 +16,7 @@ const columns = [
     links: [
       { label: "About", href: "#" },
       { label: "Careers", href: "#" },
-      { label: "Contact", href: "#" },
+      { label: "Contact", href: "/contact" },
       { label: "Blog", href: "#" },
     ],
   },
@@ -36,7 +36,7 @@ export default function AuthFooter() {
       <div className="mx-auto w-full max-w-6xl px-6">
         {/* Top section */}
         <div className="flex flex-col gap-10 py-12 sm:flex-row sm:items-start sm:justify-between">
-          <BrandLogo className="text-white shrink-0" />
+          <BrandLogo className="text-white shrink-0" href="/create-account" />
 
           <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 sm:gap-16">
             {columns.map((col) => (

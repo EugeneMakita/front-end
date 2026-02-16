@@ -1,8 +1,10 @@
+import Link from "next/link"
 import { cn } from "@/lib/utils"
 
-export default function BrandLogo({ className }: { className?: string }) {
+export default function BrandLogo({ className, href }: { className?: string; href?: string }) {
+  const Wrapper = href ? Link : "div"
   return (
-    <div className={cn("flex items-center gap-0", className)}>
+    <Wrapper href={href!} className={cn("flex items-center gap-0", className)}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 600 609"
@@ -14,6 +16,6 @@ export default function BrandLogo({ className }: { className?: string }) {
         </g>
       </svg>
       <span className="font-mono text-lg font-semibold tracking-tight text-primary">asesley</span>
-    </div>
+    </Wrapper>
   )
 }
