@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
@@ -31,63 +32,67 @@ const countries = [
   "Venezuela","Vietnam","Yemen","Zambia","Zimbabwe",
 ]
 
-export default function AddPaymentPage() {
+export default function UpdatePaymentPage() {
   const router = useRouter()
 
   return (
-    <div className="space-y-6 p-4 md:p-6">
-      {/* Back button */}
-      <button
-        onClick={() => router.back()}
-        className="inline-flex items-center gap-1.5 text-[12px] font-medium text-muted-foreground transition-colors hover:text-foreground"
-      >
-        <ArrowLeftIcon size={12} weight="bold" />
-        Back
-      </button>
+    <div className="flex min-h-screen items-start justify-center px-4 py-10 sm:py-16">
+      <div className="w-full max-w-lg">
+        <button
+          onClick={() => router.back()}
+          className="mb-4 inline-flex items-center gap-1.5 text-[12px] font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeftIcon size={12} weight="bold" />
+          Back
+        </button>
 
-      <div>
-        <h2 className="text-lg font-semibold tracking-tight">Update payment method</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Enter your new card details below.
-        </p>
+        <Card className="rounded-none py-0 gap-0">
+          <CardContent className="space-y-6 p-6 sm:p-8">
+            <div>
+              <h1 className="text-lg font-semibold tracking-tight">Update payment method</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Enter your new card details below.
+              </p>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-4">
+              <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Card details</h3>
+              <div className="space-y-3.5">
+                <Input placeholder="Card number" className="h-11 rounded-none" />
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Input placeholder="Expiration date" className="h-11 rounded-none" />
+                  <Input placeholder="Security code" className="h-11 rounded-none" />
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Select defaultValue="canada">
+                    <SelectTrigger className="h-11 w-full rounded-none">
+                      <SelectValue placeholder="Country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {countries.map((country) => (
+                        <SelectItem
+                          key={country}
+                          value={country.toLowerCase().replace(/[^a-z0-9]+/g, "-")}
+                        >
+                          {country}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Input placeholder="Postal code" className="h-11 rounded-none" />
+                </div>
+              </div>
+            </div>
+
+            <Button className="h-11 w-full rounded-none">
+              <LockSimpleIcon size={16} weight="fill" />
+              Update payment method
+            </Button>
+          </CardContent>
+        </Card>
       </div>
-
-      <Separator />
-
-      {/* Payment form */}
-      <div className="space-y-4">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Card details</h3>
-        <div className="space-y-3.5">
-          <Input placeholder="Card number" className="h-11 rounded-none" />
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Input placeholder="Expiration date" className="h-11 rounded-none" />
-            <Input placeholder="Security code" className="h-11 rounded-none" />
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <Select defaultValue="canada">
-              <SelectTrigger className="h-11 w-full rounded-none">
-                <SelectValue placeholder="Country" />
-              </SelectTrigger>
-              <SelectContent>
-                {countries.map((country) => (
-                  <SelectItem
-                    key={country}
-                    value={country.toLowerCase().replace(/[^a-z0-9]+/g, "-")}
-                  >
-                    {country}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Input placeholder="Postal code" className="h-11 rounded-none" />
-          </div>
-        </div>
-      </div>
-
-      <Button className="h-11 w-full rounded-none">
-        <LockSimpleIcon size={16} weight="fill" />
-        Update payment method
-      </Button>
     </div>
   )
 }

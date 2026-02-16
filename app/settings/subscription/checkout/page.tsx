@@ -1,8 +1,10 @@
 "use client"
 
 import * as React from "react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
@@ -31,8 +33,11 @@ const countries = [
   "Venezuela","Vietnam","Yemen","Zambia","Zimbabwe",
 ]
 
-export default function AddPaymentPage() {
+export default function CheckoutPage() {
   const router = useRouter()
+  const [showDetails, setShowDetails] = React.useState(false)
+  const [acceptTerms, setAcceptTerms] = React.useState(false)
+  const [acceptRenewal, setAcceptRenewal] = React.useState(false)
 
   return (
     <div className="space-y-6 p-4 md:p-6">
@@ -45,18 +50,57 @@ export default function AddPaymentPage() {
         Back
       </button>
 
-      <div>
-        <h2 className="text-lg font-semibold tracking-tight">Update payment method</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Enter your new card details below.
-        </p>
+      {/* Total due */}
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold tracking-tight">Total due today</h2>
+          <button
+            type="button"
+            className="cursor-pointer text-xs text-primary hover:underline"
+            onClick={() => setShowDetails((v) => !v)}
+          >
+            {showDetails ? "Hide details" : "View details"}
+          </button>
+        </div>
+        <p className="text-2xl font-bold tracking-tight">CA$218.40</p>
       </div>
+
+      {showDetails && (
+        <div className="space-y-3 pt-1 text-sm">
+          <div className="flex justify-between gap-3">
+            <div>
+              <p className="font-semibold">Brilliant Premium</p>
+              <p className="text-muted-foreground">Billed yearly</p>
+            </div>
+            <p>CA$195.00</p>
+          </div>
+          <div className="flex justify-between gap-3">
+            <p>Tax</p>
+            <p>CA$23.40</p>
+          </div>
+        </div>
+      )}
 
       <Separator />
 
-      {/* Payment form */}
+      {/* Payment method */}
       <div className="space-y-4">
-        <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Card details</h3>
+        <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Payment method</h3>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <Button type="button" className="h-11 w-full rounded-none bg-[#FFC439] text-[#003087] hover:bg-[#ffbf24]">
+            PayPal
+          </Button>
+          <Button type="button" className="h-11 w-full rounded-none bg-black text-white hover:bg-zinc-900">
+            G Pay · Visa •••• 1401
+          </Button>
+        </div>
+
+        <div className="flex items-center gap-3 py-2">
+          <Separator className="flex-1" />
+          <span className="text-xs font-semibold text-muted-foreground">OR</span>
+          <Separator className="flex-1" />
+        </div>
+
         <div className="space-y-3.5">
           <Input placeholder="Card number" className="h-11 rounded-none" />
           <div className="grid gap-3 sm:grid-cols-2">
@@ -84,9 +128,48 @@ export default function AddPaymentPage() {
         </div>
       </div>
 
-      <Button className="h-11 w-full rounded-none">
+      {/* Consent checkboxes */}
+      <div className="space-y-4 pt-1">
+        <div className="flex items-start gap-2">
+          <Checkbox
+            id="terms-consent"
+            checked={acceptTerms}
+            onCheckedChange={(v) => setAcceptTerms(v === true)}
+            className="mt-0.5"
+          />
+          <label htmlFor="terms-consent" className="text-xs leading-6 text-muted-foreground">
+            By checking this box, I agree to the{" "}
+            <Link href="/terms" className="text-primary underline underline-offset-2">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy-policy" className="text-primary underline underline-offset-2">
+              Privacy Policy
+            </Link>
+            .
+          </label>
+        </div>
+
+        <div className="flex items-start gap-2">
+          <Checkbox
+            id="renewal-consent"
+            checked={acceptRenewal}
+            onCheckedChange={(v) => setAcceptRenewal(v === true)}
+            className="mt-0.5"
+          />
+          <label htmlFor="renewal-consent" className="text-xs leading-6 text-muted-foreground">
+            I understand my subscription starts immediately, renews automatically, and can be canceled anytime
+            before renewal from account settings.
+          </label>
+        </div>
+      </div>
+
+      <Button
+        className="h-12 w-full rounded-none"
+        disabled={!acceptTerms || !acceptRenewal}
+      >
         <LockSimpleIcon size={16} weight="fill" />
-        Update payment method
+        Subscribe now
       </Button>
     </div>
   )
