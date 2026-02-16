@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import BrandLogo from "@/components/brand-logo"
 
 type StepKey = "setup" | "organization" | "invite" | "discovery"
 
@@ -24,7 +25,10 @@ export function OnboardingShell({
     <main className="min-h-screen bg-slate-100 px-6 py-8">
       <div className="mx-auto w-full max-w-5xl">
         <div className="mb-8 flex items-center justify-between">
-          <div className="text-xl font-semibold text-foreground">Onboarding</div>
+          <div className="flex items-center gap-2">
+            <BrandLogo />
+            <span className="text-xl font-semibold text-foreground">Onboarding</span>
+          </div>
           <p className="text-sm text-muted-foreground">
             Signed in as <span className="font-medium text-foreground">{email || "you@company.com"}</span>
           </p>

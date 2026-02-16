@@ -170,7 +170,7 @@ export default function GeneralSettingsPage() {
             className="absolute bottom-2 left-2 h-10 cursor-pointer rounded-xl bg-background/95"
             onClick={() => fileInputRef.current?.click()}
           >
-            <PencilSimpleIcon size={16} />
+            <PencilSimpleIcon size={16} weight="fill" />
             Edit
           </Button>
         </div>
@@ -207,7 +207,7 @@ export default function GeneralSettingsPage() {
             </div>
 
             <div className="mx-auto flex w-full max-w-[620px] items-center gap-3">
-              <MagnifyingGlassMinusIcon size={18} className="text-muted-foreground" />
+              <MagnifyingGlassMinusIcon size={18} weight="fill" className="text-muted-foreground" />
               <Slider
                 min={1}
                 max={3}
@@ -220,7 +220,7 @@ export default function GeneralSettingsPage() {
                 }}
                 className="w-full"
               />
-              <MagnifyingGlassPlusIcon size={18} className="text-muted-foreground" />
+              <MagnifyingGlassPlusIcon size={18} weight="fill" className="text-muted-foreground" />
             </div>
 
             <div className="flex items-center justify-end gap-2 pt-4">

@@ -49,7 +49,7 @@ export default function SettingsSidebar() {
                   : "text-foreground hover:bg-accent"
               }`}
             >
-              <Icon size={16} />
+              <Icon size={16} weight="fill" />
               <span>{section.label}</span>
             </Link>
           )

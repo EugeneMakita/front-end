@@ -170,7 +170,7 @@ export default function NotesPanel({
         <span className="text-sm font-semibold">Notes</span>
         <div className="flex items-center gap-1">
           <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Download">
-            <DownloadSimpleIcon size={18} />
+            <DownloadSimpleIcon size={18} weight="fill" />
           </Button>
           <Button
             variant="ghost"
@@ -182,7 +182,7 @@ export default function NotesPanel({
             <PushPinIcon size={18} weight={isPinned ? "fill" : "regular"} />
           </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Close" onClick={onClose}>
-            <XIcon size={18} />
+            <XIcon size={18} weight="fill" />
           </Button>
         </div>
       </div>
@@ -202,6 +202,7 @@ export default function NotesPanel({
         <div className="relative">
           <MagnifyingGlassIcon
             size={16}
+            weight="fill"
             className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
           />
           <Input

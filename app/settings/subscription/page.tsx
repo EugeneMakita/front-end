@@ -17,7 +17,7 @@ export default function SubscriptionSettingsPage() {
     <div className="space-y-6 p-4 md:p-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-start gap-3">
-          <TreeStructureIcon size={24} className="mt-0.5 text-muted-foreground" />
+          <TreeStructureIcon size={24} weight="fill" className="mt-0.5 text-muted-foreground" />
           <div>
             <h2 className="text-base font-semibold">Pro plan</h2>
             <p className="text-sm text-muted-foreground">Monthly</p>
@@ -30,7 +30,7 @@ export default function SubscriptionSettingsPage() {
 
       <div className="flex flex-wrap items-center gap-4 py-1">
         <div className="flex items-center gap-2">
-          <CalendarBlankIcon size={20} className="shrink-0 text-muted-foreground" />
+          <CalendarBlankIcon size={20} weight="fill" className="shrink-0 text-muted-foreground" />
           <p className="text-sm text-foreground">Your subscription will be canceled on Mar 7, 2026.</p>
         </div>
       </div>
@@ -41,7 +41,7 @@ export default function SubscriptionSettingsPage() {
         <h3 className="text-base font-semibold">Payment</h3>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <CreditCardIcon size={20} className="text-muted-foreground" />
+            <CreditCardIcon size={20} weight="fill" className="text-muted-foreground" />
             <p className="text-sm">Mastercard •••• 4984</p>
           </div>
           <Link href="/settings/subscription/add-payment">

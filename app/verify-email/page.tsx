@@ -4,8 +4,15 @@ import Link from "next/link"
 import * as React from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { EnvelopeSimpleIcon, GoogleLogoIcon, MicrosoftOutlookLogoIcon } from "@phosphor-icons/react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import { cn } from "@/lib/utils"
+import {
+  MicrosoftOutlookLogoIcon,
+  ClockIcon,
+} from "@phosphor-icons/react"
+import BrandLogo from "@/components/brand-logo"
+import { GoogleLogo } from "@/components/social-icons"
 
 const CODE_LENGTH = 6
 
@@ -13,7 +20,9 @@ export default function VerifyEmailPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const email = searchParams.get("email") || "you@company.com"
-  const [code, setCode] = React.useState<string[]>(Array(CODE_LENGTH).fill(""))
+  const [code, setCode] = React.useState<string[]>(
+    Array(CODE_LENGTH).fill("")
+  )
   const inputRefs = React.useRef<Array<HTMLInputElement | null>>([])
 
   const mergedCode = code.join("")
@@ -31,7 +40,10 @@ export default function VerifyEmailPage() {
     }
   }
 
-  function handleKeyDown(index: number, event: React.KeyboardEvent<HTMLInputElement>) {
+  function handleKeyDown(
+    index: number,
+    event: React.KeyboardEvent<HTMLInputElement>
+  ) {
     if (event.key === "Backspace" && !code[index] && index > 0) {
       inputRefs.current[index - 1]?.focus()
     }
@@ -45,7 +57,10 @@ export default function VerifyEmailPage() {
 
   function handlePaste(event: React.ClipboardEvent<HTMLInputElement>) {
     event.preventDefault()
-    const pastedDigits = event.clipboardData.getData("text").replace(/\D/g, "").slice(0, CODE_LENGTH)
+    const pastedDigits = event.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, CODE_LENGTH)
     if (!pastedDigits) return
     const next = Array(CODE_LENGTH)
       .fill("")
@@ -56,90 +71,171 @@ export default function VerifyEmailPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_10%_20%,#112b56_0%,#1f1b3f_45%,#26113a_100%)] px-6 py-10">
-      <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-7xl items-start justify-center pt-4 sm:pt-6 lg:pt-10">
-        <Card className="w-full max-w-xl rounded-none border-border/70">
-          <CardHeader className="space-y-3 px-8 pt-8 pb-2">
-            <CardTitle className="text-2xl">Verify your email address</CardTitle>
-            <CardDescription className="text-base">
-              We sent a 6-digit verification code to <span className="font-medium text-foreground">{email}</span>.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-8 px-8 pb-8 pt-4">
-            <div className="flex flex-wrap gap-3">
-              {code.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(element) => {
-                    inputRefs.current[index] = element
-                  }}
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete={index === 0 ? "one-time-code" : "off"}
-                  maxLength={1}
-                  value={digit}
-                  onChange={(event) => updateDigit(index, event.target.value)}
-                  onKeyDown={(event) => handleKeyDown(index, event)}
-                  onPaste={handlePaste}
-                  className="h-14 w-12 rounded-none border border-input bg-background text-center text-xl outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 sm:h-16 sm:w-14 sm:text-2xl"
-                  aria-label={`Verification code digit ${index + 1}`}
-                />
-              ))}
-            </div>
+    <div className="relative min-h-screen overflow-hidden bg-[#0f0e1a]">
+      {/* Ambient background glow */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-[20%] -top-[10%] h-[70vh] w-[70vh] rounded-full bg-primary/8 blur-[120px]" />
+        <div className="absolute -right-[10%] bottom-[5%] h-[50vh] w-[50vh] rounded-full bg-indigo-500/6 blur-[100px]" />
+      </div>
 
-            <div className="space-y-4">
-              <div className="flex flex-wrap gap-2">
-              <Button
-                asChild
-                variant="outline"
-                className="rounded-none border-rose-700 bg-rose-700 text-white hover:bg-rose-800 hover:border-rose-800 hover:text-white focus-visible:ring-0 focus-visible:border-rose-800"
-              >
-                <a href="https://mail.google.com" target="_blank" rel="noreferrer">
-                  <GoogleLogoIcon size={16} weight="fill" />
-                  Open Gmail
-                </a>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                className="rounded-none border-[#0078D4] bg-[#0078D4] text-white hover:bg-[#106EBE] hover:border-[#106EBE] hover:text-white focus-visible:ring-0 focus-visible:border-[#106EBE]"
-              >
-                <a href="https://outlook.live.com" target="_blank" rel="noreferrer">
-                  <MicrosoftOutlookLogoIcon size={16} weight="fill" />
-                  Open Outlook
-                </a>
-              </Button>
-              </div>
+      {/* Subtle grid texture */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+          backgroundSize: "64px 64px",
+        }}
+      />
 
-              <p className="text-sm text-muted-foreground">
-                Haven&apos;t seen the email? Check spam,{" "}
-                <button type="button" className="underline underline-offset-4 text-foreground">
-                  resend code
-                </button>{" "}
-                or{" "}
-                <Link href="/create-account" className="underline underline-offset-4 text-foreground">
-                  change email
-                </Link>
-                .
+      {/* Header */}
+      <header className="relative z-10 flex justify-center px-6 pt-10 pb-6">
+        <BrandLogo className="text-white" />
+      </header>
+
+      {/* Main */}
+      <main className="relative z-10 flex min-h-[calc(100vh-7rem)] items-start justify-center px-6 pt-4 pb-10 sm:items-center sm:pt-0">
+        <div className="w-full max-w-[460px]">
+          <Card className="rounded-none border-border/70 py-0 gap-0 shadow-2xl shadow-black/40">
+            {/* Card header */}
+            <div className="p-8 pb-0">
+              <h1 className="text-[22px] font-semibold tracking-tight">
+                Verify your email
+              </h1>
+              <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">
+                We sent a 6-digit code to{" "}
+                <span className="font-medium text-foreground">{email}</span>
               </p>
             </div>
 
-            <div className="flex flex-col items-start gap-4 border-t pt-6">
-              <div className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                <EnvelopeSimpleIcon size={16} />
-                <span>Verification code expires in 10 minutes.</span>
+            <CardContent className="space-y-5 p-8 pt-6">
+              {/* Code inputs */}
+              <div className="flex justify-center gap-2">
+                {code.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={(element) => {
+                      inputRefs.current[index] = element
+                    }}
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete={index === 0 ? "one-time-code" : "off"}
+                    maxLength={1}
+                    value={digit}
+                    onChange={(event) => updateDigit(index, event.target.value)}
+                    onKeyDown={(event) => handleKeyDown(index, event)}
+                    onPaste={handlePaste}
+                    className={cn(
+                      "h-14 w-12 border bg-background text-center text-[20px] font-semibold tabular-nums outline-none transition-all sm:h-[60px] sm:w-[54px] sm:text-[22px]",
+                      digit
+                        ? "border-primary bg-primary/[0.03] shadow-[0_0_0_3px_rgba(var(--primary),0.08)]"
+                        : "border-input",
+                      "focus:border-primary focus:shadow-[0_0_0_3px_rgba(var(--primary),0.12)]"
+                    )}
+                    aria-label={`Verification code digit ${index + 1}`}
+                  />
+                ))}
               </div>
+
+              {/* Expiry notice */}
+              <div className="flex items-center justify-center gap-1.5 text-[12px] text-muted-foreground">
+                <ClockIcon size={13} weight="fill" />
+                <span>Code expires in 10 minutes</span>
+              </div>
+
+              {/* Submit */}
               <Button
-                className="w-56 rounded-none px-4 py-2"
+                className="h-11 w-full rounded-none text-[13px] font-semibold tracking-wide"
                 disabled={!isComplete}
-                onClick={() => router.push(`/onboarding/setup?email=${encodeURIComponent(email)}`)}
+                onClick={() =>
+                  router.push(
+                    `/onboarding/setup?email=${encodeURIComponent(email)}`
+                  )
+                }
               >
                 Verify and continue
               </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </main>
+
+              <Separator />
+
+              {/* Quick mail access */}
+              <div className="space-y-3">
+                <p className="text-center text-[11px] font-medium uppercase tracking-[0.15em] text-muted-foreground/60">
+                  Open your inbox
+                </p>
+                <div className="flex justify-center gap-2.5">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="h-9 gap-2 rounded-none border-border bg-white text-[12px] font-medium text-foreground hover:border-gray-300 hover:bg-gray-50"
+                  >
+                    <a
+                      href="https://mail.google.com"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <GoogleLogo size={14} />
+                      Gmail
+                    </a>
+                  </Button>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="h-9 gap-2 rounded-none border-[#0078D4] bg-[#0078D4] text-[12px] font-medium text-white hover:border-[#106EBE] hover:bg-[#106EBE] hover:text-white"
+                  >
+                    <a
+                      href="https://outlook.live.com"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <MicrosoftOutlookLogoIcon size={14} weight="fill" />
+                      Outlook
+                    </a>
+                  </Button>
+                </div>
+              </div>
+
+              {/* Help text */}
+              <p className="text-center text-[12px] leading-relaxed text-muted-foreground">
+                Didn&apos;t receive the email?{" "}
+                <button
+                  type="button"
+                  className="font-medium text-foreground underline underline-offset-4 transition-colors hover:text-primary"
+                >
+                  Resend code
+                </button>{" "}
+                or{" "}
+                <Link
+                  href="/create-account"
+                  className="font-medium text-foreground underline underline-offset-4 transition-colors hover:text-primary"
+                >
+                  change email
+                </Link>
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Footer links */}
+          <div className="mt-6 flex items-center justify-center gap-4">
+            <Link
+              href="/terms"
+              className="text-[11px] text-white/40 transition-colors hover:text-white/60"
+            >
+              Terms
+            </Link>
+            <span className="text-white/20">&middot;</span>
+            <Link
+              href="/privacy-policy"
+              className="text-[11px] text-white/40 transition-colors hover:text-white/60"
+            >
+              Privacy
+            </Link>
+            <span className="text-white/20">&middot;</span>
+            <span className="text-[11px] text-white/30">
+              &copy; {new Date().getFullYear()} asesley
+            </span>
+          </div>
+        </div>
+      </main>
+    </div>
   )
 }

@@ -5,6 +5,11 @@ import { Input } from "@/components/ui/input"
 import { TAccountTable, type TAccountData, type TAccountVariant } from "@/components/t-account-table"
 import { TrialBalanceTable, type TrialBalanceVariant } from "@/components/trial-balance-table"
 import {
+  JournalTable,
+  type JournalTableData,
+  type JournalVariant,
+} from "@/components/journal-table"
+import {
   Table,
   TableBody,
   TableCell,
@@ -31,54 +36,370 @@ function SectionTitle({ title }: { title: string }) {
   return <h3 className="text-sm font-semibold tracking-wide text-foreground">{title}</h3>
 }
 
-function JournalTable() {
-  return (
-    <div className="space-y-3">
-      <SectionTitle title="GENERAL JOURNAL" />
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[110px]">Date</TableHead>
-            <TableHead>Account Titles and Explanation</TableHead>
-            <TableHead className="w-[140px] text-right">Debit</TableHead>
-            <TableHead className="w-[140px] text-right">Credit</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow>
-            <TableCell>Jan 01</TableCell>
-            <TableCell>Cash</TableCell>
-            <TableCell className="text-right">5,000</TableCell>
-            <TableCell />
-          </TableRow>
-          <TableRow>
-            <TableCell />
-            <TableCell className="pl-8">Service Revenue</TableCell>
-            <TableCell />
-            <TableCell className="text-right">5,000</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell />
-            <TableCell className="text-xs text-muted-foreground" colSpan={3}>
-              (Provided services for cash)
-            </TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell>Jan 03</TableCell>
-            <TableCell>Supplies</TableCell>
-            <TableCell className="text-right">600</TableCell>
-            <TableCell />
-          </TableRow>
-          <TableRow>
-            <TableCell />
-            <TableCell className="pl-8">Cash</TableCell>
-            <TableCell />
-            <TableCell className="text-right">600</TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    </div>
-  )
+const journalBaseTable: JournalTableData = {
+  tableId: "jr:general",
+  title: "General Journal",
+  entries: [
+    {
+      entryId: "je1",
+      entryLabel: "JE-1",
+      lines: [
+        {
+          rowId: "line:1",
+          date: { value: "2024-07-01", editable: false, inputId: "jr.entry:je1.date" },
+          account: { value: "Cash", editable: false, inputId: "jr.entry:je1.line:l1.account" },
+          description: { value: "", editable: false, inputId: "jr.entry:je1.line:l1.description" },
+          debit: { value: "5000.00", editable: false, inputId: "jr.entry:je1.line:l1.debit" },
+          credit: { value: "0.00", editable: false, inputId: "jr.entry:je1.line:l1.credit" },
+          ref: { value: "1010", editable: false },
+          indent: "none",
+        },
+        {
+          rowId: "line:2",
+          date: { value: "", editable: false },
+          account: {
+            value: "Service Revenue",
+            editable: false,
+            inputId: "jr.entry:je1.line:l2.account",
+            options: ["Service Revenue", "Unearned Revenue", "Accounts Receivable"],
+          },
+          description: { value: "", editable: false },
+          debit: { value: "0.00", editable: false, inputId: "jr.entry:je1.line:l2.debit" },
+          credit: { value: "5000.00", editable: false, inputId: "jr.entry:je1.line:l2.credit" },
+          ref: { value: "4010", editable: false },
+          indent: "credit",
+        },
+        {
+          rowId: "line:3",
+          date: { value: "", editable: false },
+          account: { value: "", editable: false },
+          description: {
+            value: "(Provided services for cash)",
+            editable: false,
+            inputId: "jr.entry:je1.explanation",
+          },
+          debit: { value: "", editable: false },
+          credit: { value: "", editable: false },
+          isExplanation: true,
+        },
+      ],
+    },
+    {
+      entryId: "je2",
+      entryLabel: "JE-2",
+      lines: [
+        {
+          rowId: "line:1",
+          date: { value: "2024-07-03", editable: false, inputId: "jr.entry:je2.date" },
+          account: { value: "Supplies", editable: false, inputId: "jr.entry:je2.line:l1.account" },
+          description: { value: "", editable: false, inputId: "jr.entry:je2.line:l1.description" },
+          debit: { value: "600.00", editable: false, inputId: "jr.entry:je2.line:l1.debit" },
+          credit: { value: "0.00", editable: false, inputId: "jr.entry:je2.line:l1.credit" },
+          ref: { value: "1180", editable: false },
+          indent: "none",
+        },
+        {
+          rowId: "line:2",
+          date: { value: "", editable: false },
+          account: {
+            value: "Cash",
+            editable: false,
+            inputId: "jr.entry:je2.line:l2.account",
+            options: ["Cash", "Accounts Payable", "Bank"],
+          },
+          description: { value: "", editable: false },
+          debit: { value: "0.00", editable: false, inputId: "jr.entry:je2.line:l2.debit" },
+          credit: { value: "600.00", editable: false, inputId: "jr.entry:je2.line:l2.credit" },
+          ref: { value: "1010", editable: false },
+          indent: "credit",
+        },
+        {
+          rowId: "line:3",
+          date: { value: "", editable: false },
+          account: { value: "", editable: false },
+          description: {
+            value: "(Purchased supplies for cash)",
+            editable: false,
+            inputId: "jr.entry:je2.explanation",
+          },
+          debit: { value: "", editable: false },
+          credit: { value: "", editable: false },
+          isExplanation: true,
+        },
+      ],
+    },
+  ],
+}
+
+function mapJournalTable(
+  table: JournalTableData,
+  mutateLine: (line: JournalTableData["entries"][number]["lines"][number]) => JournalTableData["entries"][number]["lines"][number]
+) {
+  return {
+    ...table,
+    entries: table.entries.map((entry) => ({
+      ...entry,
+      lines: entry.lines.map((line) => mutateLine(line)),
+    })),
+  }
+}
+
+const journalAccountOptions = [
+  "Cash",
+  "Supplies",
+  "Service Revenue",
+  "Accounts Receivable",
+  "Unearned Revenue",
+  "Accounts Payable",
+]
+
+const journalDescriptionOptions = [
+  "Provided services for cash",
+  "Purchased supplies for cash",
+  "Received cash on account",
+  "Paid utilities expense",
+]
+
+const journalVariants: JournalVariant[] = [
+  {
+    key: "journal_display_locked",
+    label: "Standard journal (all locked)",
+    description: "Display-only canonical journal with indented credits and explanation lines.",
+    tables: [journalBaseTable],
+    layout: {
+      groupByEntry: true,
+      indentCredits: true,
+      dateMode: "entry_first_line",
+      descriptionMode: "per_entry",
+      showRef: true,
+    },
+    dateEditable: false,
+    accountEditor: "text",
+    accountEditable: false,
+    descriptionEditable: false,
+    amountEditable: false,
+    rules: {
+      drCrExclusivePerLine: true,
+      allowNegativeAmounts: false,
+      enforceEntryBalanced: "warn",
+      allowExplanationLine: true,
+    },
+    show: {
+      entryTotals: true,
+      lockIcons: true,
+    },
+  },
+  {
+    key: "journal_fill_amounts",
+    label: "Fill amounts practice",
+    description: "Dates and accounts are locked; students fill debit and credit amounts.",
+    tables: [
+      mapJournalTable(journalBaseTable, (line) =>
+        line.isExplanation
+          ? line
+          : {
+              ...line,
+              debit: { ...line.debit, editable: true, value: "" },
+              credit: { ...line.credit, editable: true, value: "" },
+            }
+      ),
+    ],
+    layout: {
+      groupByEntry: true,
+      indentCredits: true,
+      dateMode: "entry_first_line",
+      descriptionMode: "per_entry",
+      showRef: true,
+    },
+    dateEditable: false,
+    accountEditor: "text",
+    accountEditable: false,
+    descriptionEditable: false,
+    amountEditable: true,
+    rules: {
+      drCrExclusivePerLine: true,
+      allowNegativeAmounts: false,
+      enforceEntryBalanced: "warn",
+      allowExplanationLine: true,
+    },
+    show: {
+      entryTotals: true,
+      lockIcons: true,
+    },
+  },
+  {
+    key: "journal_choose_accounts",
+    label: "Choose account names",
+    description: "Amounts are given; account titles are selected from dropdown choices.",
+    tables: [
+      mapJournalTable(journalBaseTable, (line) =>
+        line.isExplanation
+          ? line
+          : {
+              ...line,
+              account: { ...line.account, editable: true, value: "" },
+            }
+      ),
+    ],
+    layout: {
+      groupByEntry: true,
+      indentCredits: true,
+      dateMode: "entry_first_line",
+      descriptionMode: "per_entry",
+      showRef: false,
+    },
+    dateEditable: false,
+    accountEditor: "select",
+    accountEditable: true,
+    descriptionEditable: false,
+    amountEditable: false,
+    accountOptions: journalAccountOptions,
+    rules: {
+      drCrExclusivePerLine: true,
+      allowNegativeAmounts: false,
+      enforceEntryBalanced: "none",
+      allowExplanationLine: true,
+    },
+    show: {
+      entryTotals: false,
+      lockIcons: true,
+    },
+  },
+  {
+    key: "journal_mixed_blanks",
+    label: "Mixed blanks (targeted)",
+    description: "Only specific cells are editable to target weak areas.",
+    tables: [
+      mapJournalTable(journalBaseTable, (line) => {
+        if (line.rowId === "line:1" && line.account.value === "Cash") {
+          return { ...line, debit: { ...line.debit, editable: true, value: "" } }
+        }
+        if (line.rowId === "line:2" && line.account.value === "Service Revenue") {
+          return { ...line, credit: { ...line.credit, editable: true, value: "" } }
+        }
+        if (line.rowId === "line:2" && line.account.value === "Cash") {
+          return { ...line, account: { ...line.account, editable: true, value: "" } }
+        }
+        return line
+      }),
+    ],
+    layout: {
+      groupByEntry: true,
+      indentCredits: true,
+      dateMode: "entry_first_line",
+      descriptionMode: "per_entry",
+      showRef: true,
+    },
+    dateEditable: false,
+    accountEditor: "select",
+    accountEditable: true,
+    descriptionEditable: false,
+    amountEditable: true,
+    accountOptions: journalAccountOptions,
+    rules: {
+      drCrExclusivePerLine: true,
+      allowNegativeAmounts: false,
+      enforceEntryBalanced: "warn",
+      allowExplanationLine: true,
+    },
+    show: {
+      entryTotals: true,
+      lockIcons: true,
+    },
+  },
+  {
+    key: "journal_per_line_description",
+    label: "Per-line description mode",
+    description: "Date, account, description, and amounts editable per line.",
+    tables: [
+      mapJournalTable(journalBaseTable, (line) =>
+        line.isExplanation
+          ? line
+          : {
+              ...line,
+              date: { ...line.date, editable: true },
+              account: { ...line.account, editable: true, value: "" },
+              description: {
+                ...(line.description || { value: "", editable: true }),
+                editable: true,
+                value: line.description?.value || "",
+              },
+              debit: { ...line.debit, editable: true, value: "" },
+              credit: { ...line.credit, editable: true, value: "" },
+            }
+      ),
+    ],
+    layout: {
+      groupByEntry: true,
+      indentCredits: false,
+      dateMode: "every_line",
+      descriptionMode: "per_line",
+      showRef: false,
+    },
+    dateEditable: true,
+    accountEditor: "both",
+    accountEditable: true,
+    descriptionEditable: true,
+    amountEditable: true,
+    accountOptions: journalAccountOptions,
+    descriptionOptions: journalDescriptionOptions,
+    rules: {
+      drCrExclusivePerLine: true,
+      allowNegativeAmounts: false,
+      enforceEntryBalanced: "warn",
+      allowExplanationLine: false,
+    },
+    show: {
+      entryTotals: true,
+      lockIcons: false,
+    },
+  },
+  {
+    key: "journal_full_authoring",
+    label: "Full journal authoring",
+    description: "All key fields editable with balance checks per entry.",
+    tables: [
+      mapJournalTable(journalBaseTable, (line) => ({
+        ...line,
+        date: { ...line.date, editable: !line.isExplanation },
+        account: { ...line.account, editable: !line.isExplanation, value: line.isExplanation ? "" : line.account.value },
+        description: {
+          ...(line.description || { value: "", editable: false }),
+          editable: true,
+        },
+        debit: { ...line.debit, editable: !line.isExplanation },
+        credit: { ...line.credit, editable: !line.isExplanation },
+      })),
+    ],
+    layout: {
+      groupByEntry: true,
+      indentCredits: true,
+      dateMode: "entry_first_line",
+      descriptionMode: "per_entry",
+      showRef: false,
+    },
+    dateEditable: true,
+    accountEditor: "both",
+    accountEditable: true,
+    descriptionEditable: true,
+    amountEditable: true,
+    accountOptions: journalAccountOptions,
+    descriptionOptions: journalDescriptionOptions,
+    rules: {
+      drCrExclusivePerLine: true,
+      allowNegativeAmounts: false,
+      enforceEntryBalanced: "block_submit",
+      allowExplanationLine: true,
+    },
+    show: {
+      entryTotals: true,
+      lockIcons: false,
+    },
+  },
+]
+
+function JournalVariantsTable() {
+  return <JournalTable variants={journalVariants} />
 }
 
 function LedgerTable() {
@@ -983,7 +1304,7 @@ const tableMap: Record<number, { title: string; description: string; view: JSX.E
   201: {
     title: "Journal (given / locked)",
     description: "General journal format with indented credits and entry explanations.",
-    view: <JournalTable />,
+    view: <JournalVariantsTable />,
   },
   202: {
     title: "General Ledger",

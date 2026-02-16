@@ -126,7 +126,7 @@ export default function NotesFloatingToolbar({ editor }: { editor: Editor }) {
         active={editor.isActive("italic")}
         onClick={() => editor.chain().focus().toggleItalic().run()}
       >
-        <TextItalicIcon size={16} />
+        <TextItalicIcon size={16} weight="fill" />
       </ToolbarButton>
 
       <Divider />
@@ -137,21 +137,21 @@ export default function NotesFloatingToolbar({ editor }: { editor: Editor }) {
         active={editor.isActive("heading", { level: 1 })}
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
       >
-        <TextHOneIcon size={16} />
+        <TextHOneIcon size={16} weight="fill" />
       </ToolbarButton>
       <ToolbarButton
         label="Heading 2"
         active={editor.isActive("heading", { level: 2 })}
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
       >
-        <TextHTwoIcon size={16} />
+        <TextHTwoIcon size={16} weight="fill" />
       </ToolbarButton>
       <ToolbarButton
         label="Heading 3"
         active={editor.isActive("heading", { level: 3 })}
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
       >
-        <TextHThreeIcon size={16} />
+        <TextHThreeIcon size={16} weight="fill" />
       </ToolbarButton>
 
       <Divider />
@@ -162,21 +162,21 @@ export default function NotesFloatingToolbar({ editor }: { editor: Editor }) {
         active={editor.isActive("bulletList")}
         onClick={() => editor.chain().focus().toggleBulletList().run()}
       >
-        <ListBulletsIcon size={16} />
+        <ListBulletsIcon size={16} weight="fill" />
       </ToolbarButton>
       <ToolbarButton
         label="Ordered list"
         active={editor.isActive("orderedList")}
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
       >
-        <ListNumbersIcon size={16} />
+        <ListNumbersIcon size={16} weight="fill" />
       </ToolbarButton>
       <ToolbarButton
         label="Task list"
         active={editor.isActive("taskList")}
         onClick={() => editor.chain().focus().toggleTaskList().run()}
       >
-        <ListChecksIcon size={16} />
+        <ListChecksIcon size={16} weight="fill" />
       </ToolbarButton>
 
       <Divider />
@@ -187,7 +187,7 @@ export default function NotesFloatingToolbar({ editor }: { editor: Editor }) {
         active={editor.isActive("codeBlock")}
         onClick={() => editor.chain().focus().toggleCodeBlock().run()}
       >
-        <CodeBlockIcon size={16} />
+        <CodeBlockIcon size={16} weight="fill" />
       </ToolbarButton>
       <ToolbarButton
         label="Link"
@@ -202,20 +202,20 @@ export default function NotesFloatingToolbar({ editor }: { editor: Editor }) {
           }
         }}
       >
-        <LinkIcon size={16} />
+        <LinkIcon size={16} weight="fill" />
       </ToolbarButton>
       <ToolbarButton
         label="Strikethrough"
         active={editor.isActive("strike")}
         onClick={() => editor.chain().focus().toggleStrike().run()}
       >
-        <TextStrikethroughIcon size={16} />
+        <TextStrikethroughIcon size={16} weight="fill" />
       </ToolbarButton>
 
       <Divider />
 
       <ToolbarButton label="More" onClick={() => {}}>
-        <DotsThreeIcon size={16} />
+        <DotsThreeIcon size={16} weight="fill" />
       </ToolbarButton>
     </div>
   )

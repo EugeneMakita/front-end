@@ -352,7 +352,7 @@ export default function ForumReplyEditor({
             }}
           >
             {getCurrentBlockLabel()}
-            <CaretDownIcon size={10} />
+            <CaretDownIcon size={10} weight="fill" />
           </button>
           {showBlockMenu && (
             <div className="absolute left-0 top-full z-10 mt-1 w-36 rounded-md border bg-popover py-1 shadow-md">
@@ -391,14 +391,14 @@ export default function ForumReplyEditor({
           active={editor.isActive("italic")}
           onClick={() => editor.chain().focus().toggleItalic().run()}
         >
-          <TextItalicIcon size={16} />
+          <TextItalicIcon size={16} weight="fill" />
         </ToolbarButton>
         <ToolbarButton
           label="Strikethrough"
           active={editor.isActive("strike")}
           onClick={() => editor.chain().focus().toggleStrike().run()}
         >
-          <TextStrikethroughIcon size={16} />
+          <TextStrikethroughIcon size={16} weight="fill" />
         </ToolbarButton>
 
         <Divider />
@@ -408,14 +408,14 @@ export default function ForumReplyEditor({
           active={editor.isActive("bulletList")}
           onClick={() => editor.chain().focus().toggleBulletList().run()}
         >
-          <ListBulletsIcon size={16} />
+          <ListBulletsIcon size={16} weight="fill" />
         </ToolbarButton>
         <ToolbarButton
           label="Ordered list"
           active={editor.isActive("orderedList")}
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
         >
-          <ListNumbersIcon size={16} />
+          <ListNumbersIcon size={16} weight="fill" />
         </ToolbarButton>
 
         <Divider />
@@ -466,13 +466,13 @@ export default function ForumReplyEditor({
                 }
               }}
             >
-              <LinkIcon size={16} />
+              <LinkIcon size={16} weight="fill" />
             </ToolbarButton>
             <ToolbarButton
               label="Image"
               onClick={() => fileInputRef.current?.click()}
             >
-              <ImageIcon size={16} />
+              <ImageIcon size={16} weight="fill" />
             </ToolbarButton>
 
             {/* @ Mention */}
@@ -481,7 +481,7 @@ export default function ForumReplyEditor({
                 label="Mention"
                 onClick={() => setShowMentionMenu(!showMentionMenu)}
               >
-                <AtIcon size={16} />
+                <AtIcon size={16} weight="fill" />
               </ToolbarButton>
               {showMentionMenu && (
                 <div className="absolute left-0 top-full z-10 mt-1 w-52 rounded-md border bg-popover shadow-md">
@@ -533,7 +533,7 @@ export default function ForumReplyEditor({
                     setHoveredCols(0)
                   }}
                 >
-                  <TableIcon size={16} />
+                  <TableIcon size={16} weight="fill" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-[320px] p-0" align="start">
@@ -613,7 +613,7 @@ export default function ForumReplyEditor({
               active={editor.isActive("blockquote")}
               onClick={() => editor.chain().focus().toggleBlockquote().run()}
             >
-              <InfoIcon size={16} />
+              <InfoIcon size={16} weight="fill" />
             </ToolbarButton>
           </>
         )}
@@ -637,7 +637,7 @@ export default function ForumReplyEditor({
               setShowTableContextMenu(false)
             }}
           >
-            <RowsPlusTopIcon size={16} />
+            <RowsPlusTopIcon size={16} weight="fill" />
             Insert row above
           </button>
           <button
@@ -650,7 +650,7 @@ export default function ForumReplyEditor({
               setShowTableContextMenu(false)
             }}
           >
-            <RowsPlusBottomIcon size={16} />
+            <RowsPlusBottomIcon size={16} weight="fill" />
             Insert row below
           </button>
           <button
@@ -663,7 +663,7 @@ export default function ForumReplyEditor({
               setShowTableContextMenu(false)
             }}
           >
-            <TrashIcon size={16} />
+            <TrashIcon size={16} weight="fill" />
             Delete row
           </button>
           <div className="my-1 h-px bg-border" />
@@ -677,7 +677,7 @@ export default function ForumReplyEditor({
               setShowTableContextMenu(false)
             }}
           >
-            <ColumnsPlusLeftIcon size={16} />
+            <ColumnsPlusLeftIcon size={16} weight="fill" />
             Insert column left
           </button>
           <button
@@ -690,7 +690,7 @@ export default function ForumReplyEditor({
               setShowTableContextMenu(false)
             }}
           >
-            <ColumnsPlusRightIcon size={16} />
+            <ColumnsPlusRightIcon size={16} weight="fill" />
             Insert column right
           </button>
           <button
@@ -703,7 +703,7 @@ export default function ForumReplyEditor({
               setShowTableContextMenu(false)
             }}
           >
-            <TrashIcon size={16} />
+            <TrashIcon size={16} weight="fill" />
             Delete column
           </button>
           <div className="my-1 h-px bg-border" />
@@ -717,7 +717,7 @@ export default function ForumReplyEditor({
               setShowTableContextMenu(false)
             }}
           >
-            <TrashIcon size={16} />
+            <TrashIcon size={16} weight="fill" />
             Delete table
           </button>
         </div>

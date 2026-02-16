@@ -9,118 +9,134 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
+import BrandLogo from "@/components/brand-logo"
 import {
-  AppleLogoIcon,
   EyeIcon,
   EyeSlashIcon,
-  FacebookLogoIcon,
-  GoogleLogoIcon,
-  MicrosoftOutlookLogoIcon,
 } from "@phosphor-icons/react"
+import { GoogleLogo, FacebookLogo } from "@/components/social-icons"
 
 const socialOptions = [
   {
     label: "Google",
-    icon: GoogleLogoIcon,
+    icon: GoogleLogo,
     className:
-      "border-rose-700 bg-rose-700 text-white hover:bg-rose-800 hover:border-rose-800 hover:text-white focus-visible:ring-0 focus-visible:border-rose-800",
-    iconClassName: "text-white",
+      "border-border bg-white text-foreground hover:bg-gray-50 hover:border-gray-300 focus-visible:ring-0",
   },
   {
     label: "Facebook",
-    icon: FacebookLogoIcon,
+    icon: FacebookLogo,
     className:
-      "border-blue-700 bg-blue-700 text-white hover:bg-blue-800 hover:border-blue-800 hover:text-white focus-visible:ring-0 focus-visible:border-blue-800",
+      "border-[#1877F2] bg-[#1877F2] text-white hover:bg-[#166FE5] hover:border-[#166FE5] hover:text-white focus-visible:ring-0",
     iconClassName: "text-white",
-  },
-  {
-    label: "Apple",
-    icon: AppleLogoIcon,
-    className:
-      "border-zinc-800 bg-zinc-800 text-white hover:bg-zinc-900 hover:border-zinc-900 hover:text-white focus-visible:ring-0 focus-visible:border-zinc-900",
-    iconClassName: "text-white",
-  },
-  {
-    label: "Microsoft 365",
-    icon: MicrosoftOutlookLogoIcon,
-    className:
-      "border-slate-400 bg-slate-200 text-slate-900 hover:bg-slate-300 hover:border-slate-500 hover:text-slate-900 focus-visible:ring-0 focus-visible:border-slate-500",
-    iconClassName: "text-slate-900",
   },
 ]
 
 export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = React.useState("")
-  const [emailTouched, setEmailTouched] = React.useState(false)
   const [password, setPassword] = React.useState("")
   const [showPassword, setShowPassword] = React.useState(false)
-  const [passwordTouched, setPasswordTouched] = React.useState(false)
+  const [submitted, setSubmitted] = React.useState(false)
 
   const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
-  const emailInvalid = (emailTouched || email.length > 0) && !emailIsValid
-  const emailValid = (emailTouched || email.length > 0) && emailIsValid
-  const passwordInvalid = passwordTouched && password.length === 0
-  const passwordValid = password.length > 0
+  const emailInvalid = submitted && !emailIsValid
+  const emailValid = submitted && emailIsValid
+  const passwordInvalid = submitted && password.length === 0
+  const passwordValid = submitted && password.length > 0
+
+  function handleSubmit() {
+    setSubmitted(true)
+    if (!emailIsValid || password.length === 0) return
+    router.push("/")
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      <main className="min-h-screen bg-[radial-gradient(circle_at_10%_20%,#112b56_0%,#1f1b3f_45%,#26113a_100%)] px-6 py-10">
-        <div className="mx-auto flex min-h-[calc(100vh-5rem)] w-full max-w-7xl items-center justify-center">
-          <Card className="w-full max-w-lg rounded-none border-border/70">
-            <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl">Sign in</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Continue with social login or use your email and password.
+    <div className="relative min-h-screen overflow-hidden bg-[#0f0e1a]">
+      {/* Ambient background glow */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-[20%] -top-[10%] h-[70vh] w-[70vh] rounded-full bg-primary/8 blur-[120px]" />
+        <div className="absolute -right-[10%] bottom-[5%] h-[50vh] w-[50vh] rounded-full bg-indigo-500/6 blur-[100px]" />
+      </div>
+
+      {/* Subtle grid texture */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
+          backgroundSize: "64px 64px",
+        }}
+      />
+
+      {/* Header */}
+      <header className="relative z-10 flex justify-center px-6 pt-10 pb-6">
+        <BrandLogo className="text-white" />
+      </header>
+
+      {/* Main */}
+      <main className="relative z-10 flex min-h-[calc(100vh-7rem)] items-start justify-center px-6 pt-4 pb-10 sm:items-center sm:pt-0">
+        <div className="w-full max-w-[440px]">
+          <Card className="border-border/70 rounded-none shadow-2xl shadow-black/40 py-0 gap-0">
+            <CardHeader className="p-8 pb-0">
+              <CardTitle className="text-[22px] font-semibold tracking-tight">Welcome back</CardTitle>
+              <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">
+                Sign in to continue to your workspace.
               </p>
             </CardHeader>
-            <CardContent className="space-y-5">
-              <div className="grid grid-cols-2 gap-2">
+
+            <CardContent className="p-8 pt-5 space-y-5">
+              {/* Social login */}
+              <div className="grid grid-cols-2 gap-3">
                 {socialOptions.map((option) => {
                   const Icon = option.icon
                   return (
                     <Button
                       key={option.label}
                       variant="outline"
-                      className={cn("h-10 gap-2 rounded-none", option.className)}
+                      className={cn("h-11 gap-2.5 rounded-none text-[13px] font-medium", option.className)}
                     >
-                      <Icon size={16} weight="fill" className={option.iconClassName} />
+                      <Icon size={18} />
                       {option.label}
                     </Button>
                   )
                 })}
               </div>
 
-              <div className="relative">
+              {/* Divider */}
+              <div className="relative py-1">
                 <Separator />
-                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
-                  or continue with email
+                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-3 text-[11px] uppercase tracking-wider text-muted-foreground/70">
+                  or
                 </span>
               </div>
 
-              <div className="space-y-1.5">
-                <Label htmlFor="email">Email</Label>
+              {/* Email */}
+              <div className="space-y-2">
+                <Label htmlFor="email" className="text-[13px] font-medium">Email address</Label>
                 <Input
                   id="email"
                   className={cn(
-                    "rounded-none transition",
+                    "h-11 rounded-none text-[13px] transition",
                     emailInvalid &&
-                      "border-red-500 shadow-[0_0_0_3px_rgba(239,68,68,0.2)] focus-visible:ring-red-500/30 focus-visible:border-red-500",
+                      "border-red-500 shadow-[0_0_0_3px_rgba(239,68,68,0.15)] focus-visible:ring-red-500/30 focus-visible:border-red-500",
                     emailValid &&
-                      "border-emerald-500 shadow-[0_0_0_3px_rgba(16,185,129,0.2)] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-500"
+                      "border-emerald-500 shadow-[0_0_0_3px_rgba(16,185,129,0.15)] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-500"
                   )}
                   type="email"
                   placeholder="you@company.com"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  onBlur={() => setEmailTouched(true)}
                 />
+                {emailInvalid && (
+                  <p className="text-[12px] text-red-600 mt-1">Please enter a valid email address.</p>
+                )}
               </div>
 
-              <div className="space-y-1.5">
+              {/* Password */}
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
-                  <Link href="/forgot-password" className="text-xs text-primary hover:underline">
+                  <Label htmlFor="password" className="text-[13px] font-medium">Password</Label>
+                  <Link href="/forgot-password" className="text-[12px] font-medium text-primary hover:underline">
                     Forgot password?
                   </Link>
                 </div>
@@ -128,43 +144,65 @@ export default function LoginPage() {
                   <Input
                     id="password"
                     className={cn(
-                      "rounded-none pr-10 transition",
+                      "h-11 rounded-none pr-11 text-[13px] transition",
                       passwordInvalid &&
-                        "border-red-500 shadow-[0_0_0_3px_rgba(239,68,68,0.2)] focus-visible:ring-red-500/30 focus-visible:border-red-500",
+                        "border-red-500 shadow-[0_0_0_3px_rgba(239,68,68,0.15)] focus-visible:ring-red-500/30 focus-visible:border-red-500",
                       passwordValid &&
-                        "border-emerald-500 shadow-[0_0_0_3px_rgba(16,185,129,0.2)] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-500"
+                        "border-emerald-500 shadow-[0_0_0_3px_rgba(16,185,129,0.15)] focus-visible:ring-emerald-500/30 focus-visible:border-emerald-500"
                     )}
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter password"
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
-                    onBlur={() => setPasswordTouched(true)}
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="absolute inset-y-0 right-0 h-full w-10 rounded-none text-muted-foreground hover:text-foreground"
+                    className="absolute inset-y-0 right-0 h-full w-11 rounded-none text-muted-foreground/60 hover:text-foreground"
                     onClick={() => setShowPassword((current) => !current)}
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
-                    {showPassword ? <EyeSlashIcon size={18} /> : <EyeIcon size={18} />}
+                    {showPassword ? <EyeSlashIcon size={18} weight="fill" /> : <EyeIcon size={18} weight="fill" />}
                   </Button>
                 </div>
+                {passwordInvalid && (
+                  <p className="text-[12px] text-red-600 mt-1">Please enter your password.</p>
+                )}
               </div>
 
-              <Button className="h-10 w-full rounded-none" onClick={() => router.push("/")}>
+              {/* Submit */}
+              <Button
+                className="h-11 w-full rounded-none text-[13px] font-semibold tracking-wide"
+                onClick={handleSubmit}
+              >
                 Sign in
               </Button>
 
-              <p className="text-center text-sm text-muted-foreground">
+              {/* Create account link */}
+              <p className="text-center text-[12px] text-muted-foreground pt-1">
                 Don&apos;t have an account?{" "}
-                <Link href="/create-account" className="font-medium text-primary hover:underline">
+                <Link href="/create-account" className="font-semibold text-primary hover:underline">
                   Create one
                 </Link>
               </p>
             </CardContent>
           </Card>
+
+          {/* Footer links */}
+          <div className="mt-6 flex items-center justify-center gap-4">
+            <Link href="/terms" className="text-[11px] text-white/40 hover:text-white/60 transition-colors">
+              Terms
+            </Link>
+            <span className="text-white/20">·</span>
+            <Link href="/privacy-policy" className="text-[11px] text-white/40 hover:text-white/60 transition-colors">
+              Privacy
+            </Link>
+            <span className="text-white/20">·</span>
+            <span className="text-[11px] text-white/30">
+              &copy; {new Date().getFullYear()} asesley
+            </span>
+          </div>
         </div>
       </main>
     </div>
