@@ -36,7 +36,7 @@ export default function AuthFooter() {
       <div className="mx-auto w-full max-w-6xl px-6">
         {/* Top section */}
         <div className="flex flex-col gap-10 py-12 sm:flex-row sm:items-start sm:justify-between">
-          <BrandLogo className="text-white shrink-0 [&>svg]:h-16 [&>svg]:w-16" href="/create-account" />
+          <BrandLogo className="shrink-0 [&>svg]:h-16 [&>svg]:w-16 [&>svg]:text-teal-400" href="/create-account" />
 
           <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 sm:gap-16">
             {columns.map((col) => (
