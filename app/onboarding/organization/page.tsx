@@ -34,7 +34,7 @@ export default function OnboardingOrganizationPage() {
   const actionButtonClass = "h-8 rounded-none px-6"
 
   return (
-    <OnboardingShell current="organization" email={state.email || email}>
+    <OnboardingShell current="organization">
       <Card className="mx-auto max-w-2xl rounded-none border-slate-300">
         <CardContent className="space-y-6 p-7">
           <h1 className="text-2xl font-semibold text-slate-800">

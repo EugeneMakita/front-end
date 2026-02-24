@@ -81,7 +81,7 @@ export default function PricingPage() {
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 border-b bg-white/90 backdrop-blur-lg">
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center px-6">
-          <BrandLogo href="/create-account" />
+          <BrandLogo variant="full" href="/create-account" />
           <nav className="ml-8 hidden items-center gap-7 md:flex">
             <Link href="#" className="text-[13px] font-semibold text-foreground/70 transition-colors hover:text-foreground">Product</Link>
             <Link href="/pricing" className="text-[13px] font-semibold text-foreground transition-colors hover:text-foreground">Pricing</Link>

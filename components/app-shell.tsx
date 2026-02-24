@@ -23,6 +23,7 @@ import {
   MagnifyingGlassIcon,
   GlobeIcon,
   BellIcon,
+  ChatCircleIcon,
   CaretDownIcon,
   GearIcon,
   QuestionIcon,
@@ -65,7 +66,7 @@ function TopBar({
       <div className="flex h-16 items-center gap-4 px-6">
         {/* LEFT: brand */}
         <div className="flex items-center">
-          <BrandLogo href="/library" />
+          <BrandLogo variant="full" href="/library" />
         </div>
 
         {/* SPACER */}
@@ -103,6 +104,8 @@ function TopBar({
               </div>
             </div>
 
+            {/* Icon buttons cluster: Bell + Messages */}
+            <div className="flex items-center gap-1">
             {/* Notifications Dropdown */}
             <DropdownMenu open={isNotificationsOpen} onOpenChange={handleNotificationsOpen}>
               <DropdownMenuTrigger asChild>
@@ -167,6 +170,17 @@ function TopBar({
                 </div>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            {/* Messages */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-10 w-10 rounded-none"
+              aria-label="Messages"
+            >
+              <ChatCircleIcon size={28} weight="fill" />
+            </Button>
+            </div>
 
             {/* Avatar Dropdown Menu */}
             <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
