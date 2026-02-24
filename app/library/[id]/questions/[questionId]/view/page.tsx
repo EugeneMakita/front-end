@@ -1,6 +1,5 @@
 "use client"
 
-import "mathlive"
 import Link from "next/link"
 import * as React from "react"
 import { useParams } from "next/navigation"
@@ -136,6 +135,7 @@ export default function QuestionViewPage() {
   const [showPad, setShowPad] = React.useState(false)
   const [activeTab, setActiveTab] = React.useState<"basic" | "funcs" | "trig">("basic")
   const [isMounted, setIsMounted] = React.useState(false)
+  const [isMathliveReady, setIsMathliveReady] = React.useState(false)
 
   const getField = React.useCallback(() => {
     return fieldContainerRef.current?.querySelector("math-field") as MathfieldElement | null
@@ -146,11 +146,27 @@ export default function QuestionViewPage() {
   }, [])
 
   React.useEffect(() => {
-    if (!isMounted) {
+    let cancelled = false
+
+    void (async () => {
+      await import("mathlive")
+      await customElements.whenDefined("math-field")
+      if (!cancelled) {
+        setIsMathliveReady(true)
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  React.useEffect(() => {
+    if (!isMounted || !isMathliveReady) {
       return
     }
     const field = getField()
-    if (!field) {
+    if (!field || typeof field.setOptions !== "function") {
       return
     }
 
@@ -247,7 +263,7 @@ export default function QuestionViewPage() {
       field.removeEventListener("keydown", onKeyDown)
       field.removeEventListener("contextmenu", onContextMenu, true)
     }
-  }, [getField, isMounted])
+  }, [getField, isMathliveReady, isMounted])
 
   const insertLatex = React.useCallback((latex: string) => {
     const field = getField()

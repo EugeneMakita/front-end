@@ -2,7 +2,7 @@
 
 import * as React from "react"
 
-export type SetupType = "classes" | "school" | "district" | "home-school"
+export type SetupType = "homeschool" | "friends" | "course" | "solo" | "tutoring" | "other"
 
 export type TeamInvite = {
   name: string
@@ -13,6 +13,7 @@ export type TeamInvite = {
 export type OnboardingState = {
   email: string
   setupType: SetupType | null
+  workRole: string
   firstName: string
   lastName: string
   country: string
@@ -31,6 +32,7 @@ const STORAGE_KEY = "onboarding-state-v1"
 const DEFAULT_STATE: OnboardingState = {
   email: "",
   setupType: null,
+  workRole: "",
   firstName: "",
   lastName: "",
   country: "Canada",

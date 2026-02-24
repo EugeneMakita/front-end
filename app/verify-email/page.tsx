@@ -90,7 +90,7 @@ export default function VerifyEmailPage() {
 
       {/* Header */}
       <header className="relative z-10 flex justify-center px-6 pt-10 pb-6">
-        <BrandLogo className="text-white" href="/create-account" />
+        <BrandLogo variant="full" className="text-white" href="/create-account" />
       </header>
 
       {/* Main */}

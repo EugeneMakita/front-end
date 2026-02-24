@@ -5,18 +5,20 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 import { OnboardingShell } from "@/app/onboarding/_components/onboarding-shell"
-import { type SetupType, useOnboardingState } from "@/app/onboarding/_components/onboarding-state"
+import { useOnboardingState } from "@/app/onboarding/_components/onboarding-state"
 
-const options: Array<{ key: SetupType; label: string }> = [
-  { key: "homeschool", label: "Home schooling with kids" },
-  { key: "friends", label: "Practice with friends" },
-  { key: "course", label: "Join a school course" },
-  { key: "solo", label: "Solo study" },
-  { key: "tutoring", label: "Tutoring" },
+const options = [
+  { key: "entrepreneur", label: "Entrepreneur / Business owner" },
+  { key: "student", label: "Student" },
+  { key: "influencer", label: "Influencer / Content creator" },
+  { key: "educator", label: "Educator" },
+  { key: "developer", label: "Software developer" },
+  { key: "designer", label: "Designer / Graphic artist" },
+  { key: "marketer", label: "Marketer" },
   { key: "other", label: "Other" },
 ]
 
-export default function OnboardingSetupPage() {
+export default function OnboardingRolePage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const email = searchParams.get("email") || ""
@@ -24,11 +26,11 @@ export default function OnboardingSetupPage() {
   const [otherText, setOtherText] = React.useState("")
   const otherInputRef = React.useRef<HTMLInputElement>(null)
 
-  const otherSelected = state.setupType === "other"
-  const canContinue = state.setupType !== null && (state.setupType !== "other" || otherText.trim().length > 0)
+  const otherSelected = state.workRole === "other"
+  const canContinue = state.workRole.length > 0 && (state.workRole !== "other" || otherText.trim().length > 0)
 
-  function handleSelect(key: SetupType) {
-    update({ setupType: key })
+  function handleSelect(key: string) {
+    update({ workRole: key })
     if (key === "other") {
       setTimeout(() => otherInputRef.current?.focus(), 0)
     }
@@ -36,21 +38,19 @@ export default function OnboardingSetupPage() {
 
   return (
     <OnboardingShell
-      current="setup"
-      onContinue={() => router.push("/onboarding/role")}
+      current="role"
+      onBack={() => router.push("/onboarding/setup")}
+      onContinue={() => router.push("/onboarding/organization")}
       canContinue={canContinue}
     >
       <div>
         <h1 className="text-[1.75rem] font-semibold leading-snug tracking-[-0.018em] text-zinc-900">
-          What do you want to use noocra for?
+          What kind of work do you do?
         </h1>
-        <p className="mt-2 text-sm leading-relaxed text-zinc-400">
-          If you have a few reasons, pick the main one.
-        </p>
 
         <div className="mt-8 flex flex-wrap gap-2.5">
           {options.map((option) => {
-            const selected = state.setupType === option.key
+            const selected = state.workRole === option.key
             return (
               <button
                 key={option.key}
@@ -74,7 +74,7 @@ export default function OnboardingSetupPage() {
           <div className="mt-6 max-w-sm animate-in fade-in slide-in-from-top-2 duration-200">
             <Input
               ref={otherInputRef}
-              placeholder="Tell us more…"
+              placeholder="Please specify"
               value={otherText}
               onChange={(e) => setOtherText(e.target.value)}
               className="h-12 rounded-xl border-zinc-200 bg-white text-[13px] placeholder:text-zinc-400 focus-visible:border-primary/50 focus-visible:ring-primary/20"
